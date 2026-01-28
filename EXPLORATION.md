@@ -44,8 +44,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 2: The Structure of Justification
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59)
-**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md, thread-2.20-completeness.md, thread-2.25-dual-monoid-grading.md, thread-2.18-conservative-extension.md, thread-2.21-decidable-fragments.md, thread-2.17-justification-equivalence.md, thread-2.15-choice-construct.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60)
+**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md, thread-2.20-completeness.md, thread-2.25-dual-monoid-grading.md, thread-2.18-conservative-extension.md, thread-2.21-decidable-fragments.md, thread-2.17-justification-equivalence.md, thread-2.15-choice-construct.md, thread-2.23-confidence-subtyping.md)
 
 **Core question answered**: Are trees adequate for justification? **NO.**
 
@@ -139,6 +139,17 @@ What IS confidence for an LLM?
 - **Decidability**: Adding choice doesn't affect decidability of CLAIR fragments
 - See exploration/thread-2.15-choice-construct.md
 
+**Findings (Session 60) - Subtyping for Confidence**:
+- **Subtyping is sound and natural**: Belief<A>[c] <: Belief<A>[c'] when c >= c' (higher confidence is subtype)
+- **Direction is opposite from resource grading**: In CLAIR, more confidence = subtype; in resource systems, less usage = subtype
+- **Both × and ⊕ are monotone**: Subtyping composes correctly with derivation and aggregation
+- **Non-distributivity doesn't affect subtyping**: The dual-monoid structure is orthogonal to subtyping soundness
+- **Static bounds interpretation**: Types express construction-time guarantees; actual confidence may decrease at runtime due to defeat
+- **Function types follow standard variance**: Contravariant in argument confidence, covariant in result confidence
+- **Bidirectional type checking recommended**: Better inference with explicit subsumption at mode-switching points
+- **Prior work engaged**: Refinement types (Rondon 2008, Vazou 2014), graded types (Orchard 2019)
+- See exploration/thread-2.23-confidence-subtyping.md
+
 **Questions remaining**:
 - Q2.2: How do I (Claude) actually form beliefs? → Thread 9
 - Q2.15: ✓ Choice construct designed — Session 59. Uses max semantics; commutative, associative, idempotent; distributes with undercut and aggregate
@@ -147,6 +158,7 @@ What IS confidence for an LLM?
 - Q2.20: ✓ Completeness proven for rational confidence — Session 54
 - Q2.21: ✓ Decidable fragments characterized — Session 57. CLAIR-finite and CLAIR-stratified are decidable; full CLAIR likely undecidable (Vidal 2019)
 - Q2.22: ✓ Proof terms (Curry-Howard) — Session 53
+- Q2.23: ✓ Subtyping for confidence — Session 60. Higher confidence is subtype; both × and ⊕ monotone; compatible with dual-monoid structure
 - Q2.25: ✓ Dual-monoid grading formalized — Session 55
 
 ---
