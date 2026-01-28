@@ -70,8 +70,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 3: Self-Reference and Introspection
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27)
-**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27, 29, 32, 33)
+**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md, thread-3.20-cpl-finite-formalization.md, thread-3.21-cpl-godel-variant.md, thread-3.22-cpl-undecidability.md)
 
 CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 
@@ -133,6 +133,20 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - Complete formal proof requires additional technical verification
 - Practical stance unchanged: assume undecidable, use decidable fragments
 - See exploration/thread-3.22-cpl-undecidability.md
+
+**CPL-Gödel Variant (Session 33)**:
+- Investigated CPL using Gödel algebra (min/max) instead of product (×/⊕)
+- **Key finding**: CPL-Gödel likely decidable (0.70 confidence) because:
+  - Gödel t-norm (min) is idempotent: min(a,a) = a
+  - Vidal undecidability relies on Archimedean property that Gödel lacks
+  - Caicedo et al. (2017) prove Gödel K4 decidable via quasimodels
+- **CRITICAL**: CPL-Gödel is semantically inappropriate for CLAIR:
+  - max-disjunction fails evidence aggregation (max(0.6, 0.6) = 0.6, not ~0.84)
+  - min-conjunction loses confidence degradation (min(a,a) = a, no derivation cost)
+  - Anti-bootstrapping becomes frame-only (no algebraic c² discount)
+- **Trade-off clarified**: Decidability vs Semantic Fidelity
+- **Recommendation**: CPL-finite remains the appropriate decidable fragment
+- See exploration/thread-3.21-cpl-godel-variant.md
 
 ---
 
@@ -1532,3 +1546,67 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Dissertation will be completed" → MAINTAINED (confidence: 0.85)
 - **Status**: Task 10.1 IN PROGRESS (Chapter 1 of 13 complete + structure)
 - **Next**: Chapters 2-13, appendices, bibliography
+
+### Session 31: Lean 4 Implementation (Task 8.1-impl)
+- **LEAN 4 PROJECT FULLY IMPLEMENTED AND COMPILING**
+- **Core deliverables created**:
+  - Full Lean 4 project at `formal/lean/` with lakefile.lean
+  - Five confidence operation modules: Basic, Min, Oplus, Undercut, Rebut
+  - All proofs compiling with Mathlib 4
+- **Technical achievements**:
+  - ~800 lines of verified Lean 4 code
+  - ~70+ theorems proven across modules
+  - Uses Mathlib's unitInterval as Confidence type
+  - All algebraic properties verified: commutativity, associativity, identity, boundedness
+- **Key proofs completed**:
+  - min_assoc: Full associativity proof for min operation
+  - oplus_assoc: Full associativity proof for ⊕ operation
+  - undercut_compose: Sequential undercuts compose via ⊕
+  - rebut_add_rebut_swap: Symmetry of rebuttal
+  - All boundedness preservation theorems
+- **Beliefs updated**:
+  - "Lean formalization feasible" → CONFIRMED (confidence: 0.95)
+  - "Confidence algebra is sound" → MACHINE-VERIFIED (confidence: 1.0 for proven theorems)
+- **Status**: Task 8.1-impl COMPLETE
+- **Next**: Tasks 8.10 (Belief type), 8.11 (Stratified levels)
+
+### Session 32: CPL Undecidability Proof Strategy (Task 3.22)
+- **UNDECIDABILITY ARGUMENT STRENGTHENED**
+- **Core finding**: Proof strategy via reduction from recurrent tiling established
+- **Key insight**: Converse well-foundedness (Löb constraint) doesn't rescue decidability
+  - Allows backward-looking infinite frames: R(wᵢ, wⱼ) > 0 iff j < i
+  - Tiling encoding can be adapted to this structure
+- **Confidence updated**:
+  - CPL undecidable: 0.80 (↑ from 0.75)
+  - Via reduction from tiling: 0.65
+  - Löb doesn't rescue decidability: 0.85
+- **Output**: exploration/thread-3.22-cpl-undecidability.md
+- **Status**: Task 3.22 SUBSTANTIALLY EXPLORED
+- **Practical stance unchanged**: Assume undecidable, use CPL-finite or stratification
+
+### Session 33: CPL-Gödel Variant Investigation (Task 3.21)
+- **CPL-GÖDEL VARIANT ANALYZED FOR DECIDABILITY**
+- **Core question**: Can switching from product algebra (×, ⊕) to Gödel algebra (min, max) rescue decidability?
+- **Key findings**:
+  - CPL-Gödel is **likely decidable** (0.70 confidence)
+  - Gödel t-norm (min) is idempotent: min(a,a) = a
+  - Vidal undecidability relies on Archimedean property that Gödel lacks
+  - Caicedo et al. (2017) prove Gödel K4 decidable via quasimodels
+  - Adding Löb constraint shouldn't break this (restricts frames, not expands them)
+- **CRITICAL**: CPL-Gödel is semantically inappropriate for CLAIR:
+  - max-disjunction fails evidence aggregation: max(0.6, 0.6) = 0.6 (should be ~0.84)
+  - min-conjunction loses confidence degradation: min(a,a) = a (no derivation cost)
+  - Anti-bootstrapping becomes frame-only (no algebraic c² discount)
+  - "Multiple witnesses increase confidence" is a core CLAIR property
+- **Trade-off clarified**: Decidability vs Semantic Fidelity
+  - CPL-Gödel: Decidable but wrong operations
+  - CPL (product): Right operations but undecidable
+  - CPL-finite: Decidable AND preserves semantics (via rounding)
+- **Recommendation**: CPL-finite remains the appropriate decidable fragment for CLAIR
+- **Prior art engaged**: Caicedo-Metcalfe (2013, 2017), Vidal (2019), t-norm theory
+- **Output**: exploration/thread-3.21-cpl-godel-variant.md
+- **Status**: Task 3.21 EXPLORED
+- **Beliefs updated**:
+  - "CPL-Gödel decidable" → NEW (confidence: 0.70)
+  - "CPL-Gödel semantically appropriate" → REJECTED (confidence: 0.15)
+  - "CPL-finite is best decidable fragment" → CONFIRMED (confidence: 0.90)

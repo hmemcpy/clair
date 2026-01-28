@@ -83,7 +83,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 **New tasks discovered (Session 25)**:
 - [x] **3.20 CPL-finite formalization** - ANSWERED Session 29: CPL-finite fully formalized with L₅ = {0, 0.25, 0.5, 0.75, 1}. Key finding: no finite lattice is closed under c², requiring floor rounding for g_L(c) = floor_L(c²). Decidability established via finite model property (Bou et al. 2011). PSPACE-completeness conjectured. See exploration/thread-3.20-cpl-finite-formalization.md
-- [ ] **3.21 CPL-Gödel variant** - Investigate CPL using Gödel algebra (min/max) instead of product; may be decidable
+- [x] **3.21 CPL-Gödel variant** - EXPLORED Session 33: CPL-Gödel (using min/max instead of ×/⊕) is likely decidable (0.70 confidence) because Gödel t-norm's idempotence prevents Vidal-style encoding tricks. However, CPL-Gödel is NOT semantically appropriate for CLAIR: max-disjunction fails to capture evidence aggregation, min-conjunction lacks confidence degradation. Recommendation: use CPL-finite instead. See exploration/thread-3.21-cpl-godel-variant.md
 - [x] **3.22 Undecidability proof** - SUBSTANTIALLY EXPLORED Session 32: Proof strategy via reduction from recurrent tiling established. Key finding: converse well-foundedness (Löb constraint) allows backward-looking infinite frames, so doesn't rescue decidability. Confidence increased to 0.80 that CPL is undecidable. Complete formal proof requires additional technical verification. See exploration/thread-3.22-cpl-undecidability.md
 
 ### Thread 4: Grounding
@@ -1190,6 +1190,34 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Use stratification as primary safety mechanism
     - Use CPL-finite where decidability required
     - Document evidence in dissertation
+
+### Session 33 Discoveries (Task 3.21 CPL-Gödel Variant)
+
+179. **CPL-GÖDEL VARIANT ANALYZED** — Switching to Gödel algebra (min/max) likely provides decidability but loses semantic fit.
+
+180. **Key finding: Gödel t-norm escapes Vidal undecidability**:
+    - Vidal's proof relies on Archimedean property (a^n → 0)
+    - Gödel min is idempotent: min(a,a) = a
+    - Encoding tricks that work for product/Łukasiewicz fail for Gödel
+    - Caicedo-Metcalfe (2017) prove Gödel K4 decidable via quasimodels
+
+181. **CPL-Gödel is likely decidable** (0.70 confidence):
+    - Gödel K4 is PSPACE-complete (proven)
+    - Adding Löb restricts frames, shouldn't increase complexity
+    - Quasimodel construction should extend
+
+182. **CRITICAL: CPL-Gödel semantically inappropriate for CLAIR**:
+    - max-disjunction fails evidence aggregation: max(0.6, 0.6) = 0.6 (should compound!)
+    - min-conjunction loses confidence degradation: min(a,a) = a (no cost for derivation)
+    - Anti-bootstrapping becomes frame-only (no algebraic c² discount)
+    - "Multiple witnesses increase confidence" is a core CLAIR property
+
+183. **Trade-off clarified: Decidability vs Semantic Fidelity**:
+    - CPL-Gödel: Decidable but wrong operations
+    - CPL (product): Right operations but undecidable
+    - CPL-finite: Decidable AND preserves semantics (via rounding)
+
+184. **Recommendation confirmed**: CPL-finite remains the appropriate decidable fragment for CLAIR. CPL-Gödel is theoretically interesting but not practically useful.
 
 ## Impossibilities Encountered
 
