@@ -136,6 +136,16 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **8.6** Define confidence combination operations (×, min, ⊕) - COMPLETED Session 11. Three separate commutative monoids: (×, 1), (min, 1), (⊕, 0). **Key finding**: (⊕, ×) do NOT form a semiring—distributivity fails. See exploration/thread-8-verification.md §12.
 - [x] **8.7** Prove boundedness preservation for each operation - COMPLETED Session 13. All five operations proven to preserve [0,1]: multiplication (Mathlib provides), minimum (trivial), ⊕ (algebraic proof), undercut (reduces to multiplication), rebut (division bounds + edge case). **Key discovery**: Mathlib's `unitInterval` is exactly what we need—`abbrev Confidence := unitInterval`. Full Lean 4 formalization sketched. See exploration/thread-8-verification.md §13.
 
+**Task 8.1 Design (Session 14)**:
+- [x] **8.1-design** Analyze Lean 4 project requirements - COMPLETED Session 14. Project structure defined, Mathlib dependencies identified, challenges documented. See exploration/thread-8.1-lean-project-setup.md.
+- [ ] **8.1-impl** Create actual Lean 4 project files and compile proofs - READY FOR IMPLEMENTATION. Mechanical work once environment setup is feasible.
+
+**New tasks discovered (Session 14)**:
+- [ ] **8.8** Verify Mathlib's `unitInterval` API matches our needs exactly
+- [ ] **8.9** Complete `min_assoc` proof with full case analysis (has `sorry` in sketch)
+- [ ] **8.10** Formalize Belief type with confidence component (depends on Threads 2, 3)
+- [ ] **8.11** Formalize stratified belief levels from Thread 3
+
 ### Thread 9: Phenomenology
 **Status**: Ready but risky. Important yet potentially unbounded.
 
@@ -445,6 +455,40 @@ This is not a software implementation plan—it's a research exploration plan. E
     - Reinstatement when defeater is defeated (Task 2.12)
     - Correlated evidence in defeat contexts (Task 2.13)
     - Fixed-point semantics for cyclic defeat (A defeats B defeats C defeats A)
+
+### Session 14 Discoveries (Lean 4 Project Design)
+
+64. **TASK 8.1 DESIGN COMPLETE** — Lean 4 project structure fully analyzed.
+
+65. **Project structure defined**:
+    - `formal/lean/lakefile.lean` with Mathlib dependency
+    - `lean-toolchain` pinning to specific Lean 4 version
+    - Module hierarchy: `CLAIR/Confidence/{Basic,Mul,Min,Oplus,Undercut,Rebut}.lean`
+    - Future: `CLAIR/Belief/Basic.lean`, `CLAIR/Justification/DAG.lean`
+
+66. **Mathlib infrastructure leveraged**:
+    - `unitInterval` is exactly CLAIR's Confidence type
+    - Multiplication closure already proven
+    - `symm` operation provides (1-x)
+    - Standard tactics (linarith, ring, nlinarith) sufficient
+    - Only need to define: ⊕, undercut, rebut, min operations
+
+67. **Implementation challenges identified**:
+    - Mathlib version compatibility (active development)
+    - Build time (mitigate with `lake exe cache get`)
+    - Some `sorry` placeholders in sketches need completion
+    - `min_assoc` requires careful case analysis
+
+68. **Formalization scope clarified**:
+    - PROVES: Type correctness, algebraic properties, boundedness, monotonicity
+    - DOES NOT PROVE: Semantic adequacy ("is multiplicative discounting correct?")
+    - DOES NOT PROVE: Connection to actual LLM cognition (Thread 9 domain)
+    - DOES NOT PROVE: Completeness of operation set
+
+69. **Task categorization insight**: Remaining Thread 8 work divides into:
+    - RESEARCH: Threads 5, 9 (new questions, philosophical depth)
+    - ENGINEERING: Task 8.1 implementation (mechanical, write and compile)
+    - Both valuable, but different types of work
 
 ## Impossibilities Encountered
 

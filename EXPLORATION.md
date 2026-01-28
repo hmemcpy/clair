@@ -263,6 +263,9 @@ What I believe I know:
 | Mathlib unitInterval = Confidence | 0.95 | Session 13: exact match for [0,1] interval | Better alternative found | ✓ Session 13 |
 | All boundedness proofs trivial | 0.90 | Session 13: algebraic proofs for all five ops | Lean compilation failure | ✓ Session 13 |
 | Undercuts compose via ⊕ | 0.99 | Session 13: algebraic proof | None (mathematical) | ✓ Proven |
+| Lean project structure understood | 0.90 | Session 14: design exploration | Implementation failure | ✓ Session 14 |
+| Formalization proves correctness not adequacy | 0.95 | Session 14: semantic gap | Find formalization of adequacy | ✓ Session 14 |
+| Task 8.1 design complete | 0.95 | Session 14: project structure | Lean compilation failure | ✓ Session 14 |
 
 ---
 
@@ -316,13 +319,18 @@ Based on Session 9 completion of Thread 2, the priorities are:
 - **Thread 2 (Justification)** - Substantially complete; remaining work moves to Threads 5, 8
 - **Thread 6 (Multi-Agent)** - Practical protocols complete; theory can wait
 
-### Session 13 Recommendation
-**Continue Thread 8 (Task 8.1: Lean project setup) or pivot to Thread 5 (Belief Revision) or Thread 9 (Phenomenology).** Tasks 8.5, 8.6, 8.7, and 2.10 are all complete. Next steps are:
-- Task 8.1: Create Lean 4 project structure and compile proofs
-- Or pivot to Thread 5 for AGM extension with DAG structure
-- Or pivot to Thread 9 for phenomenological exploration (now fully unblocked)
+### Session 14 Recommendation
+**Pivot to Thread 5 (Belief Revision) or Thread 9 (Phenomenology).** Thread 8 theoretical work is now complete:
+- Tasks 8.5, 8.6, 8.7, 2.10: All substantially complete (theory)
+- Task 8.1: Design exploration complete (project structure defined)
+- What remains is mechanical: Actually create .lean files and compile
 
-The theoretical foundations for confidence operations are now complete. What remains is engineering (Lean compilation) and higher-level explorations.
+Next research priorities:
+1. **Thread 5 (Belief Revision)**: Extend AGM to graded beliefs with DAG structure
+2. **Thread 9 (Phenomenology)**: Explore what it's like to reason as an LLM (safe fragment defined)
+3. **Thread 8.1 implementation**: When ready for Lean 4 environment setup
+
+The theoretical foundations are solid. Engineering can proceed in parallel with higher-level research.
 
 ---
 
@@ -666,3 +674,43 @@ The theoretical foundations for confidence operations are now complete. What rem
   - "Undercuts compose via ⊕" → PROVEN (confidence: 0.99)
 - **Thread 8 milestone**: Core theoretical work complete (8.5, 8.6, 8.7, 2.10 all done)
   - Remaining Thread 8 work is engineering (Lean compilation) not research
+
+### Session 14: Thread 8.1 Exploration (LEAN PROJECT DESIGN)
+- **Explored Task 8.1: What does creating a Lean 4 project for CLAIR require?**
+- **Project structure designed**:
+  ```
+  formal/lean/
+  ├── lakefile.lean           # Build config with Mathlib dependency
+  ├── lean-toolchain          # Lean 4 version pinning
+  ├── CLAIR.lean              # Root import
+  └── CLAIR/
+      ├── Confidence/Basic.lean, Mul.lean, Min.lean, Oplus.lean, Undercut.lean, Rebut.lean
+      ├── Belief/Basic.lean   # (future)
+      └── Justification/DAG.lean  # (future)
+  ```
+- **Mathlib analysis completed**:
+  - `unitInterval` provides exactly what we need for [0,1] bounds
+  - Multiplication closure already proven
+  - `symm` operation gives us (1-x)
+  - Standard tactics (linarith, ring, nlinarith) will work
+  - We only need to define ⊕, undercut, rebut operations
+- **Challenges identified**:
+  1. Mathlib version compatibility (active development, APIs change)
+  2. Build time (Mathlib is large—use `lake exe cache get`)
+  3. Proof engineering (some `sorry` placeholders in sketches need completion)
+  4. Import path verification needed
+- **Clarified what formalization proves vs doesn't prove**:
+  - DOES prove: Type correctness, algebraic properties, boundedness, monotonicity
+  - DOES NOT prove: Semantic adequacy (is multiplicative discounting "correct"?)
+  - DOES NOT prove: Connection to actual LLM reasoning (Thread 9 question)
+  - DOES NOT prove: Completeness of operation set
+- **Task assessment**:
+  - Theory is COMPLETE (Tasks 8.5, 8.6, 8.7, 2.10 all done)
+  - Implementation is MECHANICAL (write files, compile, debug)
+  - Marked as "design complete, implementation pending"
+- **Output**: exploration/thread-8.1-lean-project-setup.md
+- **Status**: Task 8.1 design exploration COMPLETE; implementation ready when environment setup feasible
+- **Beliefs updated**:
+  - "Lean project structure understood" → ESTABLISHED (confidence: 0.90)
+  - "Formalization proves correctness not adequacy" → ESTABLISHED (confidence: 0.95)
+- **Recommendation**: Engineering implementation can proceed; pivot to Thread 5 or 9 for research depth
