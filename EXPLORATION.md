@@ -281,6 +281,30 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
   - Computational: 25-entry operation tables fit efficiently
 - See exploration/thread-3.27-optimal-lattice-choice.md
 
+**Fixed-Point Computation Complexity (Session 67)**:
+- **Task 3.12 answered**: How expensive is fixed-point computation for self-referential beliefs?
+- **Key finding**: Complexity varies by domain type:
+  - Finite domains: O(|domain|), always decidable by enumeration
+  - Continuous [0,1]: O(log(1/ε)), always converges (Brouwer existence + iteration)
+  - Contractive functions: Geometric convergence with Lipschitz constant L < 1 (Banach)
+  - General computable: Undecidable (Rice's theorem)
+- **Compile-time decidable patterns**:
+  - Constant confidence: c' = k (trivial)
+  - Linear confidence: c' = a×c + b with a ≠ 1 (closed-form: c* = b/(1-a))
+  - Finite content × finite confidence: Enumeration
+  - Monotone on lattices: Tarski's theorem
+  - Stratified self-reference: Type-level check
+- **Dangerous patterns** (runtime or error):
+  - Negation/oscillation (Liar-like): May have no fixed point
+  - Curry patterns: Detectable syntactically, reject
+  - Halting dependency: Undecidable, requires timeout
+- **Prior art connections**: Abstract interpretation (Cousot), stratified Datalog, well-founded semantics, μ-calculus
+- **Design recommendations**:
+  - Default to stratification (always compile-time)
+  - Require domain annotations for `self_ref_belief`
+  - Bounded iteration with convergence detection + timeout at runtime
+- See exploration/thread-3.12-fixedpoint-complexity.md
+
 ---
 
 ### Thread 4: The Grounding Problem
@@ -756,6 +780,13 @@ What I believe I know:
 | Progress/Preservation standard for CLAIR | 0.80 | Session 65: graded types don't change proof structure | Find grading-specific issue | ✓ Session 65 |
 | Two confidence levels (object/meta) | 0.85 | Session 65: types vs judgments carry different confidences | Find unification | ✓ Session 65 |
 | Preservation allows confidence change | 0.90 | Session 65: defeat decreases, substitution may increase | Find direction constraint | ✓ Session 65 |
+| Fixed-point complexity varies by domain | 0.90 | Session 67: finite vs continuous vs general | Find uniform complexity | ✓ Session 67 |
+| Finite domain fixed points decidable | 0.95 | Session 67: enumeration O(|domain|) | Find undecidable finite case | ✓ Session 67 |
+| Continuous [0,1] fixed points converge | 0.90 | Session 67: Brouwer existence + iteration | Find non-convergent case | ✓ Session 67 |
+| General fixed-point undecidable | 0.95 | Session 67: Rice's theorem | Find decidable general case | ✓ Session 67 |
+| Compile-time fixed-point for special cases | 0.85 | Session 67: constant, linear, monotone, finite | Find compile-time failure | ✓ Session 67 |
+| Stratification always compile-time checkable | 0.95 | Session 67: type-level, no runtime | Find dynamic stratification need | ✓ Session 67 |
+| Runtime timeout needed for general case | 0.90 | Session 67: bounded iteration + timeout | Find better termination proof | ✓ Session 67 |
 
 ---
 
@@ -2380,9 +2411,53 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "CLAIR is closer to graded linear logic" → NEW (confidence: 0.85)
   - "Contraction is aggregative" → KEY FINDING (confidence: 0.95)
 
+### Session 67: Fixed-Point Computation Complexity (Task 3.12)
+
+- **COMPLETED TASK 3.12**: How expensive is fixed-point computation for self-referential beliefs?
+- **Key finding**: Complexity varies dramatically by domain type:
+  - Finite domains: O(|domain|), always decidable by exhaustive enumeration
+  - Continuous [0,1]: O(log(1/ε)), always converges (Brouwer existence + iteration)
+  - Contractive functions: Geometric convergence with Lipschitz constant L < 1 (Banach)
+  - General computable: Undecidable (Rice's theorem)
+- **Compile-time decidable patterns identified**:
+  - Constant confidence (c' = k): Trivially decidable
+  - Linear confidence (c' = a×c + b, a ≠ 1): Closed-form c* = b/(1-a)
+  - Finite content × finite confidence: Enumerate all pairs
+  - Monotone on lattices: Tarski's theorem guarantees least/greatest
+  - Stratified self-reference: Type-level check, no runtime needed
+- **Dangerous patterns requiring runtime or rejection**:
+  - Negation/oscillation (Liar-like): May have no fixed point
+  - Curry patterns: Detectable syntactically, reject at compile time
+  - Halting dependency: Undecidable, requires timeout mechanism
+- **Prior art surveyed**:
+  - Kleene's First/Second Recursion Theorems
+  - Tarski's Lattice-Theoretic Fixed-Point Theorem (monotone on CPO)
+  - Rice's Theorem (semantic properties undecidable)
+  - Abstract interpretation (Cousot): Widening/narrowing for acceleration
+  - Stratified Datalog (Van Gelder): Stratification prevents negation cycles
+  - Well-founded semantics: Three-valued fixed points
+  - μ-calculus model checking: O(|φ| × |S|) for finite state spaces
+- **Design recommendations**:
+  - Default to stratification (compile-time safe)
+  - Require domain annotations for `self_ref_belief`
+  - Compiler performs syntactic analysis → domain analysis → contractivity check
+  - Runtime uses bounded iteration with convergence detection + timeout
+  - Return structured results: Unique/Multiple/None
+- **New tasks discovered**:
+  - 3.28: Automatic contractivity detection
+  - 3.29: Gradual self-reference typing
+  - 3.30: Löb discount and fixed points interaction
+  - 3.31: Probabilistic approximation for undecidable cases
+- **Output**: exploration/thread-3.12-fixedpoint-complexity.md
+- **Beliefs updated**:
+  - "Fixed-point complexity varies by domain" → ESTABLISHED (confidence: 0.90)
+  - "Finite domains decidable" → PROVEN (confidence: 0.95)
+  - "General case undecidable" → PROVEN (confidence: 0.95)
+  - "Stratification is always compile-time" → ESTABLISHED (confidence: 0.95)
+
 ### CLAIR EXPLORATION CONTINUES
 
-The CLAIR exploration project has reached its conclusion after 47 sessions. Key accomplishments:
+The CLAIR exploration project continues with 32 remaining tasks. Key accomplishments so far:
 
 1. **Theoretical Foundations**: Nine foundational threads explored to substantial completion
 2. **Novel Contributions**: CPL (first graded provability logic), confidence algebra (three monoids), DAG justification with defeat semantics

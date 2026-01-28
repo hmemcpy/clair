@@ -87,10 +87,16 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **3.11** Gupta & Belnap, "The Revision Theory of Truth" - Revision sequences, categorical truth
 
 **New tasks discovered (Session 8)**:
-- [ ] **3.12 Fixed-point computation complexity** - How expensive? Can some cases be decided at compile time?
+- [x] **3.12 Fixed-point computation complexity** - ANSWERED Session 67: Complexity varies by domain. Finite domains: O(|domain|), decidable. Continuous [0,1]: O(log(1/ε)), convergent. General: undecidable (Rice's theorem). Compile-time analysis possible for constant, linear, finite, monotone, and stratified cases. See exploration/thread-3.12-fixedpoint-complexity.md
 - [x] **3.13 Graded provability logic** - ANSWERED Session 22: Literature gap confirmed. Proposed CPL (Confidence-Bounded Provability Logic) with graded Löb axiom. Key finding: self-soundness claims cap confidence via anti-bootstrapping theorem. See exploration/thread-3.13-graded-provability-logic.md
 - [ ] **3.14 Unbounded quantification** - How to handle "beliefs about all my beliefs"?
 - [ ] **3.15 Formalize stratification in Lean** - Moves to Thread 8
+
+**New tasks discovered (Session 67)**:
+- [ ] **3.28 Automatic contractivity detection** - What syntactic patterns guarantee |f'| < 1 for automatic convergence proof?
+- [ ] **3.29 Gradual self-reference typing** - Should CLAIR allow unchecked self-reference with incremental verification?
+- [ ] **3.30 Löb discount and fixed points** - How does g(c) = c² interact with fixed-point computation?
+- [ ] **3.31 Probabilistic fixed-point approximation** - Can random sampling provide useful bounds for undecidable cases?
 
 **New tasks discovered (Session 22)**:
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
@@ -2098,6 +2104,48 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Task 8.2: Prove progress and preservation (requires weakening, substitution lemmas)
     - Task 8.3: Prove confidence soundness (connect syntax to semantic types)
     - Task 8.4: Extract runnable interpreter
+
+### Session 67 Discoveries (Task 3.12 Fixed-Point Computation Complexity)
+
+331. **FIXED-POINT COMPLEXITY CHARACTERIZED** — Complexity varies dramatically by domain, from decidable to undecidable.
+
+332. **Domain-dependent complexity results**:
+    - Finite domains: O(|domain|), always decidable by enumeration
+    - Continuous [0,1]: O(log(1/ε)), always converges (Brouwer guarantees existence)
+    - Contractive functions: Geometric convergence rate, unique fixed point (Banach)
+    - General computable functions: Undecidable (Rice's theorem)
+
+333. **Compile-time decidable cases identified**:
+    - Constant confidence: c' = k (trivially decidable)
+    - Linear confidence: c' = a×c + b with a ≠ 1 (closed-form: c* = b/(1-a))
+    - Finite content × finite confidence: Enumerate all (|Content| × |L_n|) pairs
+    - Monotone functions on lattices: Tarski guarantees least/greatest fixed point
+    - Stratified self-reference: Type-level check, no runtime needed
+
+334. **Syntactic patterns requiring runtime**:
+    - General continuous functions: Iteration with convergence detection
+    - Liar-like patterns (negation): May have no fixed point
+    - Curry-like patterns: Detectable syntactically, should reject
+    - Unbounded computation: Requires timeout mechanism
+
+335. **Design recommendations for CLAIR**:
+    - Default to stratification (always compile-time safe)
+    - Require domain annotations for `self_ref_belief`
+    - Compiler performs syntactic analysis before domain analysis
+    - Runtime uses bounded iteration with convergence detection + timeout
+    - Return structured results: `Unique(belief)`, `Multiple(beliefs)`, `None(reason)`
+
+336. **Prior art connections established**:
+    - Abstract interpretation (Cousot): Widening/narrowing for acceleration
+    - Stratified Datalog (Van Gelder): Stratification prevents negation cycles
+    - Well-founded semantics: Three-valued (true/false/undefined) for Liar-like cases
+    - μ-calculus model checking: O(|φ| × |S|) for finite state spaces
+
+337. **New questions raised by this exploration**:
+    - Task 3.28: Automatic contractivity detection
+    - Task 3.29: Gradual self-reference typing
+    - Task 3.30: Löb discount and fixed points interaction
+    - Task 3.31: Probabilistic approximation for undecidable cases
 
 ## Impossibilities Encountered
 
