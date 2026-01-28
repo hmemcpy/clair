@@ -65,7 +65,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **New tasks discovered (Session 53)**:
 - [ ] **2.23 Subtyping for confidence** - Should Belief<A>[c] be subtype of Belief<A>[c'] when c ≥ c'?
 - [ ] **2.24 Type inference for confidence** - Can confidence bounds be inferred automatically?
-- [ ] **2.25 Dual-monoid grading formalization** - Formalize the two-sorted grading structure for × and ⊕
+- [x] **2.25 Dual-monoid grading formalization** - SUBSTANTIALLY COMPLETE Session 55: CLAIR's confidence algebra is a De Morgan bimonoid—two commutative monoids connected by an involution (symm) but without distributivity. Key findings: (1) Non-distributivity is mathematically fundamental (t-norm/t-conorm pairs don't distribute), (2) Double Residuated Lattices (Orłowska & Radzikowska 2002) and Linearly Distributive Categories (Cockett & Seely 1997) address similar structures, (3) CLAIR's type system naturally separates × (derivation) and ⊕ (aggregation) so distributivity is never needed, (4) Standard graded type theory assumes semiring grades but CLAIR requires weaker bimonoid structure, (5) Lean formalization should add DeMorganBimonoid typeclass. See exploration/thread-2.25-dual-monoid-grading.md
 
 ### Thread 3: Self-Reference
 **Status**: ✓ SUBSTANTIALLY EXPLORED. Safe fragment characterized. Design proposal ready. See exploration/thread-3-self-reference.md
@@ -1807,6 +1807,45 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - ✓ Does completeness connect to decidability? Yes, via finite model property
     - ? Standard completeness for reals? Conjectured
     - ? First-order CLAIR completeness? Future work
+
+### Session 55 Discoveries (Task 2.25 Dual-Monoid Grading)
+
+278. **NON-DISTRIBUTIVITY IS MATHEMATICALLY FUNDAMENTAL** — CLAIR's × and ⊕ don't distribute, and this is expected for product t-norm / algebraic sum t-conorm pairs.
+
+279. **CLAIR's confidence algebra is a De Morgan bimonoid**:
+    - ([0,1], ×, 1) — derivation monoid (confidence decreases)
+    - ([0,1], ⊕, 0) — aggregation monoid (confidence increases)
+    - symm(x) = 1 - x — involution connecting the monoids
+    - De Morgan law: a ⊕ b = symm(symm(a) × symm(b))
+    - NO distributivity required or satisfied
+
+280. **Prior art connection established**:
+    - Double Residuated Lattices (Orłowska & Radzikowska 2002): expand residuated lattices with t-conorm operation
+    - Linearly Distributive Categories (Cockett & Seely 1997): two monoidal structures with linear (not full) distributivity
+    - Bimonoids: two monoid operations without distributivity requirement
+    - Key insight from fuzzy logic: "Any t-conorm distributes over minimum, but not over any other t-norm"
+
+281. **Type system naturally separates the operations**:
+    - × is used only for derivation chains (sequential/conjunctive)
+    - ⊕ is used only for aggregation (independent evidence combination)
+    - Never need a × (b ⊕ c) in practice because derivation and aggregation operate at different levels
+    - This structural separation makes distributivity irrelevant
+
+282. **Standard graded type theory doesn't directly apply**:
+    - Orchard et al. (2019), Gaboardi et al. (2016) assume semiring grades
+    - CLAIR requires weaker bimonoid structure
+    - Two-sorted grading approach possible: track derivation and aggregation grades separately
+
+283. **Lean formalization design identified**:
+    - Add DeMorganBimonoid typeclass
+    - Prove not_distrib theorem as formal counterexample (a=b=c=0.5)
+    - Extend Belief type with aggregate operation using ⊕
+
+284. **Confidence assessment**:
+    - Non-distributivity is fundamental: 0.95 (mathematical proof, t-norm theory)
+    - De Morgan bimonoid characterizes CLAIR: 0.85 (captures all operations and duality)
+    - Type system doesn't need distributivity: 0.90 (structural separation of operations)
+    - This is novel for graded type theory: 0.70 (not found in standard literature)
 
 ## Impossibilities Encountered
 

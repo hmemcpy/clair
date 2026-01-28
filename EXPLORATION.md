@@ -44,8 +44,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 2: The Structure of Justification
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53, 54)
-**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md, thread-2.20-completeness.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53, 54, 55)
+**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md, thread-2.20-completeness.md, thread-2.25-dual-monoid-grading.md)
 
 **Core question answered**: Are trees adequate for justification? **NO.**
 
@@ -105,6 +105,14 @@ What IS confidence for an LLM?
 - Real-valued (standard) completeness conjectured but requires algebraic methods
 - Connection to decidability: completeness + finite model property ⟹ decidability for finite lattices
 
+**Findings (Session 55) - Dual-Monoid Grading**:
+- **Non-distributivity is fundamental**: × and ⊕ don't distribute (mathematically expected for t-norm/t-conorm)
+- CLAIR's confidence algebra is a **De Morgan bimonoid**: two commutative monoids connected by involution (symm)
+- Prior art: Double Residuated Lattices (Orłowska & Radzikowska 2002), Linearly Distributive Categories (Cockett & Seely 1997)
+- Type system naturally separates operations: derivation (×) and aggregation (⊕) operate at different levels
+- Standard graded type theory (semiring grades) doesn't apply; CLAIR needs weaker bimonoid structure
+- See exploration/thread-2.25-dual-monoid-grading.md
+
 **Questions remaining**:
 - Q2.2: How do I (Claude) actually form beliefs? → Thread 9
 - Q2.15: Should CLAIR add JL-style Choice construct?
@@ -112,6 +120,7 @@ What IS confidence for an LLM?
 - Q2.20: ✓ Completeness proven for rational confidence — Session 54
 - Q2.21: Decidable fragments (informed by 2.20: finite model property yields decidability)
 - Q2.22: ✓ Proof terms (Curry-Howard) — Session 53
+- Q2.25: ✓ Dual-monoid grading formalized — Session 55
 
 ---
 
@@ -491,6 +500,8 @@ What I believe I know:
 | Confidence type formalizable in Lean | 0.95 | Session 10: layered design complete | Implementation failure | ✓ Session 10 |
 | Lean 4 + Mathlib right choice | 0.90 | Session 10: ℝ foundation, active development | Better alternative found | ✓ Session 10 |
 | (⊕, ×) form semiring | 0.05 | **REFUTED** Session 11: distributivity fails | Find alternative proof | ✗ False |
+| De Morgan bimonoid is correct structure | 0.85 | Session 55: two monoids + involution + De Morgan | Find better algebraic structure | ✓ Session 55 |
+| Type system doesn't need distributivity | 0.90 | Session 55: × and ⊕ operate at different levels | Find necessary distributivity | ✓ Session 55 |
 | Three monoid structures work | 0.95 | Session 11: (×,1), (min,1), (⊕,0) | Implementation failure | ✓ Session 11 |
 | min(a,b) ≥ a×b | 0.99 | Session 11: algebraic proof | None (mathematical) | ✓ Proven |
 | Belief type formalizable | 0.90 | Session 48: Phase 1 complete | Implementation failure | ✓ Session 48 |
