@@ -150,6 +150,17 @@ What IS confidence for an LLM?
 - **Prior work engaged**: Refinement types (Rondon 2008, Vazou 2014), graded types (Orchard 2019)
 - See exploration/thread-2.23-confidence-subtyping.md
 
+**Findings (Session 62) - Type Inference for Confidence**:
+- **Type inference is decidable**: Monomorphic inference is polynomial time; polymorphic is EXPTIME via Tarski-Seidenberg
+- **Principal types exist**: Every well-typed term has a unique tightest (highest) confidence bound
+- **Algorithm INFER**: Generate constraints (equalities for operations, inequalities for subtyping), solve by forward propagation
+- **Constraint structure**: Derivation uses × exclusively; aggregation uses ⊕ exclusively; no mixing required
+- **Non-distributivity doesn't complicate inference**: Operations are structurally separated in typing rules
+- **Bidirectional checking integrates subtyping**: Synthesis mode infers tightest bounds, checking mode uses expected bounds
+- **Rational arithmetic recommended**: Exact computation avoids floating-point issues, ensures decidability
+- **Prior work engaged**: Hindley-Milner, Liquid Types (Rondon 2008), Granule graded types (Orchard 2019)
+- See exploration/thread-2.24-type-inference-confidence.md
+
 **Questions remaining**:
 - Q2.2: How do I (Claude) actually form beliefs? → Thread 9
 - Q2.15: ✓ Choice construct designed — Session 59. Uses max semantics; commutative, associative, idempotent; distributes with undercut and aggregate
@@ -159,6 +170,7 @@ What IS confidence for an LLM?
 - Q2.21: ✓ Decidable fragments characterized — Session 57. CLAIR-finite and CLAIR-stratified are decidable; full CLAIR likely undecidable (Vidal 2019)
 - Q2.22: ✓ Proof terms (Curry-Howard) — Session 53
 - Q2.23: ✓ Subtyping for confidence — Session 60. Higher confidence is subtype; both × and ⊕ monotone; compatible with dual-monoid structure
+- Q2.24: ✓ Type inference for confidence — Session 62. Decidable via constraint generation; principal types exist; bidirectional checking recommended
 - Q2.25: ✓ Dual-monoid grading formalized — Session 55
 
 ---
