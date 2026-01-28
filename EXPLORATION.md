@@ -105,16 +105,25 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 - **Introspection semantics**: Can be identity-beta (type-level coercion, runtime no-op)
 - **Open**: Full semantic soundness proof deferred (major undertaking)
 
+### Confidence Algebra Completion (Session 77)
+- **Graded monad laws**: All three proven (`bind_pure_left`, `bind_pure_right`, `bind_assoc`)
+- **Value components**: Definitional equality
+- **Confidence components**: Follow from multiplication associativity
+- **Undercut composition**: Already proven, via ⊕
+- **Rebut composition**: Documented as non-existent (mathematically fundamental)
+- **Non-distributivity**: Counterexample formally proven (`mul_oplus_not_distrib`)
+- **Key insight**: Rebut's ratio-based semantics prevent clean composition
+
 ---
 
-## Remaining Work (2 Core Tasks)
+## Remaining Work (1 Core Task)
 
 Focus: Prove CLAIR works as LLM lingua franca via working interpreter.
 
 1. ~~**3.47 Affine types in Lean**~~ ✓ Design complete (Session 75)
 2. ~~**3.15 Stratification in Lean**~~ ✓ Analysis complete (Session 76)
-3. **1.4 Confidence algebra completion** ← Current
-4. **8.4 Extract interpreter** ← Key deliverable
+3. ~~**1.4 Confidence algebra completion**~~ ✓ Complete (Session 77)
+4. **8.4 Extract interpreter** ← Key deliverable (FINAL TASK)
 
 Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
 
@@ -142,6 +151,8 @@ Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
 | Stratification architecture complete | 0.90 | ✓ Session 76 |
 | Löb discount g(c)=c² prevents bootstrapping | 0.95 | ✓ Session 76 |
 | Introspection as type-level coercion | 0.85 | ✓ Session 76 |
+| Graded monad laws hold | 0.95 | ✓ Session 77 |
+| Rebut has no composition law | 0.99 | ✓ Session 77 |
 | LLM phenomenality | 0.35 | ⚠ Unknown |
 | Captures how I reason | 0.50 | ⚠ Unknown |
 
@@ -169,5 +180,5 @@ Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
 
 1. ~~**Task 3.47**: Add affine contexts to Lean typing judgment~~ ✓ Design complete
 2. ~~**Task 3.15**: Complete stratification formalization~~ ✓ Analysis complete
-3. **Task 1.4**: Prove confidence algebra properties ← Current
-4. **Task 8.4**: Extract working interpreter ← Goal
+3. ~~**Task 1.4**: Prove confidence algebra properties~~ ✓ Complete (Session 77)
+4. **Task 8.4**: Extract working interpreter ← **FINAL TASK**

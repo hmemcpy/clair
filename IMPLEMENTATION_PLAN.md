@@ -15,7 +15,7 @@ These directly prove CLAIR is viable:
 - [x] **3.15 Stratification** - Level-indexed beliefs, introspection rules ✓ Analysis complete (Session 76)
 
 ### 2. Complete Semantics in Lean
-- [ ] **1.4 Confidence algebra** - Prove monad laws, defeat composition ← **CURRENT**
+- [x] **1.4 Confidence algebra** - Prove monad laws, defeat composition ✓ Session 77
 
 ### 3. Produce Working Artifact
 - [ ] **8.4 Extract interpreter** - Runnable code from Lean ← **KEY DELIVERABLE**
@@ -35,11 +35,13 @@ These directly prove CLAIR is viable:
    - Introspection: Type-level coercion, runtime identity-beta
    - Deferred: Full semantic soundness proof
 
-3. **1.4 Confidence algebra** ← Current
-   - Prove graded monad laws
-   - Prove defeat composition theorems
+3. ~~**1.4 Confidence algebra**~~ ✓ Complete (Session 77)
+   - Graded monad laws proven (left/right identity, associativity)
+   - Undercut composition via ⊕ proven
+   - Rebut non-composition documented (mathematically fundamental)
+   - Non-distributivity counterexample proven
 
-4. **8.4 Extract interpreter**
+4. **8.4 Extract interpreter** ← **CURRENT**
    - Use Lean's code extraction
    - Produce runnable CLAIR evaluator
    - Demonstrate with examples
@@ -84,11 +86,12 @@ Moved for future theoretical exploration:
 | Lean confidence | Complete (⊕, ×, undercut, rebut) |
 | Lean beliefs | Complete (basic + stratified) |
 | Lean semantics | Complete (small-step) |
+| 1.4 Confidence algebra | Graded monad laws, defeat composition, non-distributivity |
 
 ---
 
 ## Statistics
 
-- **Core tasks remaining**: 2
+- **Core tasks remaining**: 1
 - **Theoretical tasks archived**: 9
 - **Completed explorations**: 54 files

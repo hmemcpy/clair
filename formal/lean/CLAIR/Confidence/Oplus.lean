@@ -174,8 +174,32 @@ Counterexample: a = b = c = 0.5
   a × (b ⊕ c) = 0.5 × (0.5 + 0.5 - 0.25) = 0.5 × 0.75 = 0.375
   (a × b) ⊕ (a × c) = 0.25 + 0.25 - 0.0625 = 0.4375 ≠ 0.375
 
-This is documented but not proven here (would require a counterexample construction).
+This is mathematically fundamental and cannot be fixed.
+The operations × and ⊕ form separate monoids (a "de Morgan bimonoid"),
+not a semiring.
 -/
+
+/-- Counterexample showing × does not distribute over ⊕.
+    This is mathematically fundamental: (⊕, ×) do NOT form a semiring.
+    The proof uses a = b = c = 0.5 as witness. -/
+theorem mul_oplus_not_distrib :
+    ∃ (a b c : Confidence),
+      (a : ℝ) * ((b ⊕ c) : ℝ) ≠ ((a * b) ⊕ (a * c) : ℝ) := by
+  -- Use a = b = c = 0.5
+  use ⟨1/2, by norm_num, by norm_num⟩
+  use ⟨1/2, by norm_num, by norm_num⟩
+  use ⟨1/2, by norm_num, by norm_num⟩
+  simp only [oplus, Subtype.coe_mk, ne_eq]
+  -- LHS: 0.5 × (0.5 + 0.5 - 0.25) = 0.5 × 0.75 = 0.375
+  -- RHS: 0.25 + 0.25 - 0.0625 = 0.4375
+  norm_num
+
+/-- Corollary: × distributing over ⊕ from the left fails for some values -/
+theorem not_left_distrib :
+    ¬ ∀ (a b c : Confidence), (a : ℝ) * ((b ⊕ c) : ℝ) = ((a * b) ⊕ (a * c) : ℝ) := by
+  intro h
+  have ⟨a, b, c, hne⟩ := mul_oplus_not_distrib
+  exact hne (h a b c)
 
 end Confidence
 

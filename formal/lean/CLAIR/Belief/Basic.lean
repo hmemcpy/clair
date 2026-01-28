@@ -355,6 +355,50 @@ theorem bind_pure_right_confidence (b : Belief α) :
   simp only [bind, pure, certain, Subtype.coe_mk]
   simp only [unitInterval.coe_one, mul_one]
 
+/-!
+## Full Graded Monad Laws
+
+Belief forms a graded monad over ([0,1], ×, 1).
+The grading is tracked at the value level, not the type level.
+These theorems prove the three monad laws hold for full Belief equality,
+not just confidence components.
+-/
+
+/-- Left identity law: bind (pure a) f = f a
+    This is the full equality, combining value and confidence components. -/
+theorem bind_pure_left (v : α) (f : α → Belief β) :
+    bind (pure v) f = f v := by
+  simp only [bind, pure, certain]
+  constructor <;> rfl
+
+/-- Right identity law: bind b pure = b
+    This is the full equality, combining value and confidence components. -/
+theorem bind_pure_right (b : Belief α) :
+    bind b pure = b := by
+  simp only [bind, pure, certain]
+  constructor
+  · rfl
+  · apply Subtype.ext
+    simp only [Subtype.coe_mk, unitInterval.coe_one, mul_one]
+
+/-- Associativity law: bind (bind b f) g = bind b (λx. bind (f x) g)
+    Values match definitionally; confidences match via × associativity. -/
+theorem bind_assoc (b : Belief α) (f : α → Belief β) (g : β → Belief γ) :
+    bind (bind b f) g = bind b (fun x => bind (f x) g) := by
+  simp only [bind]
+  constructor
+  · rfl  -- values match definitionally
+  · apply Subtype.ext
+    simp only [Subtype.coe_mk]
+    ring  -- confidence associativity
+
+/-- Associativity for confidence only (may be useful separately) -/
+theorem bind_assoc_confidence (b : Belief α) (f : α → Belief β) (g : β → Belief γ) :
+    ((bind (bind b f) g).confidence : ℝ) =
+    ((bind b (fun x => bind (f x) g)).confidence : ℝ) := by
+  simp only [bind, Subtype.coe_mk]
+  ring
+
 end Belief
 
 end CLAIR
