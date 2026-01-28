@@ -221,8 +221,8 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 6: Multi-Agent Epistemology
-**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 23)
-**Depth**: Deep (see exploration/thread-6.1-objective-truth.md)
+**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 23); DISSERTATION CHAPTER COMPLETE (Session 40)
+**Depth**: Deep (see exploration/thread-6.1-objective-truth.md, formal/dissertation/chapters/08-multi-agent.tex)
 
 **Core question answered (Session 23)**: Is there objective truth? **Yes, but framework-relative.**
 
@@ -1775,3 +1775,36 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Dissertation Chapter 7 complete" → NEW (confidence: 0.95)
   - "AGM extension to graded DAG beliefs validated" → CONFIRMED (confidence: 0.95)
   - "Recovery correctly fails" → CONFIRMED (confidence: 0.99)
+
+### Session 40: Dissertation Chapter 8 (Task 10.1h - Multi-Agent Epistemology)
+- **COMPLETED TASK 10.1h: Dissertation Chapter 8**
+- **Chapter 8: Multi-Agent Epistemology** (~25 pages)
+- **Key formalizations**:
+  - Pragmatic Internal Realism: five principles characterizing CLAIR's metaphysical stance
+  - Epistemic Framework: (T, O, A, I, E) tuple (types, operations, axioms, inference, evaluation)
+  - Agent Perspective: framework + purpose + constraints + assumptions
+  - Framework Compatibility: FullyCompatible / DifferentQuestions / FrameworkMismatch / ConflictingConstraints
+  - Disagreement Type: Factual / Evaluative / Perspectival / Underdetermined
+  - Multi-Agent Belief Structure: beliefs + frameworks + compatibility + aggregated + dissent + convergence
+  - Trust Profile: agent + base_trust + domain_trust + track_record
+  - Theorem: Consensus as Truth-Approximation (under Condorcet conditions)
+  - Theorem: Multi-Agent Aggregation via ⊕ (for independent evidence)
+  - Theorem: CLAIR Escapes Arrow (via domain restriction to compatible frameworks)
+  - Theorem: Collective Anti-Bootstrapping (unanimous agreement cannot guarantee truth)
+  - Algorithm: CLAIR Multi-Agent Consensus Protocol (5 steps)
+- **Key insights**:
+  - Pragmatic internal realism: truth is objective within shared frameworks but framework-relative
+  - Framework compatibility MUST be checked before aggregation (escapes Arrow's impossibility)
+  - Independence check needed: use δ-adjusted aggregation for correlated agents
+  - Collective fallibilism: unanimous agreement still cannot produce confidence 1.0
+  - Trust is domain-specific and evolves with track record
+  - Disagreement is informative signal, not noise—preserve minority views
+- **Prior art engaged**: Putnam (1981), Massimi (2022), Peirce, Condorcet, Arrow, List & Pettit (2002)
+- **Output**: `formal/dissertation/chapters/08-multi-agent.tex`
+- **Status**: Chapter 8 COMPLETED
+- **Dissertation progress**: Chapters 1-8 complete (~185 pages); Chapters 9-13 and appendices remaining
+- **Beliefs updated**:
+  - "Dissertation Chapter 8 complete" → NEW (confidence: 0.95)
+  - "Pragmatic internal realism is correct stance" → CONFIRMED (confidence: 0.90)
+  - "Arrow escape via domain restriction valid" → CONFIRMED (confidence: 0.95)
+  - "Collective anti-bootstrapping theorem valid" → NEW (confidence: 0.90)

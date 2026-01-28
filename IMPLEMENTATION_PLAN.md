@@ -1342,6 +1342,47 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 
 206. **Dissertation progress**: Chapters 1-7 complete (Introduction, Background, Confidence, Justification, Self-Reference, Grounding, Belief Revision). Remaining: Chapters 8-13 and appendices.
 
+### Session 40 Discoveries (Task 10.1h Dissertation Chapter 8 Complete)
+
+207. **DISSERTATION CHAPTER 8 COMPLETE** — Multi-Agent Epistemology (~25 pages) written.
+
+208. **Chapter structure**:
+    - The multi-agent problem in AI systems
+    - Philosophical foundations: metaphysical realism, perspectivism, internal realism, perspectival realism
+    - CLAIR's position: pragmatic internal realism
+    - Agent-attributed beliefs and nested beliefs
+    - Framework compatibility and disagreement taxonomy
+    - Belief aggregation: ⊕ for independent, δ-adjusted for correlated
+    - Trust profiles with domain-specific trust and evolution
+    - Consensus protocols: majority, quorum, weighted voting
+    - Connection to Arrow's theorem (escape via domain restriction)
+    - Multi-agent provenance and decision attribution
+    - Conflict resolution strategies
+    - Collective anti-bootstrapping
+
+209. **Key formalizations included**:
+    - Definition: Pragmatic Internal Realism (five principles)
+    - Definition: Epistemic Framework (T, O, A, I, E)
+    - Definition: Agent Perspective (framework, purpose, constraints, assumptions)
+    - Definition: Framework Compatibility
+    - Definition: Disagreement Type (factual/evaluative/perspectival/underdetermined)
+    - Theorem: Consensus as Truth-Approximation (under Condorcet conditions)
+    - Theorem: Multi-Agent Aggregation via ⊕
+    - Definition: Trust Profile with domain trust
+    - Algorithm: CLAIR Multi-Agent Consensus Protocol
+    - Theorem: CLAIR Escapes Arrow (via domain restriction)
+    - Theorem: Collective Anti-Bootstrapping
+
+210. **Key insights**:
+    - Pragmatic internal realism: truth is objective within shared frameworks but framework-relative
+    - Framework compatibility must be checked BEFORE aggregation
+    - Arrow's theorem escape: restrict domain to framework-compatible beliefs
+    - Collective fallibilism: unanimous agreement still cannot produce confidence 1.0
+    - Trust is domain-specific and evolves with track record
+    - Disagreement is informative, not noise—preserve minority views
+
+211. **Dissertation progress**: Chapters 1-8 complete (Introduction, Background, Confidence, Justification, Self-Reference, Grounding, Belief Revision, Multi-Agent). Remaining: Chapters 9-13 and appendices (~185 pages complete, ~60 remaining).
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -1603,7 +1644,8 @@ With Threads 1, 2, 3 complete, priority shifts to:
 - [x] **10.1e Write Chapter 5: Self-Reference and the Gödelian Limits** — COMPLETED Session 37. Full treatment of self-reference: Löb's theorem and anti-bootstrapping, Tarski's stratification hierarchy, Kripke's fixed points for safe self-reference, CPL (Confidence-Bounded Provability Logic) as novel extension of GL with graded Löb axiom g(c)=c², anti-bootstrapping theorem, decidability analysis (CPL undecidable, CPL-finite decidable, CPL-Gödel semantically inappropriate). Two-layer design recommendation: stratification by default, Kripke fixed points as escape hatch. ~25 pages. See `formal/dissertation/chapters/05-self-reference.tex`.
 - [x] **10.1f Write Chapter 6: Epistemological Grounding** — COMPLETED Session 38. Full treatment of grounding: Agrippa's trilemma and the regress problem, classical responses (foundationalism, coherentism, infinitism), Sellars's Myth of the Given applied to LLMs, pragmatic dogmatism as CLAIR's stance, stratified coherentism architecture. Formalized GroundingType, ReliabilityMetric, Source types. Training as pragmatic grounding (not epistemic justification). Honest uncertainty as appropriate stance. Connection to self-reference and belief revision. ~20 pages. See `formal/dissertation/chapters/06-grounding.tex`.
 - [x] **10.1g Write Chapter 7: Belief Revision** — COMPLETED Session 39. Full treatment of CLAIR belief revision: extending AGM to graded DAG-structured beliefs, justification-based revision (not proposition-based), confidence recomputation algorithm with topological sort, locality/monotonicity/defeat-composition theorems, Recovery postulate correctly fails. Defeat dynamics: fixed-point existence via Brouwer, uniqueness via Banach contraction (condition b_max×d_max<1), special cases (mutual undercut, infinite chains, pure rebut). Reinstatement emerges compositionally. Implementation sketch with efficient SCC-based evaluation. Connection to TMS, ranking theory, DEL. ~25 pages. See `formal/dissertation/chapters/07-belief-revision.tex`.
-- [ ] **10.1 Complete remaining dissertation chapters** — IN PROGRESS. Chapters 8-13 and appendices remain.
+- [x] **10.1h Write Chapter 8: Multi-Agent Epistemology** — COMPLETED Session 40. Full treatment of multi-agent CLAIR: philosophical foundations (pragmatic internal realism), agent-attributed beliefs with explicit attribution, framework compatibility requirements, disagreement taxonomy (factual/evaluative/perspectival/underdetermined), belief aggregation via ⊕ with dependency adjustment for correlated agents, trust profiles with domain-specific trust and evolution, consensus protocols (majority, quorum, weighted), Arrow's theorem escape via domain restriction, multi-agent provenance, conflict resolution strategies, and collective anti-bootstrapping theorem. ~25 pages. See `formal/dissertation/chapters/08-multi-agent.tex`.
+- [ ] **10.1 Complete remaining dissertation chapters** — IN PROGRESS. Chapters 9-13 and appendices remain.
 
   **Objective**: Synthesize all exploration findings into a coherent, PhD-level academic document that formalizes CLAIR as a novel contribution to the intersection of programming language theory, epistemology, and AI reasoning.
 
