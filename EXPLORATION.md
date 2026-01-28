@@ -332,6 +332,11 @@ What I believe I know:
 | Undercut uses Mathlib symm directly | 0.99 | Session 21: undercut(c,d) = c * symm(d) | None (mathematical) | ✓ Discovered |
 | No Mathlib API conflicts | 0.95 | Session 21: namespace analysis | Find naming conflict | ✓ Session 21 |
 | Thread 8 foundation complete | 0.95 | Session 21: Tasks 8.5-8.8 all done | Lean compilation failure | ✓ Session 21 |
+| Graded provability logic is literature gap | 0.95 | Session 22: comprehensive literature survey | Find existing work | ✓ Session 22 |
+| CPL (Confidence-Bounded Provability Logic) feasible | 0.80 | Session 22: design proposal sketched | Find inconsistency | ✓ Session 22 |
+| Anti-bootstrapping theorem holds | 0.90 | Session 22: self-soundness caps confidence | Find counterexample | ✓ Session 22 |
+| Graded Löb axiom: g(c) ≤ c required | 0.85 | Session 22: discount function analysis | Find g(c) > c that works | ✓ Session 22 |
+| CPL complements stratification | 0.90 | Session 22: what vs how-strongly | Find incompatibility | ✓ Session 22 |
 
 ---
 
@@ -1156,3 +1161,52 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - Theoretical foundation fully verified
   - Ready for 8.1-impl (create actual Lean 4 project)
   - Remaining: 8.9 (min_assoc proof), 8.10 (Belief type), 8.11 (stratified beliefs)
+
+### Session 22: Task 3.13 Exploration (GRADED PROVABILITY LOGIC)
+- **COMPLETED TASK 3.13: Graded provability logic — graded version of GL for confidence levels**
+- **Literature gap confirmed**:
+  - No existing work on graded/fuzzy provability logic (GL with Löb's axiom)
+  - Fuzzy modal logics exist (K, S4, S5, epistemic) but none address GL specifically
+  - This is a genuine gap at the intersection of provability logic and many-valued logic
+- **Prior art surveyed**:
+  - Boolos (1993): Classical GL—transitive, converse well-founded frames
+  - Godo, Esteva et al.: Fuzzy epistemic logic with Kleene-Dienes/Gödel semantics
+  - Graded modalities (de Rijke, Fine): Counting modalities (different from fuzzy)
+  - Possibilistic modal logic: Necessity/possibility over Gödel logic
+  - Belief function logic (Bílková et al.): Łukasiewicz-based graded modalities
+- **Design proposal: Confidence-Bounded Provability Logic (CPL)**:
+  - Graded Kripke semantics with confidence values in [0,1]
+  - Graded versions of K (distribution), 4 (positive introspection), L (Löb)
+  - No truth axiom (preserves fallibilism: beliefs can be wrong)
+  - Novel "anti-bootstrapping theorem" derived
+- **Anti-Bootstrapping Theorem derived**:
+  - If confidence(B(Bφ→φ)) = c, then confidence(Bφ) ≤ c
+  - Self-soundness claims cap confidence; cannot bootstrap authority
+  - Mathematical formalization of honest uncertainty
+- **Graded Löb axiom proposed**:
+  ```
+  B_c(B_c φ → φ) → B_{g(c)} φ   where g(c) ≤ c
+  ```
+  - g(c) = c² or g(c) = c × (1-c) as candidate discount functions
+  - Key constraint: self-soundness should discount, not amplify
+- **Integration with CLAIR**:
+  - CPL complements Thread 3's stratification
+  - Stratification: WHAT can reference what (levels)
+  - CPL: HOW STRONGLY beliefs can be held (confidence bounds)
+  - Type-level anti-bootstrapping possible for CLAIR's type checker
+- **Output**: exploration/thread-3.13-graded-provability-logic.md
+- **Status**: Task 3.13 SUBSTANTIALLY COMPLETE
+- **New questions raised**:
+  - CPL decidability (likely via finite model property)
+  - CPL soundness/completeness (requires algebraic semantics)
+  - Right choice of discount function g(c)
+  - Polymodal extension (CPL with levels, like GLP)
+- **Beliefs updated**:
+  - "Graded provability logic is literature gap" → ESTABLISHED (0.95)
+  - "CPL feasible as design" → ESTABLISHED (0.80)
+  - "Anti-bootstrapping theorem holds" → ESTABLISHED (0.90)
+  - "Graded Löb requires g(c) ≤ c" → ESTABLISHED (0.85)
+  - "CPL complements stratification" → ESTABLISHED (0.90)
+- **Thread 3 extensions**:
+  - Task 3.13 complete
+  - New tasks added: 3.16 (CPL decidability), 3.17 (CPL soundness/completeness), 3.18 (g function choice), 3.19 (type-level anti-bootstrapping)

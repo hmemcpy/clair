@@ -736,3 +736,56 @@ See exploration/thread-2.11-aggregation.md for detailed exploration.
 - Conservative default: assume moderate dependency (δ ≈ 0.3) when unknown
 
 See exploration/thread-2.13-correlated-evidence.md for detailed exploration.
+
+### ✓ SURVEYED (Session 22)
+
+**Thread 3.13 (Graded Provability Logic):** ✓ Literature gap confirmed; design proposal developed
+
+**Classical Provability Logic GL (Boolos 1993)**:
+- Gödel-Löb logic formalizes arithmetic provability
+- Key axioms: K (distribution), 4 (positive introspection), L (Löb's axiom: □(□A→A)→□A)
+- Notably absent: Truth axiom □A→A (provability ≠ truth)
+- Semantics: Transitive, converse well-founded Kripke frames
+- Complete, decidable (PSPACE-complete)
+- Reference: [Stanford Encyclopedia: Provability Logic](https://plato.stanford.edu/entries/logic-provability/)
+
+**Fuzzy Epistemic Logic (Godo, Esteva, et al.)**:
+- Truth values in [0,1] over Gödel, Łukasiewicz, or Product algebra
+- Fuzzy accessibility relations: r : W × W → [0,1]
+- Belief operator semantics: B_a φ = inf_{w'} max{1-r(w,w'), V_{w'}(φ)}
+- Extensions to public announcement and autoepistemic reasoning
+- Reference: [Some Epistemic Extensions of Gödel Fuzzy Logic (arXiv)](https://arxiv.org/html/1605.03828v8)
+
+**Graded Modalities in Epistemic Logic (de Rijke, Fine)**:
+- Counting modalities: □_n = "at least n accessible worlds satisfy φ"
+- Different from fuzzy—numeric bounds on accessibility, not truth degrees
+- Allows expressing "knowledge with exceptions" (n exceptions allowed)
+- Reference: [Graded Modalities in Epistemic Logic (ResearchGate)](https://www.researchgate.net/publication/227173933_Graded_modalities_in_epistemic_logic)
+
+**Belief Function Logic (Bílková et al. 2023)**:
+- Extends S5 with graded modalities using Łukasiewicz logic
+- Captures belief functions (lower probabilities) via modal semantics
+- Duality between necessity/possibility extends to graded environment
+- Reference: [An Elementary Belief Function Logic](https://www.tandfonline.com/doi/full/10.1080/11663081.2023.2244366)
+
+**Possibilistic Modal Logic over Gödel Logic**:
+- Necessity (N) and possibility (Π) operators with graded semantics
+- Algebraic semantics using NG-algebras
+- Completeness results for different notions of necessity
+- Reference: [Exploring Extensions of Possibilistic Logic over Gödel Logic](https://link.springer.com/chapter/10.1007/978-3-642-02906-6_79)
+
+**Literature Gap Confirmed**:
+- No existing work directly combines GL's Löb axiom with fuzzy/graded semantics
+- Fuzzy modal logics focus on K, S4, S5, epistemic logics
+- Graded modalities (counting) differ from fuzzy (truth degrees)
+- This gap motivates CLAIR's CPL (Confidence-Bounded Provability Logic) proposal
+
+**Key design decisions for CLAIR (Session 22)**:
+- Proposed Confidence-Bounded Provability Logic (CPL) as graded extension of GL
+- Graded Löb axiom: B_c(B_c φ → φ) → B_{g(c)} φ where g(c) ≤ c
+- Anti-Bootstrapping Theorem: self-soundness claims cap confidence
+- g(c) = c² or g(c) = c × (1-c) as candidate discount functions
+- CPL complements stratification: stratification handles WHAT, CPL handles HOW STRONGLY
+- Type-level anti-bootstrapping possible for CLAIR's type checker
+
+See exploration/thread-3.13-graded-provability-logic.md for detailed exploration.

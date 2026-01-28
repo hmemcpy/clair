@@ -71,9 +71,15 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 **New tasks discovered (Session 8)**:
 - [ ] **3.12 Fixed-point computation complexity** - How expensive? Can some cases be decided at compile time?
-- [ ] **3.13 Graded provability logic** - Literature gap: graded version of GL for confidence levels
+- [x] **3.13 Graded provability logic** - ANSWERED Session 22: Literature gap confirmed. Proposed CPL (Confidence-Bounded Provability Logic) with graded Löb axiom. Key finding: self-soundness claims cap confidence via anti-bootstrapping theorem. See exploration/thread-3.13-graded-provability-logic.md
 - [ ] **3.14 Unbounded quantification** - How to handle "beliefs about all my beliefs"?
 - [ ] **3.15 Formalize stratification in Lean** - Moves to Thread 8
+
+**New tasks discovered (Session 22)**:
+- [ ] **3.16 CPL decidability** - Is Confidence-Bounded Provability Logic decidable? Likely via finite model property
+- [ ] **3.17 CPL soundness/completeness** - Formulate and prove for CPL
+- [ ] **3.18 Graded Löb discount function** - Choose the right g(c) function: g(c) = c², c×(1-c), or other?
+- [ ] **3.19 Type-level anti-bootstrapping** - Implement Löb constraints in CLAIR's type checker
 
 ### Thread 4: Grounding
 **Status**: ✓ SUBSTANTIALLY EXPLORED (Session 17). See exploration/thread-4-grounding.md
@@ -820,6 +826,51 @@ This is not a software implementation plan—it's a research exploration plan. E
     - Leverage `LinearOrderedCommMonoidWithZero` instance
     - Define oplus, undercut, rebut, min
     - Proofs use `ring`, `linarith`, `unit_interval` tactics
+
+### Session 22 Discoveries (Task 3.13 Graded Provability Logic)
+
+120. **TASK 3.13 COMPLETE** — Literature gap confirmed; design proposal (CPL) developed.
+
+121. **Literature gap verified**:
+    - No existing work on graded provability logic (fuzzy/many-valued GL)
+    - Fuzzy modal logics exist (K, S4, S5, epistemic) but none address Löb's axiom
+    - This is a genuine gap at the intersection of provability logic and fuzzy logic
+
+122. **Confidence-Bounded Provability Logic (CPL) proposed**:
+    - Graded Kripke semantics with confidence values in [0,1]
+    - Graded versions of K, 4 (introspection), and L (Löb) axioms
+    - No truth axiom (preserves fallibilism)
+    - Novel "anti-bootstrapping theorem" derived
+
+123. **Anti-Bootstrapping Theorem**:
+    - Self-soundness claims cap confidence: if conf(B(Bφ→φ)) = c, then conf(Bφ) ≤ c
+    - Cannot gain confidence from claiming own beliefs are sound
+    - Mathematical formalization of honest uncertainty
+
+124. **Graded Löb axiom proposed**:
+    ```
+    B_c(B_c φ → φ) → B_{g(c)} φ   where g(c) ≤ c
+    ```
+    - g(c) = c² or g(c) = c × (1-c) as candidate discount functions
+    - Key insight: self-soundness claims should discount, not amplify
+
+125. **Integration with CLAIR**:
+    - CPL complements stratification (Thread 3)
+    - Stratification: what can reference what
+    - CPL: how strongly beliefs can be held
+    - Type-level anti-bootstrapping possible for CLAIR's type checker
+
+126. **New research questions identified**:
+    - CPL decidability (likely via finite model property)
+    - CPL soundness/completeness (requires algebraic semantics)
+    - Right choice of discount function g(c)
+    - Polymodal extension (CPL with levels, like GLP)
+
+127. **Prior art surveyed**:
+    - Boolos (1993): Classical GL foundations
+    - Godo, Esteva et al.: Fuzzy epistemic logic semantics
+    - Graded modalities in epistemic logic (de Rijke, Fine)
+    - Possibilistic modal logic over Gödel logic
 
 ## Impossibilities Encountered
 
