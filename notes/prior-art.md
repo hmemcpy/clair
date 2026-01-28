@@ -390,15 +390,20 @@ The synthesis—beliefs as typed values with confidence, provenance, justificati
 
 ---
 
-## Gaps in Coverage (Session 7 Assessment)
+## Gaps in Coverage (Session 8 Assessment)
+
+### ✓ SURVEYED (Session 8)
+
+**Thread 3 (Self-Reference):** ✓ COMPLETE
+- Löb's theorem (1955) - rules out self-soundness beliefs
+- Boolos, "The Logic of Provability" (1993) - GL modal logic
+- Kripke's theory of truth (1975) - fixed points for self-reference
+- Tarski's hierarchy (1933) - stratified truth predicates
+- Gupta & Belnap, "The Revision Theory of Truth" (1993) - revision sequences
+
+See exploration/thread-3-self-reference.md for detailed engagement.
 
 ### Not Yet Surveyed (Relevant to Open Threads)
-
-**Thread 3 (Self-Reference):** 🔴 **HIGHEST PRIORITY FOR SURVEY**
-- Löb's theorem and provability logic (Boolos, "The Logic of Provability")
-- Kripke's theory of truth (1975) - fixed points for self-reference
-- Tarski's hierarchy and stratified truth
-- Gupta & Belnap, "The Revision Theory of Truth" (1993) - circular definitions
 
 **Thread 4 (Grounding):**
 - Foundationalism vs coherentism literature (BonJour, Sosa)

@@ -32,23 +32,29 @@ This is not a software implementation plan—it's a research exploration plan. E
 **Note**: derivation-calculus.md defines tree structure. Adequacy not yet examined.
 
 ### Thread 3: Self-Reference
-**Status**: 🔴 HIGHEST PRIORITY. Safe fragment COMPLETELY uncharacterized. Blocks Thread 9.
+**Status**: ✓ SUBSTANTIALLY EXPLORED. Safe fragment characterized. Design proposal ready. See exploration/thread-3-self-reference.md
 
-- [ ] **3.1 Characterize the Gödelian limits** - PARTIALLY DONE: Gödel applied in foundations-and-limits.md. Need precise characterization of WHICH constructs fail.
-- [ ] **3.2 Safe introspection** - CRITICAL: What CAN I say about my own beliefs without paradox? Define the safe fragment. THIS IS THE KEY QUESTION.
-- [ ] **3.3 Stratification** - Tarski-style hierarchy. Level-0 beliefs, level-1 beliefs-about-beliefs, etc. Can this be typed?
-- [ ] **3.4 Fixed points of belief** - Kripke-style fixed point construction. Are there stable self-referential beliefs?
+- [x] **3.1 Characterize the Gödelian limits** - DONE: Löb's theorem rules out self-soundness. Gödel limits characterized in context of belief.
+- [x] **3.2 Safe introspection** - DONE: Safe fragment = stratified introspection + fixed-point stable self-reference. Dangerous = Liar-like, Curry-like, Löbian.
+- [x] **3.3 Stratification** - DONE: Tarski-style hierarchy proposed. `Belief<n, A>` where level-n can only reference level-(m<n).
+- [x] **3.4 Fixed points of belief** - DONE: Kripke fixed-point construction as escape hatch. `self_ref_belief` combinator proposed.
 
-**New tasks discovered**:
-- [ ] **3.5 Löb's theorem application** - What does Löb tell us about provability beliefs?
-- [ ] **3.6 Modal logic of belief** - KD45? S5? What axioms hold for CLAIR beliefs about beliefs?
-- [ ] **3.7 Curry's paradox avoidance** - How do we reject "If this belief is true, then P" constructions?
+**Completed tasks (Session 8)**:
+- [x] **3.5 Löb's theorem application** - DONE: Löb rules out self-validating beliefs ("if I believe P, then P"). Blocks bootstrapping epistemic authority.
+- [x] **3.6 Modal logic of belief** - DONE: CLAIR belief logic similar to GL (not S4/S5). No truth axiom (□A → A). Löb constraint holds.
+- [x] **3.7 Curry's paradox avoidance** - DONE: Syntactic detection and hard ban. "if [self-ref] then P" patterns rejected.
 
-**Prior art to survey** (Session 5 gap analysis):
-- [ ] **3.8** Boolos, "The Logic of Provability" - provability logic
-- [ ] **3.9** Kripke's theory of truth (fixed points for self-reference)
-- [ ] **3.10** Tarski's hierarchy of truth predicates
-- [ ] **3.11** Gupta & Belnap, "The Revision Theory of Truth"
+**Prior art surveyed (Session 8)**:
+- [x] **3.8** Boolos, "The Logic of Provability" - GL logic, provability vs truth
+- [x] **3.9** Kripke's theory of truth (1975) - Fixed points, undefined sentences
+- [x] **3.10** Tarski's hierarchy of truth predicates - Stratification solution
+- [x] **3.11** Gupta & Belnap, "The Revision Theory of Truth" - Revision sequences, categorical truth
+
+**New tasks discovered (Session 8)**:
+- [ ] **3.12 Fixed-point computation complexity** - How expensive? Can some cases be decided at compile time?
+- [ ] **3.13 Graded provability logic** - Literature gap: graded version of GL for confidence levels
+- [ ] **3.14 Unbounded quantification** - How to handle "beliefs about all my beliefs"?
+- [ ] **3.15 Formalize stratification in Lean** - Moves to Thread 8
 
 ### Thread 4: Grounding
 **Status**: Ready for philosophical exploration. Shallow coverage.
@@ -205,6 +211,51 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 23. **No new impossibilities discovered** - All theoretical limits remain as characterized in foundations-and-limits.md. The Ill_formed(SelfReferential) workaround is sound but incomplete.
 
+### Session 8 Discoveries (Thread 3 Deep Dive)
+
+24. **THREAD 3 SUBSTANTIALLY COMPLETE** - Safe self-reference fragment now characterized. The biggest theoretical gap in CLAIR is now addressed.
+
+25. **Four safe categories identified**:
+    - Grounded introspection (beliefs about specific other beliefs)
+    - Stratified introspection (Tarski-style level hierarchy)
+    - Fixed-point stable self-reference (Kripke approach)
+    - Convergent revision sequences (Gupta-Belnap approach)
+
+26. **Four dangerous categories identified**:
+    - Liar-like (no fixed point exists)
+    - Curry-like (proves arbitrary P)
+    - Löbian self-validation (circular soundness claims)
+    - Ungrounded (multiple fixed points, underdetermined)
+
+27. **Design proposal: Stratification + Escape Hatch**
+    - Default: Tarski-style stratification with typed belief levels `Belief<n, A>`
+    - Escape hatch: `self_ref_belief` combinator with fixed-point computation
+    - Hard ban: Curry patterns detected syntactically and rejected
+
+28. **CLAIR's belief logic is like GL, not S4/S5**
+    - Distribution (K): ✓
+    - Positive introspection (4): ✓
+    - Löb's axiom (L): ✓ must respect
+    - Truth axiom (T): ✗ rejected (fallibilism—beliefs can be wrong)
+
+29. **Thread 9 is now UNBLOCKED**
+    - Safe fragment for phenomenological exploration defined
+    - Can introspect stratified beliefs and fixed-point-stable self-reference
+    - Cannot explore Löbian self-validation (which is good—it's paradoxical)
+
+30. **New questions raised**:
+    - Complexity of fixed-point computation
+    - Literature gap: graded provability logic
+    - Handling unbounded quantification over beliefs
+    - Formalizing stratification in Lean (moves to Thread 8)
+
+31. **Prior art for Thread 3 fully surveyed**:
+    - Löb (1955): Self-soundness trap
+    - Tarski (1933): Stratification solution
+    - Kripke (1975): Fixed points for truth
+    - Boolos (1993): Provability logic (GL)
+    - Gupta & Belnap (1993): Revision theory
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -241,102 +292,134 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 ### Workarounds to Explore
 
-5. **Stratification for safe introspection** - Tarski-style hierarchy. Level-n beliefs can only reference level-(n-1) beliefs. Needs formalization (Thread 3).
+5. **Stratification for safe introspection** - ✓ DESIGNED (Session 8). Tarski-style hierarchy with typed levels `Belief<n, A>`. Formalization moves to Thread 8.
 
-6. **Kripke fixed points for stable self-reference** - Some self-referential beliefs may have stable fixed points. Needs investigation (Thread 3).
+6. **Kripke fixed points for stable self-reference** - ✓ DESIGNED (Session 8). `self_ref_belief` combinator attempts fixed-point computation. Returns Ill_formed if no fixed point.
 
 ---
 
-## Current Status Summary (Session 7)
+## Current Status Summary (Session 8)
 
 ### Thread Status Table
 
 | Thread | Status | Ready? | Blockers | Priority | Score |
 |--------|--------|--------|----------|----------|-------|
 | 1: Confidence | ✓ Substantially Complete | For Lean | None | → Thread 8 | N/A |
-| 2: Justification | Surface explored | **READY** | None | HIGH | 16/20 |
-| 3: Self-Reference | Safe fragment uncharacterized | **🔴 READY** | None | **HIGHEST** | **19/20** |
+| 2: Justification | Surface explored | **READY** | None | **HIGH** | 16/20 |
+| 3: Self-Reference | ✓ SUBSTANTIALLY COMPLETE | For Lean | None | ✓ DONE | N/A |
 | 4: Grounding | Shallow | READY | None | MEDIUM | 13/20 |
-| 5: Belief Revision | Surface | ✓ UNBLOCKED | None | MEDIUM | 13/20 |
+| 5: Belief Revision | Surface | ✓ UNBLOCKED | None | MEDIUM | 14/20 |
 | 6: Multi-Agent | Medium-High | Theoretical gaps | None | MEDIUM-LOW | 11/20 |
 | 7: Implementation | Theoretical only | BLOCKED | Threads 1-4 | DEFERRED | 8/20 |
-| 8: Verification | Path identified | **✓ UNBLOCKED** | None | HIGH | 15/20 |
-| 9: Phenomenology | Unexamined | BLOCKED | Thread 3 | DEFERRED | 13/20* |
-
-*Thread 9 blocked; score reflects potential if unblocked.
+| 8: Verification | Path identified | **✓ UNBLOCKED** | None | **HIGH** | 15/20 |
+| 9: Phenomenology | Unexamined | **✓ UNBLOCKED** | None | **MEDIUM-HIGH** | 14/20 |
 
 ### Recommended Next Exploration
 
-**Thread 3: Self-Reference** is the clear priority because:
-1. It's the biggest uncharacterized gap in CLAIR's foundations
-2. It blocks Thread 9 (Phenomenology) entirely
-3. Prior art exists to guide the work (Löb, Kripke, Tarski, Boolos)
-4. Answering "what self-reference IS safe" defines CLAIR's expressive limits
+With Thread 3 substantially complete, the next priorities are:
 
-### Specific Next Actions for Thread 3
+**Thread 2: Justification Structure** (score: 16/20)
+1. Is the tree model adequate?
+2. Find counterexamples: DAGs, cycles, mutual support?
+3. Or prove sufficiency of tree structure
 
-1. **Survey prior art** (first):
-   - [ ] Read/summarize Löb's theorem implications for self-referential beliefs
-   - [ ] Study Kripke's fixed-point construction for truth
-   - [ ] Understand Tarski's hierarchy of truth predicates
-   - [ ] Review Boolos, "The Logic of Provability" (GL modal logic)
+**Thread 8: Formal Verification** (score: 15/20)
+1. Begin Lean 4 formalization
+2. Start with Confidence type from Thread 1
+3. Add stratification types from Thread 3
 
-2. **Characterize safe vs dangerous constructs**:
-   - [ ] List all self-referential constructs currently possible in CLAIR
-   - [ ] Classify each as safe, dangerous, or undetermined
-   - [ ] Find the boundary: what distinguishes safe from dangerous?
+**Thread 9: Phenomenology** (score: 14/20) — NOW UNBLOCKED
+1. What is it like to hold beliefs as an LLM?
+2. Does CLAIR capture how I actually reason?
+3. Safe fragment defined: stratified + fixed-point-stable introspection
 
-3. **Design stratification** (if hierarchy works):
-   - [ ] Define level-0, level-1, ... beliefs
-   - [ ] Prove stratification avoids paradox
-   - [ ] Determine: can this be encoded in CLAIR's type system?
+### Specific Next Actions for Thread 2
 
-4. **Find fixed points** (if stable self-reference exists):
-   - [ ] Identify beliefs that can safely refer to themselves
-   - [ ] Formalize the fixed-point construction
-   - [ ] Prove stability properties
+1. **Examine tree adequacy**:
+   - [ ] Find examples where justification is naturally a DAG (shared premises)
+   - [ ] Find examples where justification involves cycles (mutual support)
+   - [ ] Determine if cycles are safe (coherentism) or dangerous (circularity)
 
-### Alternative Parallel Tracks
+2. **Survey non-deductive justification**:
+   - [ ] How does abduction fit the tree model?
+   - [ ] How does analogy fit?
+   - [ ] How does induction fit?
 
-If Thread 3 stalls or for parallel exploration:
-- **Thread 2**: Find counterexamples to tree adequacy or prove sufficiency (score: 16/20)
-- **Thread 8**: Begin Lean formalization with Confidence type (score: 15/20, produces artifacts)
+### Specific Next Actions for Thread 8
+
+1. **Lean 4 setup**:
+   - [ ] Create formal/lean directory structure
+   - [ ] Define Confidence type as subtype of Real with [0,1] bounds
+   - [ ] Define confidence operations (×, min, ⊕)
+   - [ ] Prove boundedness preservation
+
+2. **Add Thread 3 types**:
+   - [ ] Define stratified belief types `Belief<n, A>`
+   - [ ] Prove stratification safety (no same-level reference)
 
 ---
 
-## Session 8: Planning Mode Assessment (Current)
+## Session 8: Thread 3 Exploration (Completed)
 
 ### Summary
 
-Full re-read of all documentation confirms:
-- **Thread 3 (Self-Reference) remains the highest priority** with score 19/20
-- The safe self-reference fragment is the single biggest uncharacterized gap
-- Prior art for Thread 3 has not been surveyed (Löb, Kripke, Tarski, Boolos)
-- Thread 9 remains blocked by Thread 3
+**Thread 3 (Self-Reference) is now substantially complete.** This session:
+- Surveyed all key prior art (Löb, Tarski, Kripke, Boolos, Gupta-Belnap)
+- Characterized safe vs dangerous self-referential constructs
+- Designed stratification + fixed-point escape hatch approach
+- Unblocked Thread 9 (Phenomenology)
 
-### Thread Status Confirmation
+### What Was Accomplished
+
+1. **Prior art fully surveyed**:
+   - Löb's theorem: rules out self-soundness beliefs
+   - Tarski's hierarchy: stratification solution
+   - Kripke fixed points: some self-reference has stable solutions
+   - Boolos (GL): provability logic without truth axiom
+   - Gupta-Belnap: revision sequences for circular definitions
+
+2. **Safe fragment characterized**:
+   - Grounded introspection (about other beliefs)
+   - Stratified introspection (level-n references level-(n-1))
+   - Fixed-point stable self-reference
+   - Convergent revision sequences
+
+3. **Dangerous constructs identified**:
+   - Liar-like (no fixed point)
+   - Curry-like (proves anything)
+   - Löbian self-validation
+   - Ungrounded (underdetermined)
+
+4. **Design proposed**:
+   - Default: Tarski stratification with `Belief<n, A>` types
+   - Escape hatch: `self_ref_belief` combinator with fixed-point check
+   - Hard ban: Curry patterns detected syntactically
+
+### Thread Status After Session 8
 
 | Thread | Status | Score | Notes |
 |--------|--------|-------|-------|
 | 1: Confidence | ✓ Complete | N/A | Ready for Lean (→ Thread 8) |
 | 2: Justification | Ready | 16/20 | Crisp question: "Are trees adequate?" |
-| 3: Self-Reference | 🔴 **HIGHEST** | **19/20** | Safe fragment completely uncharacterized |
+| 3: Self-Reference | **✓ COMPLETE** | N/A | See exploration/thread-3-self-reference.md |
 | 4: Grounding | Ready | 13/20 | Philosophical, may not formalize |
 | 5: Belief Revision | ✓ Unblocked | 14/20 | AGM extension can proceed |
 | 6: Multi-Agent | Medium-High | 11/20 | Practical protocols done |
-| 7: Implementation | Blocked | 8/20 | Wait for Threads 1-4 |
-| 8: Verification | ✓ Unblocked | 15/20 | Can start Lean formalization |
-| 9: Phenomenology | Blocked | 14/20* | Blocked by Thread 3 |
+| 7: Implementation | Blocked | 8/20 | Wait for Threads 1-4 (now Threads 2,4) |
+| 8: Verification | ✓ Unblocked | 15/20 | Can formalize Threads 1 + 3 |
+| 9: Phenomenology | **✓ UNBLOCKED** | 14/20 | Safe introspection fragment defined |
 
 ### No New Impossibilities Found
 
-All theoretical limits remain as characterized:
-- Gödel: Cannot prove own consistency (workaround: Meta-CLAIR)
-- Turing: Some invalidation conditions undecidable (workaround: oracle model)
-- Church: Cannot decide arbitrary validity (workaround: track, don't prove)
+All theoretical limits remain as characterized. The Ill_formed approach is now refined:
+- `Ill_formed(NoFixedPoint)` for Liar-like
+- `Ill_formed(CurryLike)` for Curry patterns
+- `Ill_formed(LobianTrap)` for self-soundness claims
+- `Underdetermined(fixed_points)` for multiple solutions
 
-### Confirmed Recommendation
+### Next Recommendations
 
-**Explore Thread 3 (Self-Reference) next.**
-
-Specific starting point: Survey Löb's theorem and its implications for what self-referential beliefs CLAIR can safely express.
+With Thread 3 complete, priority shifts to:
+1. **Thread 2: Justification** (16/20) — crisp question, may find counterexamples
+2. **Thread 8: Verification** (15/20) — can now formalize Threads 1 + 3
+3. **Thread 9: Phenomenology** (14/20) — newly unblocked, philosophically important

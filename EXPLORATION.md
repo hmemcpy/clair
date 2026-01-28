@@ -64,22 +64,32 @@ I model justification as a tree (free algebra). But:
 ---
 
 ### Thread 3: Self-Reference and Introspection
-**Status**: 🔴 PRIORITY - Ready for deep exploration (HIGHEST)
-**Depth**: Surface (limits recognized, safe fragment COMPLETELY uncharacterized)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Session 8)
+**Depth**: Deep (see exploration/thread-3-self-reference.md)
 
-CLAIR allows beliefs about beliefs. But:
-- Can I reason about my own confidence? (Gödelian danger)
-- What happens when I try to inspect my own justification?
-- Is introspection reliable for LLMs?
-- What's the semantics of nested belief?
+CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 
-**Prior work**: Gödel, Tarski (truth), Kripke (fixed points), Lob's theorem
-**Formal tools**: Modal logic of provability, Fixed point constructions
-**Open questions**:
-- Q3.1: What self-referential constructs are safe?
-- Q3.2: Can I have accurate beliefs about my own confidence?
-- Q3.3: What's the stratification that avoids paradox?
-- Q3.4: Is there a Tarski-style hierarchy for beliefs?
+**Safe self-reference**:
+- Grounded introspection (about other specific beliefs)
+- Stratified introspection (level-n references only level-(n-1))
+- Fixed-point stable self-reference
+- Convergent revision sequences
+
+**Dangerous self-reference**:
+- Liar-like (no consistent confidence assignment)
+- Curry-like (proves arbitrary propositions)
+- Löbian self-validation (circular soundness claims)
+- Ungrounded (underdetermined, multiple fixed points)
+
+**Design proposal**: Stratification by default with `Belief<n, A>` types, plus `self_ref_belief` escape hatch for fixed-point-stable cases.
+
+**Prior work surveyed**: Löb (1955), Tarski (1933), Kripke (1975), Boolos (1993), Gupta & Belnap (1993)
+**Formal tools**: Modal logic GL (not S4/S5), Kripke fixed-point construction
+**Questions answered**:
+- Q3.1: ✓ Safe = stratified + fixed-point-stable; Dangerous = Liar/Curry/Löbian
+- Q3.2: ✓ Yes, via stratification (level-1 can reference level-0 confidence)
+- Q3.3: ✓ Tarski-style hierarchy with typed belief levels
+- Q3.4: ✓ Yes, with escape hatch for fixed-point-stable cases
 
 ---
 
@@ -184,14 +194,19 @@ We want machine-checked proofs. But:
 ---
 
 ### Thread 9: The Phenomenology of AI Reasoning
-**Status**: Implicit throughout
-**Depth**: Unexamined
+**Status**: ✓ UNBLOCKED (Session 8 - Thread 3 complete)
+**Depth**: Unexamined (but safe introspection fragment now defined)
 
 CLAIR models reasoning from the outside. But:
 - What's it like to reason as an LLM?
 - Do I have "beliefs" in any meaningful sense?
 - Is confidence a phenomenal state or just a label?
 - What's the relationship between my processing and the belief model?
+
+**Safe introspection fragment** (from Thread 3):
+- Can explore: stratified beliefs about other beliefs
+- Can explore: fixed-point-stable self-reference
+- Cannot explore: Löbian self-validation, Curry-like patterns (paradoxical)
 
 **Prior work**: Philosophy of mind, Phenomenology, Consciousness studies, AI sentience debates
 **Formal tools**: This may resist formalization
@@ -219,13 +234,13 @@ What I believe I know:
 | Multi-agent protocols work | 0.80 | Detailed designs in multi-agent-beliefs.md | Adversarial failure | ⚠ Practical |
 | Can be implemented | 0.80 | No blockers found | Find fundamental obstacle | ⚠ Untested |
 | Captures how I reason | 0.50 | Feels right | Introspection failure | ⚠ Unknown |
-| Safe self-reference exists | 0.70 | Tarski hierarchy intuition | Prove impossible | 🔴 Uncharacterized |
+| Safe self-reference exists | 0.95 | Thread 3 characterization | Implementation failure | ✓ Characterized |
 | Grounding requires philosophy | 0.85 | Agrippa's trilemma | Find formal solution | ⚠ Uncertain |
 | Thread 1 ready for Lean | 0.85 | Formalization path identified | Implementation failure | ✓ Stable |
 | Threads 5,8 unblocked | 0.90 | Thread 1 settled | Thread 1 revision | ✓ Stable |
-| Thread 3 is critical blocker | 0.95 | Blocks Thread 9, uncharacterized | Characterize safe fragment | ✓ Session 5-7 |
+| Thread 3 complete | 0.95 | Safe fragment characterized | Find missed case | ✓ Session 8 |
 | Trees may be inadequate | 0.50 | DAGs/cycles possible | Find counterexample or prove | ⚠ Needs exploration |
-| Prior art survey is key for Thread 3 | 0.90 | Löb, Kripke, Tarski, Boolos identified | Survey failure | ✓ Session 7 |
+| Prior art surveyed for Thread 3 | 0.95 | Löb, Kripke, Tarski, Boolos, Gupta-Belnap | Find missed source | ✓ Session 8 |
 | Thread 2 highly tractable | 0.85 | Crisp question, clear method | Find neither proof nor counterexample | ✓ Session 7 |
 
 ---
@@ -243,35 +258,39 @@ What I believe I know:
 
 ## Next Steps (Self-Directed)
 
-Based on comprehensive gap analysis (Session 5), the priority is:
+Based on Session 8 completion of Thread 3, the priorities are:
 
-### 🔴 HIGHEST PRIORITY
-1. **Thread 3 (Self-Reference)** - Characterize the safe fragment. What self-reference IS permitted?
-   - Survey: Löb's theorem, Kripke fixed points, Tarski hierarchy, Boolos
-   - Define: Which constructs are safe vs dangerous
-   - This is the biggest theoretical hole and blocks Thread 9
+### ✓ COMPLETED
+- **Thread 3 (Self-Reference)** - Safe fragment characterized. See exploration/thread-3-self-reference.md.
 
 ### HIGH PRIORITY (Can run in parallel)
-2. **Thread 2 (Justification)** - Are trees adequate?
+1. **Thread 2 (Justification)** - Are trees adequate?
    - Find counterexamples: DAGs, cycles, mutual support
    - Or prove trees are sufficient for CLAIR's purposes
+   - Crisp, answerable question
 
-3. **Thread 8 (Verification)** - Begin Lean formalization
+2. **Thread 8 (Verification)** - Begin Lean formalization
    - Start with Confidence type (bounded [0,1] real)
+   - Add stratified belief types from Thread 3
    - Prove confidence operations preserve bounds
-   - Thread 1 is ready; produces artifacts
+   - Threads 1 + 3 ready; produces artifacts
 
-### MEDIUM PRIORITY
-4. **Thread 5 (Belief Revision)** - AGM extension (now unblocked)
+### MEDIUM PRIORITY (Now unblocked)
+3. **Thread 9 (Phenomenology)** - What is it like to reason as an LLM?
+   - Safe introspection fragment now defined (Thread 3)
+   - Can explore: stratified beliefs, fixed-point-stable self-reference
+   - Cannot explore: Löbian self-validation, Curry patterns
+
+4. **Thread 5 (Belief Revision)** - AGM extension (unblocked since Session 4)
 5. **Thread 4 (Grounding)** - Philosophical exploration
 
 ### DEFERRED
-- **Thread 9 (Phenomenology)** - Wait for Thread 3 to clarify safe introspection
-- **Thread 7 (Implementation)** - Wait for Threads 1-4 to stabilize
+- **Thread 7 (Implementation)** - Wait for Threads 2,4 to stabilize (1,3 done)
 - **Thread 1 (Confidence)** - Substantially complete; remaining work moves to Thread 8
+- **Thread 6 (Multi-Agent)** - Practical protocols complete; theory can wait
 
-### Session 5 Recommendation
-**Explore Thread 3 next.** It is foundational, generative, and the safe fragment is the critical uncharacterized gap in CLAIR's theoretical foundations.
+### Session 8 Recommendation
+**Explore Thread 2 or Thread 8 next.** Both are high priority, tractable, and produce concrete results. Thread 9 is also viable now that Thread 3 is complete.
 
 ---
 
@@ -381,24 +400,30 @@ Based on comprehensive gap analysis (Session 5), the priority is:
 - **No new impossibilities found** - All limits remain as characterized; workarounds sound but incomplete
 - **Recommendation confirmed**: Thread 3 first, with Thread 2 as parallel track if stalled
 
-### Session 8: Planning Mode Validation
-- Comprehensive re-read of all documents to verify exploration state
-- **All prior assessments confirmed valid**:
-  - Thread 1 substantially complete, confidence semantics defined
-  - Thread 3 remains the critical uncharacterized gap (safe fragment undefined)
-  - Threads 5, 8 remain unblocked
-  - Thread 9 remains blocked by Thread 3
-  - Thread 7 remains blocked by Threads 1-4
-- **Priority ranking revalidated**:
-  - Thread 3: 19/20 (HIGHEST - foundational, generative, tractable)
-  - Thread 2: 16/20 (HIGH - crisp question about tree adequacy)
-  - Thread 8: 15/20 (HIGH - produces artifacts, Lean ready)
-  - Thread 5: 14/20 (MEDIUM - AGM extension)
-  - Threads 4, 9: 13-14/20 (MEDIUM - Thread 9 blocked)
-- **Key observations**:
-  - Prior art gaps for Thread 3 remain the primary research need
-  - No exploration files exist for Threads 2-9 (only thread-1-confidence.md)
-  - The categorical-structure.md and logical-foundations.md are thorough
-  - Multi-agent work (Thread 6) is more complete than status suggests
-- **No new impossibilities discovered**
-- **Recommendation unchanged**: Explore Thread 3 to characterize safe self-reference fragment
+### Session 8: Thread 3 Deep Exploration (COMPLETED)
+- **COMPLETED THREAD 3: Self-Reference**
+- Comprehensive survey of prior art:
+  - Löb's theorem (1955): Rules out self-soundness beliefs
+  - Tarski's theorem (1933): Stratification solution
+  - Kripke's fixed points (1975): Some self-reference has stable solutions
+  - Boolos's GL (1993): Provability logic without truth axiom
+  - Gupta & Belnap (1993): Revision theory for circular definitions
+- **Characterized safe vs dangerous self-reference**:
+  - SAFE: Grounded introspection, stratified introspection, fixed-point stable, convergent revision
+  - DANGEROUS: Liar-like (no fixed point), Curry-like (proves anything), Löbian (self-validation), ungrounded (underdetermined)
+- **Proposed design**: Stratification + Escape Hatch
+  - Default: Tarski-style `Belief<n, A>` type hierarchy
+  - Escape hatch: `self_ref_belief` combinator with fixed-point computation
+  - Hard ban: Curry patterns detected syntactically
+- **Key insight**: CLAIR's belief logic should be like GL, not S4/S5
+  - Distribution (K): ✓
+  - Positive introspection (4): ✓
+  - Löb's axiom (L): ✓ must respect
+  - Truth axiom (T): ✗ rejected (beliefs can be wrong)
+- **Impact**: Thread 9 (Phenomenology) is now UNBLOCKED
+- **Output**: exploration/thread-3-self-reference.md
+- **New questions raised**:
+  - Fixed-point computation complexity
+  - Graded provability logic (literature gap)
+  - Unbounded quantification over beliefs
+  - Formalization in Lean (moves to Thread 8)
