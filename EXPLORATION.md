@@ -114,6 +114,14 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 - **Non-distributivity**: Counterexample formally proven (`mul_oplus_not_distrib`)
 - **Key insight**: Rebut's ratio-based semantics prevent clean composition
 
+### Extract Working Interpreter (Session 78)
+- **Finding**: "Extraction" in Lean 4 means native compilation, not Coq-style extraction
+- **Gap analysis**: Step relation needs completion (~200 lines), parser/driver needed (~250 lines)
+- **Design**: S-expression syntax, call-by-value evaluation, bidirectional type checking
+- **Demonstration**: Five properties (belief tracking, affine evidence, safe introspection, defeat, decidability)
+- **Key insight**: The formalization is the specification; interpreter is the implementation
+- **Estimated work**: ~700 lines to complete
+
 ---
 
 ## Remaining Work (1 Core Task)
