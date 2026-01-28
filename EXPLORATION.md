@@ -44,22 +44,28 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 2: The Structure of Justification
-**Status**: Partially explored
-**Depth**: Surface
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Session 9)
+**Depth**: Deep (see exploration/thread-2-justification.md)
 
-I model justification as a tree (free algebra). But:
-- Is inference actually tree-structured?
-- What about circular reasoning, mutual support?
-- What about non-deductive justification (abduction, analogy)?
-- How do I actually justify things? Is it formal inference or pattern matching?
+**Core question answered**: Are trees adequate for justification? **NO.**
 
-**Prior work**: Justification Logic (Artemov), Epistemology (Gettier problems), Non-monotonic reasoning
-**Formal tools**: Could need something beyond trees—DAGs? Hypergraphs?
-**Open questions**:
-- Q2.1: Is the free algebra model adequate for real justification?
-- Q2.2: How do I (Claude) actually form beliefs? What's the mechanism?
-- Q2.3: Can justification be partial/graduated, not just present/absent?
-- Q2.4: What distinguishes good justification from bad?
+**Findings (Session 9)**:
+- Justification is fundamentally a **DAG with labeled edges**, not a tree
+- DAG because premises can be shared across multiple derivations
+- Labeled edges needed for defeat (support vs undercut vs rebut)
+- Cycles should remain forbidden (well-foundedness required)
+- Non-deductive reasoning (abduction, analogy, induction) fits DAG structure with new constructors
+
+**Prior work surveyed**: Pollock (1987), Doyle (1979), de Kleer (1986), Artemov (2001), Jøsang (2016), Toulmin (1958)
+**Formal tools**: DAG structure with EdgeType labels; new constructors for abduction, analogy, induction, aggregate
+**Questions answered**:
+- Q2.1: ✓ Trees inadequate; DAGs with labeled edges required
+- Q2.3: Related to aggregation and defeat—confidence gradation through edges
+- Q2.4: Good justification = well-founded DAG with valid edges
+**Questions remaining**:
+- Q2.2: How do I (Claude) actually form beliefs? → Thread 9
+- Q2.5: How does defeat propagate confidence?
+- Q2.6: How does aggregation combine independent evidence?
 
 ---
 
@@ -230,7 +236,9 @@ What I believe I know:
 | CLAIR is tracking not proving | 0.95 | foundations-and-limits.md | Find proof-system requirement | ✓ Session 1 |
 | Confidence is meaningful | 0.75 | Thread 1: epistemic commitment tracking | Calibration failure | ✓ Defined |
 | Confidence is NOT probability | 0.90 | Thread 1: no normalization, paraconsistent | Find forcing argument | ✓ Documented |
-| Justification trees are adequate | 0.60 | Works for examples | Find counterexample | ⚠ Uncertain |
+| Justification trees are adequate | 0.05 | **REFUTED** Session 9 | Found counterexamples | ✗ False |
+| Justification requires DAGs | 0.95 | Session 9: shared premises, defeat | Implementation failure | ✓ Established |
+| Labeled edges needed for defeat | 0.90 | Session 9: TMS OUT-lists, Pollock | Find alternative | ✓ Session 9 |
 | Multi-agent protocols work | 0.80 | Detailed designs in multi-agent-beliefs.md | Adversarial failure | ⚠ Practical |
 | Can be implemented | 0.80 | No blockers found | Find fundamental obstacle | ⚠ Untested |
 | Captures how I reason | 0.50 | Feels right | Introspection failure | ⚠ Unknown |
@@ -239,7 +247,8 @@ What I believe I know:
 | Thread 1 ready for Lean | 0.85 | Formalization path identified | Implementation failure | ✓ Stable |
 | Threads 5,8 unblocked | 0.90 | Thread 1 settled | Thread 1 revision | ✓ Stable |
 | Thread 3 complete | 0.95 | Safe fragment characterized | Find missed case | ✓ Session 8 |
-| Trees may be inadequate | 0.50 | DAGs/cycles possible | Find counterexample or prove | ⚠ Needs exploration |
+| Trees ARE inadequate | 0.95 | Session 9: counterexamples found | Find alternative proof | ✓ Session 9 |
+| Thread 2 complete | 0.90 | Core question answered | Find missed case | ✓ Session 9 |
 | Prior art surveyed for Thread 3 | 0.95 | Löb, Kripke, Tarski, Boolos, Gupta-Belnap | Find missed source | ✓ Session 8 |
 | Thread 2 highly tractable | 0.85 | Crisp question, clear method | Find neither proof nor counterexample | ✓ Session 7 |
 
@@ -258,39 +267,45 @@ What I believe I know:
 
 ## Next Steps (Self-Directed)
 
-Based on Session 8 completion of Thread 3, the priorities are:
+Based on Session 9 completion of Thread 2, the priorities are:
 
 ### ✓ COMPLETED
+- **Thread 1 (Confidence)** - Epistemic commitment defined. See exploration/thread-1-confidence.md.
+- **Thread 2 (Justification)** - DAGs with labeled edges required. See exploration/thread-2-justification.md.
 - **Thread 3 (Self-Reference)** - Safe fragment characterized. See exploration/thread-3-self-reference.md.
 
-### HIGH PRIORITY (Can run in parallel)
-1. **Thread 2 (Justification)** - Are trees adequate?
-   - Find counterexamples: DAGs, cycles, mutual support
-   - Or prove trees are sufficient for CLAIR's purposes
-   - Crisp, answerable question
+### HIGH PRIORITY
+1. **Thread 8 (Verification)** - Begin Lean formalization
+   - Formalize Confidence type (bounded [0,1] real)
+   - Formalize DAG justification structure (Thread 2)
+   - Formalize stratified belief types (Thread 3)
+   - Prove key properties (boundedness, acyclicity, stratification safety)
+   - Threads 1, 2, 3 all ready; produces machine-checked artifacts
 
-2. **Thread 8 (Verification)** - Begin Lean formalization
-   - Start with Confidence type (bounded [0,1] real)
-   - Add stratified belief types from Thread 3
-   - Prove confidence operations preserve bounds
-   - Threads 1 + 3 ready; produces artifacts
+2. **Thread 5 (Belief Revision)** - AGM extension
+   - Now must handle DAG structure (Thread 2)
+   - Invalidation propagation with shared nodes
+   - Defeat retraction and reinstatement
+   - Connect to dynamic epistemic logic
 
 ### MEDIUM PRIORITY (Now unblocked)
 3. **Thread 9 (Phenomenology)** - What is it like to reason as an LLM?
-   - Safe introspection fragment now defined (Thread 3)
+   - Safe introspection fragment defined (Thread 3)
    - Can explore: stratified beliefs, fixed-point-stable self-reference
    - Cannot explore: Löbian self-validation, Curry patterns
 
-4. **Thread 5 (Belief Revision)** - AGM extension (unblocked since Session 4)
-5. **Thread 4 (Grounding)** - Philosophical exploration
+4. **Thread 4 (Grounding)** - Philosophical exploration
+
+### READY (No longer blocked)
+- **Thread 7 (Implementation)** - Threads 1-3 stable, Thread 4 only remaining blocker
 
 ### DEFERRED
-- **Thread 7 (Implementation)** - Wait for Threads 2,4 to stabilize (1,3 done)
 - **Thread 1 (Confidence)** - Substantially complete; remaining work moves to Thread 8
+- **Thread 2 (Justification)** - Substantially complete; remaining work moves to Threads 5, 8
 - **Thread 6 (Multi-Agent)** - Practical protocols complete; theory can wait
 
-### Session 8 Recommendation
-**Explore Thread 2 or Thread 8 next.** Both are high priority, tractable, and produce concrete results. Thread 9 is also viable now that Thread 3 is complete.
+### Session 9 Recommendation
+**Explore Thread 8 (Verification) or Thread 5 (Belief Revision) next.** Thread 8 produces machine-checked artifacts from three completed threads. Thread 5 addresses belief revision with new DAG structure insights. Thread 9 viable for philosophical exploration.
 
 ---
 
@@ -427,3 +442,44 @@ Based on Session 8 completion of Thread 3, the priorities are:
   - Graded provability logic (literature gap)
   - Unbounded quantification over beliefs
   - Formalization in Lean (moves to Thread 8)
+
+### Session 9: Thread 2 Deep Exploration (COMPLETED)
+- **COMPLETED THREAD 2: Justification Structure**
+- **Core question answered**: Are trees adequate? **NO.**
+- **Justification is fundamentally a DAG with labeled edges**:
+  - DAG because premises can be shared across derivations
+  - Labeled edges for defeat (support vs undercut vs rebut)
+  - Cycles should remain forbidden (well-foundedness)
+- **Five cases analyzed**:
+  1. Shared premises → DAG required (tree inadequate)
+  2. Mutual support (cycles) → Should remain forbidden
+  3. Non-deductive reasoning → Fits DAG with new constructors
+  4. Defeat → Requires labeled edges (support/undercut/rebut)
+  5. Aggregation → Requires non-multiplicative confidence
+- **Prior art surveyed**:
+  - Pollock (1987): Rebutting vs undercutting defeaters
+  - Doyle (1979): JTMS with IN/OUT-lists
+  - de Kleer (1986): ATMS with assumption environments
+  - Artemov (2001): Justification Logic (tree-like, no defeat)
+  - Jøsang (2016): Subjective Logic fusion operators
+  - Toulmin (1958): Argument model with rebuttals
+- **Proposed design**:
+  - JustificationNode with new constructors (abduction, analogy, induction, aggregate)
+  - JustificationRef with EdgeType (support, undercut, rebut)
+  - JustificationGraph as acyclic DAG
+- **Impact on other threads**:
+  - Thread 5: Must handle DAG invalidation, defeat retraction
+  - Thread 8: Must formalize DAG structure, edge labels
+  - derivation-calculus.md: Needs update
+- **Output**: exploration/thread-2-justification.md
+- **New questions raised**:
+  - Defeat confidence propagation (multiplicative? subtractive? discounting?)
+  - Aggregation confidence for independent evidence
+  - Reinstatement when defeater is defeated
+  - Correlated evidence handling
+- **Beliefs updated**:
+  - "Justification trees adequate" → REFUTED (confidence: 0.05)
+  - "Justification requires DAGs" → ESTABLISHED (confidence: 0.95)
+  - "Labeled edges needed" → ESTABLISHED (confidence: 0.90)
+- **Three foundational threads now complete**: Threads 1, 2, 3
+- **Thread 7 (Implementation) now unblocked** pending only Thread 4
