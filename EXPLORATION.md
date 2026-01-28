@@ -70,8 +70,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 3: Self-Reference and Introspection
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25)
-**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27)
+**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md)
 
 CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 
@@ -103,6 +103,18 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - Cause: transitivity + continuous values (Vidal 2019)
 - Decidable fragments: CPL-finite (discrete values), CPL-0 (stratified only)
 - Implication: Stratification is primary safety mechanism; anti-bootstrapping is guideline
+
+**Graded Löb Discount Function (Session 26)**:
+- g(c) = c² is the recommended discount function for graded Löb axiom
+- Derivation: penalty = c(1-c), so g(c) = c - c(1-c) = c²
+- Anti-bootstrapping: c → c² → c⁴ → ... → 0 (for c < 1)
+- Alternative: g(c) = c×d (product discount) acceptable for tunable systems
+
+**CPL Soundness/Completeness (Session 27)**:
+- CPL-finite: likely sound and complete via Bou et al. (2011) framework
+- CPL-0 (stratified): straightforward soundness/completeness
+- Full CPL: completeness uncertain due to undecidability
+- Key insight: graded Löb axiom with g(c) = c² is semantically sound
 
 ---
 
@@ -399,6 +411,15 @@ What I believe I know:
 | Anti-bootstrapping is guideline not invariant | 0.85 | Session 25: cannot check full CPL | Find decidable checking method | ⚠ Pragmatic |
 | Transitive fuzzy modal logic undecidable | 0.95 | Session 25: Vidal (2019) formal proof | Find error in Vidal | ✓ Session 25 |
 | Quasimodel approach for CPL uncertain | 0.40 | Session 25: unproven, non-trivial | Prove quasimodel completeness | ⚠ Unknown |
+| g(c) = c² for graded Löb | 0.95 | Session 26: all desiderata, derivation from first principles | Find better discount function | ✓ Session 26 |
+| g(c) = c² aligns with CLAIR ops | 0.90 | Session 26: matches multiplicative structure | Find algebraic conflict | ✓ Session 26 |
+| Anti-bootstrapping via g(c) = c² | 0.85 | Session 26: c → c² → c⁴ → ... → 0 | Find fixed point > 0 for c < 1 | ✓ Proven |
+| CPL-finite soundness | 0.90 | Session 27: axiom verification via Bou et al. | Find unsound axiom | ✓ Session 27 |
+| CPL-finite completeness | 0.80 | Session 27: canonical model + finite lattice | Find countermodel | ⚠ Session 27 |
+| CPL-0 soundness/completeness | 0.85 | Session 27: stratification simplifies | Find same-level issue | ✓ Session 27 |
+| Full CPL completeness | 0.25 | Session 27: undecidability suggests failure | Prove via novel methods | ⚠ Unlikely |
+| Graded Löb axiom semantically sound | 0.90 | Session 27: g(c) = c² ensures anti-bootstrapping | Find counterexample | ✓ Session 27 |
+| Bou et al. (2011) key framework | 0.95 | Session 27: many-valued modal completeness | Find better framework | ✓ Session 27 |
 
 ---
 

@@ -77,7 +77,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 **New tasks discovered (Session 22)**:
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
-- [ ] **3.17 CPL soundness/completeness** - Formulate and prove for CPL (or decidable fragments)
+- [x] **3.17 CPL soundness/completeness** - ANSWERED Session 27: CPL-finite and CPL-0 (stratified) likely have soundness and completeness via Bou et al. (2011) framework. Full CPL completeness is uncertain due to undecidability. Proof sketches provided. Key insight: the graded Löb axiom with g(c) = c² is semantically sound. See exploration/thread-3.17-cpl-soundness-completeness.md
 - [x] **3.18 Graded Löb discount function** - ANSWERED Session 26: g(c) = c² (quadratic) is the recommended choice. Supported by: (1) all mathematical desiderata satisfied, (2) derivation from first principles (penalty = c(1-c), so g(c) = c - c(1-c) = c²), (3) alignment with CLAIR's multiplicative structure. Alternative g(c) = c×d (product discount) also acceptable for tunable systems. See exploration/thread-3.18-loeb-discount.md
 - [ ] **3.19 Type-level anti-bootstrapping** - Implement Löb constraints in CLAIR's type checker (use stratification, not full CPL)
 
@@ -994,6 +994,43 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - g(c) = c² captures anti-bootstrapping semantics: 0.85
     - g(c) = c² aligns with CLAIR operations: 0.90
     - Task 3.18 substantially answered: 0.90
+
+### Session 27 Discoveries (Task 3.17 CPL Soundness/Completeness)
+
+144. **CPL-FINITE LIKELY HAS SOUNDNESS AND COMPLETENESS** — Via Bou et al. (2011) framework for many-valued modal logics over finite residuated lattices.
+
+145. **Key prior art identified**:
+    - Bou, Esteva, Godo, Rodríguez (2011): "On the Minimum Many-Valued Modal Logic over a Finite Residuated Lattice" — foundational framework
+    - Segerberg (1971): Classical GL completeness via canonical model + filtration
+    - Negri (2005, 2014): Labelled sequent calculi for GL with direct completeness
+
+146. **Soundness proof sketch for CPL-finite**:
+    - K (Graded Distribution): Follows from product t-norm residuation
+    - 4 (Graded Introspection): Follows from graded transitivity of accessibility
+    - L (Graded Löb with g(c) = c²): Novel verification — anti-bootstrapping ensures soundness
+    - No Truth axiom: Trivially sound (not claimed)
+
+147. **Completeness approach for CPL-finite**:
+    - Canonical model construction over finite lattice L = {0, 1/n, 2/n, ..., 1}
+    - Maximally L-consistent sets as worlds
+    - Truth lemma by induction on formula structure
+    - Completeness follows from consistency extension
+
+148. **CPL-0 (stratified) has straightforward soundness/completeness**:
+    - Without same-level self-reference, Löb is vacuously satisfied
+    - Reduces to many-valued modal logic per level
+    - Compose completeness across stratified levels
+
+149. **Full CPL completeness is uncertain**:
+    - Undecidability (Vidal 2019) suggests standard completeness may fail
+    - Strong completeness definitely fails (compactness fails, as for classical GL)
+    - Algebraic completeness might be possible with novel CPL-algebras
+
+150. **Confidence assessment**:
+    - CPL-finite soundness: 0.90
+    - CPL-finite completeness: 0.80
+    - CPL-0 soundness and completeness: 0.85
+    - Full CPL completeness: 0.25
 
 ## Impossibilities Encountered
 
