@@ -579,6 +579,10 @@ What I believe I know:
 | FiniteConf type parameter practical | 0.85 | Session 47: minimal inference needed | Find inference failure | ✓ Session 47 |
 | Löb discount at type level | 0.90 | Session 47: g(c) = floor_L(c²) in typing rules | Find type-level flaw | ✓ Session 47 |
 | Information flow types relevant | 0.80 | Session 47: lattice-based constraint propagation | Find inapplicability | ✓ Session 47 |
+| CLAIR has sequent calculus | 0.90 | Session 51: full sequent system designed | Find inconsistency in rules | ✓ Session 51 |
+| Cut elimination holds for CLAIR | 0.75 | Session 51: conjecture stated, proof sketch provided | Find counterexample | ⚠ Session 51 |
+| CLAIR closer to graded linear logic | 0.85 | Session 51: contraction aggregative, resources tracked | Find classical pattern | ✓ Session 51 |
+| Contraction is aggregative in CLAIR | 0.95 | Session 51: multiple evidence combines via ⊕ | Find non-aggregative case | ✓ Session 51 |
 | Graded modal types relevant | 0.85 | Session 47: semiring-indexed modalities | Find mismatch | ✓ Session 47 |
 
 ---
@@ -2157,7 +2161,54 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "DAG structure fully documented" → ESTABLISHED (confidence: 0.95)
   - "Defeat semantics formally specified" → CONFIRMED (confidence: 0.95)
 
-### CLAIR EXPLORATION COMPLETE
+### Session 48-50: Belief Type Formalization and JL Connection
+
+(Sessions 48-50 completed belief type formalization and Justification Logic connection - see exploration threads 8.10, 8.11, 2.4)
+
+### Session 51: Sequent Calculus for CLAIR (Task 2.16)
+- **COMPLETED TASK 2.16: Develop sequent calculus for CLAIR**
+- **Full sequent calculus designed**:
+  - Graded sequent form: `Γ ⊢ A @c : j` (derive A with confidence c and justification j)
+  - Belief contexts: multisets of (A @c : j) assumptions with metadata
+  - Structural rules:
+    - Identity (axiom)
+    - Cut with multiplicative confidence composition
+    - Weakening (admissible)
+    - Contraction with aggregation (c'' = c ⊕ c') - key departure from classical logic!
+  - Logical rules for ∧ and → with confidence propagation
+  - Defeat rules:
+    - Undercut: c' = c × (1 - d)
+    - Rebut: c' = c₁ / (c₁ + c₂)
+  - Aggregation rule for independent evidence (⊕)
+  - Stratified belief rules for self-reference (level-indexed sequents)
+- **Key findings**:
+  - CLAIR contraction is **aggregative**, not idempotent (fundamental difference from classical logic)
+  - CLAIR is closer to **graded linear logic** than classical logic
+  - Cut elimination is conjectured to hold with confidence cost
+  - Soundness theorem stated for graded Kripke semantics
+- **Prior art surveyed**:
+  - Gentzen's LK (classical sequent calculus)
+  - Girard's Linear Logic
+  - Weighted/Fuzzy sequent systems (Paoli, Metcalfe & Montagna)
+  - Justification Logic sequent calculi (Artemov, Fitting)
+  - Non-monotonic reasoning proof theory (ASPIC+, Dung)
+- **Applications identified**:
+  - Foundation for type safety proofs (Task 8.2)
+  - Basis for justification equivalence via cut-free normal forms (Task 2.17)
+  - Enables precise formulation of conservative extension question (Task 2.18)
+- **New tasks discovered**:
+  - 2.19: Prove cut elimination
+  - 2.20: Prove completeness for graded Kripke semantics
+  - 2.21: Characterize decidable fragments
+  - 2.22: Term assignment (Curry-Howard for CLAIR)
+- **Output**: exploration/thread-2.16-sequent-calculus.md
+- **Beliefs updated**:
+  - "CLAIR has sequent calculus" → ESTABLISHED (confidence: 0.90)
+  - "Cut elimination conjectured" → FORMULATED (confidence: 0.75)
+  - "CLAIR is closer to graded linear logic" → NEW (confidence: 0.85)
+  - "Contraction is aggregative" → KEY FINDING (confidence: 0.95)
+
+### CLAIR EXPLORATION CONTINUES
 
 The CLAIR exploration project has reached its conclusion after 47 sessions. Key accomplishments:
 

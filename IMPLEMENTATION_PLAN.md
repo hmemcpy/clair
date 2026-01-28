@@ -52,9 +52,15 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 **New tasks discovered (Session 50)**:
 - [ ] **2.15 Add Choice construct** - For JL-compatibility, should CLAIR add JL-style sum (choice of justifications)? Different from aggregation. Confidence = max(alternatives)?
-- [ ] **2.16 Sequent calculus for CLAIR** - Develop sequent calculus presentation for better proof-theoretic foundations
-- [ ] **2.17 Justification equivalence** - When are two CLAIR justification DAGs "equivalent"? Normal forms?
-- [ ] **2.18 Conservative extension** - Is CLAIR a conservative extension of JL? Formalize relationship
+- [x] **2.16 Sequent calculus for CLAIR** - COMPLETED Session 51: Full sequent calculus designed with graded judgments Γ ⊢ A @c : j. Structural rules (Id, Cut, Weak, Contr with aggregation), logical rules (∧, →), defeat rules (Undercut, Rebut), aggregation rule, and stratified belief rules. Cut elimination conjectured. Soundness theorem stated. See exploration/thread-2.16-sequent-calculus.md
+- [ ] **2.17 Justification equivalence** - When are two CLAIR justification DAGs "equivalent"? Normal forms? (Informed by 2.16: cut-free derivations define equivalence via normal forms)
+- [ ] **2.18 Conservative extension** - Is CLAIR a conservative extension of JL? Formalize relationship (Informed by 2.16: sequent calculus enables precise formulation)
+
+**New tasks discovered (Session 51)**:
+- [ ] **2.19 Cut elimination proof** - Prove cut elimination for CLAIR sequent calculus. Key for type safety.
+- [ ] **2.20 CLAIR completeness** - Prove completeness of sequent calculus for graded Kripke semantics
+- [ ] **2.21 Decidable fragments** - Characterize decidable fragments of CLAIR (rational confidence, finite lattice)
+- [ ] **2.22 Proof terms (Curry-Howard)** - What's the term assignment for CLAIR sequents?
 
 ### Thread 3: Self-Reference
 **Status**: ✓ SUBSTANTIALLY EXPLORED. Safe fragment characterized. Design proposal ready. See exploration/thread-3-self-reference.md
