@@ -97,14 +97,34 @@ Terms t ::= c           (constant justification, axiom)
           | !t          (proof checker: if t:P then !t:(t:P))
 ```
 
-### Key Axiom: Application
+### Key Axioms
+**Application Axiom**:
 ```
 s : (P → Q) → (t : P → (s · t) : Q)
-
 "If s justifies P→Q, and t justifies P, then s·t justifies Q"
 ```
 
-### Relevance to CLAIR
+**Sum Axiom (Monotonicity)**:
+```
+t : P → (t + s) : P
+"If t justifies P, then t + s also justifies P (for any s)"
+```
+
+**Proof Checker Axiom**:
+```
+t : P → !t : (t : P)
+"If t justifies P, then !t justifies that t justifies P"
+```
+
+### Semantics (Kripke-Fitting Models)
+A JL model is (W, R, V, E) where E is an "evidence function" E : Terms × Formulas → P(W).
+Key condition: w ⊨ t : P iff w ∈ E(t, P) and ∀w'. R(w,w') → w' ⊨ P
+
+### Key Theorems
+- **Internalization**: For any provable P, there exists t such that t : P is provable
+- **Realization**: Every S4 theorem can be realized in LP by replacing □ with terms
+
+### Relevance to CLAIR (Session 50 Analysis)
 Our justification composition directly mirrors justification logic's · operator. We have:
 ```
 just(derive b₁, b₂ by r) = rule(r, just(b₁), just(b₂))
@@ -112,9 +132,27 @@ just(derive b₁, b₂ by r) = rule(r, just(b₁), just(b₂))
 
 This is essentially `r · j₁ · j₂` in justification logic notation.
 
+**CLAIR extends JL in multiple dimensions**:
+| Dimension | JL | CLAIR |
+|-----------|---|-------|
+| Grading | Binary (0 or 1) | Continuous [0,1] |
+| Evidence type | Positive only | Positive + Defeat |
+| Structure | Tree (terms) | DAG (shared premises) |
+| Revision | None | Full revision theory |
+| Self-reference | Free (!) | Stratified levels |
+
+**Key differences**:
+- JL sum (+) ≠ CLAIR aggregation (⊕): JL sum is choice ("either suffices"), CLAIR aggregation is evidence combination ("both strengthen")
+- JL proof checker (!) ≈ CLAIR introspect, but CLAIR adds explicit level stratification
+- Translation from CLAIR to JL is lossy (loses defeat and confidence information)
+
 ### Key Papers
 - Artemov, "Explicit Provability and Constructive Semantics" (2001)
 - Artemov & Fitting, "Justification Logic: Reasoning with Reasons" (2019, book)
+- Fitting, "The Logic of Proofs, Semantically" (2005)
+- Kuznets & Studer, "Logics of Proofs and Justifications" (2019)
+
+See also: exploration/thread-2.4-justification-logic-connection.md
 
 ---
 

@@ -44,8 +44,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 2: The Structure of Justification
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Session 9)
-**Depth**: Deep (see exploration/thread-2-justification.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50)
+**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md)
 
 **Core question answered**: Are trees adequate for justification? **NO.**
 
@@ -56,16 +56,24 @@ What IS confidence for an LLM?
 - Cycles should remain forbidden (well-foundedness required)
 - Non-deductive reasoning (abduction, analogy, induction) fits DAG structure with new constructors
 
-**Prior work surveyed**: Pollock (1987), Doyle (1979), de Kleer (1986), Artemov (2001), Jøsang (2016), Toulmin (1958)
+**Findings (Session 50) - Connection to Artemov's Justification Logic**:
+- CLAIR extends JL in multiple dimensions: confidence, defeat, DAG structure, revision
+- JL's application (·) ↔ CLAIR's Support-derivation with confidence propagation
+- JL's sum (+) ≠ CLAIR's aggregation (different semantics: choice vs. evidence combination)
+- Translation from CLAIR to JL is lossy (loses defeat and confidence)
+- CLAIR is strictly more expressive than JL for belief structures
+- Potential extension: add `Choice` construct for JL-style "any suffices" scenarios
+
+**Prior work surveyed**: Pollock (1987), Doyle (1979), de Kleer (1986), Artemov (2001, 2019), Jøsang (2016), Toulmin (1958), Fitting (2005)
 **Formal tools**: DAG structure with EdgeType labels; new constructors for abduction, analogy, induction, aggregate
 **Questions answered**:
 - Q2.1: ✓ Trees inadequate; DAGs with labeled edges required
 - Q2.3: Related to aggregation and defeat—confidence gradation through edges
-- Q2.4: Good justification = well-founded DAG with valid edges
+- Q2.4: ✓ CLAIR extends JL; formal mapping established (Session 50)
 **Questions remaining**:
 - Q2.2: How do I (Claude) actually form beliefs? → Thread 9
-- Q2.5: How does defeat propagate confidence?
-- Q2.6: How does aggregation combine independent evidence?
+- Q2.15: Should CLAIR add JL-style Choice construct?
+- Q2.16: Develop sequent calculus for CLAIR
 
 ---
 

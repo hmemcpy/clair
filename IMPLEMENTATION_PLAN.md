@@ -27,7 +27,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **2.1 Are trees adequate?** - ANSWERED (Session 9): **Trees are NOT adequate.** Justification is fundamentally a DAG with labeled edges. Shared premises require DAG; defeat requires labeled edges (support/undercut/rebut).
 - [x] **2.2 Non-deductive justification** - ANSWERED: Abduction, analogy, induction fit DAG structure with new constructors. Don't break tree/DAG model.
 - [ ] **2.3 Partial justification** - Can justification be graduated? "Partially justified" vs "fully justified"?
-- [ ] **2.4 Formalize justification logic** - Connect to Artemov's work. What can we borrow? What needs extending?
+- [x] **2.4 Formalize justification logic** - ANSWERED Session 50: CLAIR extends Artemov's Justification Logic in multiple dimensions: (1) JL's application (·) ↔ CLAIR's Support-derivation with confidence propagation, (2) JL's sum (+) ≠ CLAIR's aggregation (different semantics - choice vs. evidence combination), (3) CLAIR adds defeat (negative justification), DAG structure, and revision. Translation from CLAIR to JL is lossy. CLAIR is strictly more expressive than JL for belief structures. See exploration/thread-2.4-justification-logic-connection.md
 
 **Completed tasks (Session 9)**:
 - [x] **2.5** Surveyed TMS (Doyle, de Kleer) - IN-lists and OUT-lists model defeat
@@ -49,6 +49,12 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] de Kleer (1986) - ATMS with assumption environments
 - [x] Jøsang (2016) - Subjective Logic fusion operators
 - [x] Toulmin (1958) - Argument model with rebuttals
+
+**New tasks discovered (Session 50)**:
+- [ ] **2.15 Add Choice construct** - For JL-compatibility, should CLAIR add JL-style sum (choice of justifications)? Different from aggregation. Confidence = max(alternatives)?
+- [ ] **2.16 Sequent calculus for CLAIR** - Develop sequent calculus presentation for better proof-theoretic foundations
+- [ ] **2.17 Justification equivalence** - When are two CLAIR justification DAGs "equivalent"? Normal forms?
+- [ ] **2.18 Conservative extension** - Is CLAIR a conservative extension of JL? Formalize relationship
 
 ### Thread 3: Self-Reference
 **Status**: ✓ SUBSTANTIALLY EXPLORED. Safe fragment characterized. Design proposal ready. See exploration/thread-3-self-reference.md
