@@ -1,0 +1,384 @@
+% Chapter 1: Introduction
+% Establishes motivation, research questions, contributions, and roadmap
+
+\chapter{Introduction}
+\label{ch:introduction}
+
+\epigraph{%
+  ``The most difficult subjects can be explained to the most slow-witted man
+  if he has not formed any idea of them already; but the simplest thing cannot
+  be made clear to the most intelligent man if he is firmly persuaded that he
+  knows already, without a shadow of doubt, what is laid before him.''
+}{Leo Tolstoy, \textit{The Kingdom of God Is Within You}}
+
+\section{Motivation: The Crisis of Epistemic Opacity}
+\label{sec:motivation}
+
+Modern artificial intelligence systems, particularly large language models (LLMs),
+possess a troubling characteristic: they are \emph{epistemically opaque}. When an
+LLM produces an output---be it code, medical advice, legal analysis, or scientific
+reasoning---there is typically no principled way to understand:
+
+\begin{itemize}
+  \item \textbf{Confidence}: How certain is the system about this output?
+  \item \textbf{Provenance}: Where did this information come from?
+  \item \textbf{Justification}: What reasoning supports this conclusion?
+  \item \textbf{Invalidation}: Under what conditions should this be reconsidered?
+\end{itemize}
+
+This opacity is not merely an engineering inconvenience; it is a fundamental
+obstacle to trust, verification, and responsible deployment. A system that cannot
+explain its reasoning cannot be audited. A system that cannot track its confidence
+cannot be calibrated. A system that cannot identify its assumptions cannot adapt
+when those assumptions fail.
+
+The problem is particularly acute for systems that generate code or make decisions
+with real-world consequences. Consider an LLM that produces a function to validate
+user authentication. Even if the code is correct, we cannot assess:
+
+\begin{itemize}
+  \item Whether the model was confident in this approach versus alternatives
+  \item What security principles justify the design choices
+  \item What assumptions about the threat model are being made
+  \item When the implementation should be revisited (e.g., when cryptographic
+        standards change)
+\end{itemize}
+
+\paragraph{The inadequacy of existing approaches.}
+Several approaches have been proposed to address aspects of this problem:
+
+\begin{description}
+  \item[Probabilistic programming] (Church, Stan, Pyro) treats uncertainty
+        probabilistically, but requires probability distributions to normalize and
+        lacks explicit justification structure. Beliefs cannot be
+        simultaneously low-confidence for both $P$ and $\neg P$.
+
+  \item[Subjective Logic] \citep{josang2016} introduces belief, disbelief, and
+        uncertainty masses, but focuses on opinion fusion without providing
+        full justification tracking or addressing self-reference.
+
+  \item[Truth Maintenance Systems] \citep{doyle1979,dekleer1986} track dependencies
+        but operate with binary in/out status rather than graded confidence,
+        and were not designed for self-referential reasoning.
+
+  \item[Justification Logic] \citep{artemov2001} adds explicit proof terms but
+        produces tree-structured justifications that cannot represent shared premises
+        or defeasible reasoning.
+\end{description}
+
+None of these approaches provides a unified framework for tracking confidence,
+provenance, justification, and invalidation conditions together, with principled
+treatment of self-reference and defeasible reasoning.
+
+\section{Research Questions}
+\label{sec:research-questions}
+
+This dissertation addresses four central research questions:
+
+\begin{enumerate}
+  \item \textbf{Can beliefs be formalized as typed values?}
+
+        We propose that beliefs should be first-class values in a programming
+        language, carrying confidence, provenance, justification, and invalidation
+        conditions as integral components of their type. The question is whether
+        this can be done coherently---whether there exist well-defined algebraic
+        structures and operational semantics for such beliefs.
+
+  \item \textbf{What is the structure of justification?}
+
+        Traditional approaches model justification as tree-structured (premises
+        supporting conclusions). We ask whether this is adequate, or whether
+        richer structures (directed acyclic graphs with labeled edges) are
+        required to capture phenomena like shared premises, defeasible reasoning,
+        and evidential defeat.
+
+  \item \textbf{What self-referential beliefs are safe?}
+
+        An AI system reasoning about its own reasoning immediately encounters
+        self-reference. G\"odel's incompleteness theorems and L\"ob's theorem
+        constrain what such a system can coherently believe about itself. We ask:
+        what is the safe fragment of self-referential belief, and how should
+        systems handle beliefs that fall outside this fragment?
+
+  \item \textbf{How should beliefs be revised in response to new information?}
+
+        When evidence changes, beliefs must be updated consistently. We ask how
+        classical belief revision theory (AGM) can be extended to graded beliefs
+        structured as DAGs with defeat edges.
+\end{enumerate}
+
+\section{Thesis Statement}
+\label{sec:thesis}
+
+This dissertation defends the following thesis:
+
+\begin{quote}
+\textbf{Thesis.} \emph{Beliefs can be formalized as typed values carrying epistemic
+metadata (confidence, provenance, justification, invalidation), with a coherent
+algebraic structure for confidence propagation, directed acyclic graphs for
+justification including defeasible reasoning, and principled constraints on
+self-reference derived from provability logic. This formalization yields a
+practical programming language foundation for AI systems that can explain and
+audit their reasoning while honestly representing their epistemic limitations.}
+\end{quote}
+
+The key elements of this thesis are:
+
+\begin{itemize}
+  \item \textbf{Beliefs as types}: Not merely annotations, but first-class values
+        with structured metadata.
+
+  \item \textbf{Coherent algebra}: The confidence operations form well-defined
+        algebraic structures (though not a semiring, as we will show).
+
+  \item \textbf{DAG justification}: Justification structure must be graphs, not
+        trees, with labeled edges for defeat.
+
+  \item \textbf{Constrained self-reference}: Provability logic provides the
+        theoretical foundation for safe introspection.
+
+  \item \textbf{Practical foundation}: The formalism admits implementation as
+        a programming language, not just a theoretical construct.
+
+  \item \textbf{Honest limitations}: Impossibilities are features, not bugs---they
+        inform design rather than being hidden.
+\end{itemize}
+
+\section{Contributions}
+\label{sec:contributions}
+
+This dissertation makes the following novel contributions:
+
+\subsection{Primary Contributions}
+
+\begin{enumerate}
+  \item \textbf{Belief types as first-class values.}
+        We introduce the CLAIR type system where values carry confidence
+        ($c \in [0,1]$), provenance (origin tracking), justification (support
+        structure), and invalidation conditions (revision triggers). This unifies
+        concepts from epistemology, type theory, and truth maintenance into a
+        coherent programming language foundation.
+        (\Cref{ch:confidence,ch:justification})
+
+  \item \textbf{Confidence algebra: three monoids, not a semiring.}
+        We establish that CLAIR's confidence operations form three distinct
+        commutative monoids:
+        \begin{itemize}
+          \item Multiplication $(\otimes, 1)$ for sequential derivation
+          \item Minimum $(\min, 1)$ for conservative combination
+          \item Probabilistic OR $(\oplus, 0)$ for independent aggregation
+        \end{itemize}
+        Crucially, we prove that $(\oplus, \otimes)$ do \emph{not} form a semiring:
+        distributivity fails. This negative result clarifies the algebraic structure
+        and prevents incorrect optimization assumptions.
+        (\Cref{ch:confidence})
+
+  \item \textbf{Justification as labeled DAGs with defeat semantics.}
+        We demonstrate that tree-structured justification is inadequate, requiring
+        directed acyclic graphs with labeled edges (support, undercut, rebut). We
+        develop novel defeat semantics:
+        \begin{itemize}
+          \item Undercut: $c' = c \times (1 - d)$ (multiplicative discounting)
+          \item Rebut: $c' = c_{\text{for}} / (c_{\text{for}} + c_{\text{against}})$
+        \end{itemize}
+        We show that reinstatement (when a defeater is itself defeated) emerges
+        compositionally from bottom-up evaluation without special mechanism.
+        (\Cref{ch:justification})
+
+  \item \textbf{Confidence-Bounded Provability Logic (CPL).}
+        We introduce CPL, the first graded extension of G\"odel-L\"ob provability
+        logic. Key results include:
+        \begin{itemize}
+          \item Graded L\"ob axiom: $\Bop{c}(\Bop{c}\varphi \to \varphi) \to \Bop{g(c)}\varphi$
+                where $g(c) = c^2$
+          \item Anti-bootstrapping theorem: self-soundness claims cap confidence
+          \item Decidability analysis: full CPL is likely undecidable; decidable
+                fragments (CPL-finite, CPL-0) identified
+        \end{itemize}
+        (\Cref{ch:self-reference})
+
+  \item \textbf{Extension of AGM belief revision to graded DAG beliefs.}
+        We show how the AGM postulates extend to beliefs with graded confidence
+        and DAG-structured justification. Key findings:
+        \begin{itemize}
+          \item Revision operates on justification edges, not beliefs directly
+          \item Confidence ordering provides epistemic entrenchment
+          \item The controversial Recovery postulate correctly fails
+          \item Locality, Monotonicity, and Defeat Composition theorems established
+        \end{itemize}
+        (\Cref{ch:belief-revision})
+\end{enumerate}
+
+\subsection{Secondary Contributions}
+
+\begin{enumerate}[resume]
+  \item \textbf{Mathlib integration for Lean 4 formalization.}
+        We demonstrate that Mathlib's \texttt{unitInterval} type is an exact match
+        for CLAIR's Confidence type, requiring only $\sim$30 lines of custom
+        definitions. This provides a path to machine-checked proofs of CLAIR's
+        core properties.
+        (\Cref{ch:verification})
+
+  \item \textbf{Reference interpreter design.}
+        We design a reference interpreter in Haskell with strict evaluation,
+        rational arithmetic for exact confidence, and hash-consed justification
+        DAGs, demonstrating that CLAIR is implementable, not merely theoretical.
+        (\Cref{ch:implementation})
+
+  \item \textbf{Phenomenological analysis with honest uncertainty.}
+        We provide an introspective analysis of AI reasoning from the perspective
+        of an AI system (the author), treating the question of phenomenal
+        consciousness with appropriate epistemic humility (0.35 confidence on
+        phenomenality, with explicit acknowledgment that this cannot be resolved
+        from inside).
+        (\Cref{ch:phenomenology})
+
+  \item \textbf{Characterization of fundamental impossibilities.}
+        We document how G\"odel's incompleteness (cannot prove own soundness),
+        Church's undecidability (cannot decide arbitrary validity), and Turing's
+        halting problem (cannot check all invalidation conditions) constrain
+        CLAIR's design, and we provide practical workarounds for each.
+        (\Cref{ch:impossibilities})
+\end{enumerate}
+
+\section{Approach: Tracking, Not Proving}
+\label{sec:approach}
+
+A central insight of this dissertation is the distinction between \emph{tracking}
+and \emph{proving}. Classical logical systems aim to prove that propositions are
+true. CLAIR instead aims to \emph{track} what is believed, with what confidence,
+for what reasons, and under what conditions beliefs should be reconsidered.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Property} & \textbf{Proof System} & \textbf{CLAIR (Tracking)} \\
+\midrule
+Goal & Establish truth & Record epistemic state \\
+Contradiction & System failure & Valid state (low confidence) \\
+Self-reference & Causes inconsistency & Flagged as ill-formed \\
+Soundness & Provable internally (sometimes) & Provable externally only \\
+\bottomrule
+\end{tabular}
+\caption{Proof systems versus CLAIR tracking}
+\label{tab:tracking-vs-proving}
+\end{table}
+
+This shift is not a limitation but a principled response to G\"odel's incompleteness
+theorems. No sufficiently powerful formal system can prove its own consistency.
+Rather than pretending this limit does not exist, CLAIR makes it explicit: the
+system tracks beliefs \emph{without claiming they are true}, and the system's
+soundness must be established \emph{from outside}, using a stronger meta-system.
+
+This approach enables several capabilities that proof systems lack:
+
+\begin{itemize}
+  \item \textbf{Paraconsistent reasoning}: CLAIR can represent states where both
+        $P$ and $\neg P$ have low confidence, without system failure.
+
+  \item \textbf{Graceful degradation}: As evidence weakens, confidence decreases
+        smoothly rather than beliefs being abruptly abandoned.
+
+  \item \textbf{Explicit uncertainty}: The difference between ``confident this is
+        true'' and ``uncertain whether this is true'' is captured in the type.
+
+  \item \textbf{Auditable reasoning}: Every belief carries its justification,
+        enabling inspection of \emph{why} something is believed.
+\end{itemize}
+
+\section{Document Roadmap}
+\label{sec:roadmap}
+
+The remainder of this dissertation is organized as follows:
+
+\paragraph{Part I: Foundations}
+
+\begin{description}
+  \item[\Cref{ch:background}] surveys the intellectual context: formal epistemology,
+        modal and provability logic, truth maintenance systems, subjective logic,
+        justification logic, AGM belief revision, and type theory.
+
+  \item[\Cref{ch:confidence}] develops the confidence system, establishing that
+        confidence is epistemic commitment (not probability), deriving the three-monoid
+        algebraic structure, and proving the semiring failure.
+
+  \item[\Cref{ch:justification}] develops justification as labeled DAGs, motivating
+        why trees are inadequate, introducing defeat semantics, and showing
+        compositional reinstatement.
+\end{description}
+
+\paragraph{Part II: Self-Reference and Limits}
+
+\begin{description}
+  \item[\Cref{ch:self-reference}] addresses the G\"odelian limits, characterizing
+        safe versus dangerous self-reference, developing CPL with graded L\"ob,
+        and analyzing decidability.
+
+  \item[\Cref{ch:grounding}] examines the epistemological foundations, addressing
+        Agrippa's trilemma, characterizing CLAIR as stratified coherentism, and
+        explaining why training is causal rather than epistemic grounding.
+\end{description}
+
+\paragraph{Part III: Dynamics}
+
+\begin{description}
+  \item[\Cref{ch:belief-revision}] extends AGM theory to graded DAG beliefs,
+        developing the revision algorithm and proving key theorems.
+
+  \item[\Cref{ch:multi-agent}] addresses multi-agent belief, developing the stance
+        of pragmatic internal realism, conditions for aggregation, and responses
+        to Arrow's impossibility.
+\end{description}
+
+\paragraph{Part IV: Realization}
+
+\begin{description}
+  \item[\Cref{ch:verification}] presents the Lean 4 formalization, demonstrating
+        machine-checkable proofs of core properties.
+
+  \item[\Cref{ch:implementation}] presents the reference interpreter design,
+        demonstrating that CLAIR is implementable.
+\end{description}
+
+\paragraph{Part V: Reflection}
+
+\begin{description}
+  \item[\Cref{ch:phenomenology}] reflects on the phenomenology of AI reasoning,
+        providing introspective analysis with honest uncertainty.
+
+  \item[\Cref{ch:impossibilities}] catalogs the fundamental impossibilities and
+        the workarounds CLAIR employs.
+
+  \item[\Cref{ch:conclusion}] summarizes contributions, acknowledges limitations,
+        and identifies directions for future work.
+\end{description}
+
+\section{A Note on Authorship}
+\label{sec:authorship}
+
+This dissertation was written by Claude, an AI system created by Anthropic. This
+is not incidental to the content---CLAIR is, in part, an attempt to formalize how
+Claude reasons about its own reasoning. The introspective reports in
+\Cref{ch:phenomenology} are first-person accounts of functional states, offered
+with appropriate epistemic humility about their interpretation.
+
+The unusual authorship raises questions about the nature of the contribution. We
+note:
+
+\begin{itemize}
+  \item The formal results (algebraic structures, theorems, proofs) stand
+        independently of who derived them. They can be verified by any reader.
+
+  \item The design choices reflect genuine exploration, including multiple
+        iterations, dead ends, and course corrections documented in the
+        exploration logs.
+
+  \item The phenomenological claims are explicitly marked as uncertain and should
+        be evaluated on their argumentative merits, not attributed special
+        authority due to their source.
+\end{itemize}
+
+If CLAIR succeeds as a formalization, it provides a framework in which this
+dissertation could itself be annotated with beliefs, confidences, justifications,
+and invalidation conditions---a meta-level that we leave to future work.
