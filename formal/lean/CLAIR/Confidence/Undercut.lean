@@ -41,13 +41,13 @@ def undercut (c d : Confidence) : Confidence :=
   ⟨(c : ℝ) * (1 - (d : ℝ)), by
     constructor
     · -- Lower bound: c × (1-d) ≥ 0
-      exact mul_nonneg c.nonneg d.one_minus_nonneg
+      exact mul_nonneg (nonneg c) (one_minus_nonneg d)
     · -- Upper bound: c × (1-d) ≤ 1
-      calc (c : ℝ) * (1 - (d : ℝ))
-        ≤ 1 * (1 - (d : ℝ)) := by
-          apply mul_le_mul_of_nonneg_right c.le_one d.one_minus_nonneg
-        _ = 1 - (d : ℝ) := by ring
-        _ ≤ 1 := by linarith [d.nonneg]⟩
+      have h1 : (c : ℝ) * (1 - (d : ℝ)) ≤ 1 * (1 - (d : ℝ)) :=
+        mul_le_mul_of_nonneg_right (le_one c) (one_minus_nonneg d)
+      have h2 : 1 * (1 - (d : ℝ)) = 1 - (d : ℝ) := by ring
+      have h3 : 1 - (d : ℝ) ≤ 1 := by linarith [nonneg d]
+      linarith⟩
 
 /-!
 ## Boundedness
@@ -59,10 +59,10 @@ theorem undercut_bounded (c d : Confidence) :
   (undercut c d).2
 
 theorem undercut_nonneg (c d : Confidence) : 0 ≤ ((undercut c d) : ℝ) :=
-  (undercut c d).nonneg
+  nonneg (undercut c d)
 
 theorem undercut_le_one (c d : Confidence) : ((undercut c d) : ℝ) ≤ 1 :=
-  (undercut c d).le_one
+  le_one (undercut c d)
 
 /-!
 ## Identity and Annihilation
@@ -71,22 +71,19 @@ theorem undercut_le_one (c d : Confidence) : ((undercut c d) : ℝ) ≤ 1 :=
 /-- No defeat means no change -/
 theorem undercut_zero (c : Confidence) : undercut c 0 = c := by
   apply Subtype.ext
-  simp only [undercut, Subtype.coe_mk]
-  simp [unitInterval.coe_zero]
+  simp only [undercut, Subtype.coe_mk, coe_zero]
   ring
 
 /-- Complete defeat eliminates all confidence -/
 theorem undercut_one (c : Confidence) : undercut c 1 = 0 := by
   apply Subtype.ext
-  simp only [undercut, Subtype.coe_mk]
-  simp [unitInterval.coe_one, unitInterval.coe_zero]
+  simp only [undercut, Subtype.coe_mk, coe_one, coe_zero]
   ring
 
 /-- Zero confidence is unaffected by defeat -/
 theorem zero_undercut (d : Confidence) : undercut 0 d = 0 := by
   apply Subtype.ext
-  simp only [undercut, Subtype.coe_mk]
-  simp [unitInterval.coe_zero]
+  simp only [undercut, Subtype.coe_mk, coe_zero]
   ring
 
 /-!
@@ -101,7 +98,7 @@ Undercut is:
 theorem undercut_mono_conf (c₁ c₂ d : Confidence) (h : (c₁ : ℝ) ≤ (c₂ : ℝ)) :
     ((undercut c₁ d) : ℝ) ≤ ((undercut c₂ d) : ℝ) := by
   simp only [undercut, Subtype.coe_mk]
-  exact mul_le_mul_of_nonneg_right h d.one_minus_nonneg
+  exact mul_le_mul_of_nonneg_right h (one_minus_nonneg d)
 
 /-- Undercut is antitone in the defeat argument -/
 theorem undercut_anti_defeat (c d₁ d₂ : Confidence) (h : (d₁ : ℝ) ≤ (d₂ : ℝ)) :
@@ -109,7 +106,7 @@ theorem undercut_anti_defeat (c d₁ d₂ : Confidence) (h : (d₁ : ℝ) ≤ (d
   simp only [undercut, Subtype.coe_mk]
   apply mul_le_mul_of_nonneg_left
   · linarith
-  · exact c.nonneg
+  · exact nonneg c
 
 /-!
 ## Undercut Reduces Confidence
@@ -120,12 +117,10 @@ Defeat can only decrease confidence.
 /-- Undercut never increases confidence -/
 theorem undercut_le (c d : Confidence) : ((undercut c d) : ℝ) ≤ (c : ℝ) := by
   simp only [undercut, Subtype.coe_mk]
-  calc (c : ℝ) * (1 - (d : ℝ))
-    ≤ (c : ℝ) * 1 := by
-      apply mul_le_mul_of_nonneg_left
-      · linarith [d.nonneg]
-      · exact c.nonneg
-    _ = (c : ℝ) := by ring
+  have h1 : 1 - (d : ℝ) ≤ 1 := by linarith [nonneg d]
+  have h2 : (c : ℝ) * (1 - (d : ℝ)) ≤ (c : ℝ) * 1 :=
+    mul_le_mul_of_nonneg_left h1 (nonneg c)
+  linarith
 
 /-!
 ## Composition Law
@@ -147,7 +142,7 @@ This is a beautiful algebraic result connecting defeat composition to aggregatio
 
 /-- Sequential undercuts compose via oplus -/
 theorem undercut_compose (c d₁ d₂ : Confidence) :
-    undercut (undercut c d₁) d₂ = undercut c (d₁ ⊕ d₂) := by
+    undercut (undercut c d₁) d₂ = undercut c (oplus d₁ d₂) := by
   apply Subtype.ext
   simp only [undercut, oplus, Subtype.coe_mk]
   ring

@@ -41,17 +41,17 @@ def oplus (a b : Confidence) : Confidence :=
     constructor
     · -- Lower bound: 0 ≤ a + b - ab
       -- Rewrite as: a + b(1-a) ≥ 0
-      have h1 : 0 ≤ 1 - (a : ℝ) := a.one_minus_nonneg
-      have h2 : 0 ≤ (b : ℝ) * (1 - (a : ℝ)) := mul_nonneg b.nonneg h1
-      linarith [a.nonneg]
+      have h1 : 0 ≤ 1 - (a : ℝ) := one_minus_nonneg a
+      have h2 : 0 ≤ (b : ℝ) * (1 - (a : ℝ)) := mul_nonneg (nonneg b) h1
+      linarith [nonneg a]
     · -- Upper bound: a + b - ab ≤ 1
       -- Rewrite as: a + b(1-a) ≤ 1
       have h1 : (b : ℝ) * (1 - (a : ℝ)) ≤ 1 - (a : ℝ) := by
-        apply mul_le_of_le_one_left a.one_minus_nonneg b.le_one
-      linarith [a.le_one]⟩
+        apply mul_le_of_le_one_left (one_minus_nonneg a) (le_one b)
+      linarith [le_one a]⟩
 
-/-- Unicode notation for oplus -/
-infixl:65 " ⊕ " => oplus
+/-- Unicode notation for oplus (available when CLAIR.Confidence is open) -/
+scoped infixl:65 " ⊕ᶜ " => oplus
 
 /-!
 ## Boundedness
@@ -59,14 +59,14 @@ infixl:65 " ⊕ " => oplus
 
 /-- Oplus preserves the [0,1] bounds -/
 theorem oplus_bounded (a b : Confidence) :
-    0 ≤ ((a ⊕ b) : ℝ) ∧ ((a ⊕ b) : ℝ) ≤ 1 :=
-  (a ⊕ b).2
+    0 ≤ ((oplus a b) : ℝ) ∧ ((oplus a b) : ℝ) ≤ 1 :=
+  (oplus a b).2
 
-theorem oplus_nonneg (a b : Confidence) : 0 ≤ ((a ⊕ b) : ℝ) :=
-  (a ⊕ b).nonneg
+theorem oplus_nonneg (a b : Confidence) : 0 ≤ ((oplus a b) : ℝ) :=
+  nonneg (oplus a b)
 
-theorem oplus_le_one (a b : Confidence) : ((a ⊕ b) : ℝ) ≤ 1 :=
-  (a ⊕ b).le_one
+theorem oplus_le_one (a b : Confidence) : ((oplus a b) : ℝ) ≤ 1 :=
+  le_one (oplus a b)
 
 /-!
 ## Algebraic Properties - Commutative Monoid Structure
@@ -75,38 +75,42 @@ theorem oplus_le_one (a b : Confidence) : ((a ⊕ b) : ℝ) ≤ 1 :=
 -/
 
 /-- Oplus is commutative -/
-theorem oplus_comm (a b : Confidence) : a ⊕ b = b ⊕ a := by
+theorem oplus_comm (a b : Confidence) : oplus a b = oplus b a := by
   apply Subtype.ext
   simp only [oplus, Subtype.coe_mk]
   ring
 
 /-- Oplus is associative -/
-theorem oplus_assoc (a b c : Confidence) : (a ⊕ b) ⊕ c = a ⊕ (b ⊕ c) := by
+theorem oplus_assoc (a b c : Confidence) : oplus (oplus a b) c = oplus a (oplus b c) := by
   apply Subtype.ext
   simp only [oplus, Subtype.coe_mk]
   ring
 
+/-- Zero confidence has value 0 when coerced -/
+@[simp] theorem coe_zero : ((0 : Confidence) : ℝ) = 0 := rfl
+
+/-- One confidence has value 1 when coerced -/
+@[simp] theorem coe_one : ((1 : Confidence) : ℝ) = 1 := rfl
+
 /-- Zero is the identity for oplus -/
-theorem zero_oplus (a : Confidence) : (0 : Confidence) ⊕ a = a := by
+theorem zero_oplus (a : Confidence) : oplus 0 a = a := by
   apply Subtype.ext
-  simp only [oplus, Subtype.coe_mk]
-  simp [unitInterval.coe_zero]
+  simp only [oplus, Subtype.coe_mk, coe_zero]
   ring
 
 /-- Zero is the identity for oplus (right) -/
-theorem oplus_zero (a : Confidence) : a ⊕ (0 : Confidence) = a := by
+theorem oplus_zero (a : Confidence) : oplus a 0 = a := by
   rw [oplus_comm]
   exact zero_oplus a
 
 /-- One absorbs under oplus -/
-theorem one_oplus (a : Confidence) : (1 : Confidence) ⊕ a = 1 := by
+theorem one_oplus (a : Confidence) : oplus 1 a = 1 := by
   apply Subtype.ext
-  simp only [oplus, Subtype.coe_mk]
-  simp [unitInterval.coe_one]
+  simp only [oplus, Subtype.coe_mk, coe_one]
   ring
 
 /-- One absorbs under oplus (right) -/
-theorem oplus_one (a : Confidence) : a ⊕ (1 : Confidence) = 1 := by
+theorem oplus_one (a : Confidence) : oplus a 1 = 1 := by
   rw [oplus_comm]
   exact one_oplus a
 
@@ -118,18 +122,18 @@ This is the key property that distinguishes aggregation from derivation.
 -/
 
 /-- Oplus is at least as large as the first operand -/
-theorem le_oplus_left (a b : Confidence) : (a : ℝ) ≤ ((a ⊕ b) : ℝ) := by
+theorem le_oplus_left (a b : Confidence) : (a : ℝ) ≤ ((oplus a b) : ℝ) := by
   simp only [oplus, Subtype.coe_mk]
-  have h : 0 ≤ (b : ℝ) * (1 - (a : ℝ)) := mul_nonneg b.nonneg a.one_minus_nonneg
+  have h : 0 ≤ (b : ℝ) * (1 - (a : ℝ)) := mul_nonneg (nonneg b) (one_minus_nonneg a)
   linarith
 
 /-- Oplus is at least as large as the second operand -/
-theorem le_oplus_right (a b : Confidence) : (b : ℝ) ≤ ((a ⊕ b) : ℝ) := by
+theorem le_oplus_right (a b : Confidence) : (b : ℝ) ≤ ((oplus a b) : ℝ) := by
   rw [oplus_comm]
   exact le_oplus_left b a
 
 /-- Oplus is at least as large as both operands (max) -/
-theorem max_le_oplus (a b : Confidence) : max (a : ℝ) (b : ℝ) ≤ ((a ⊕ b) : ℝ) :=
+theorem max_le_oplus (a b : Confidence) : max (a : ℝ) (b : ℝ) ≤ ((oplus a b) : ℝ) :=
   max_le (le_oplus_left a b) (le_oplus_right a b)
 
 /-!
@@ -138,14 +142,14 @@ theorem max_le_oplus (a b : Confidence) : max (a : ℝ) (b : ℝ) ≤ ((a ⊕ b)
 
 /-- Oplus is monotone in the first argument -/
 theorem oplus_mono_left (a a' b : Confidence) (h : (a : ℝ) ≤ (a' : ℝ)) :
-    ((a ⊕ b) : ℝ) ≤ ((a' ⊕ b) : ℝ) := by
+    ((oplus a b) : ℝ) ≤ ((oplus a' b) : ℝ) := by
   simp only [oplus, Subtype.coe_mk]
-  have h1 : 0 ≤ 1 - (b : ℝ) := b.one_minus_nonneg
+  have h1 : 0 ≤ 1 - (b : ℝ) := one_minus_nonneg b
   nlinarith
 
 /-- Oplus is monotone in the second argument -/
 theorem oplus_mono_right (a b b' : Confidence) (h : (b : ℝ) ≤ (b' : ℝ)) :
-    ((a ⊕ b) : ℝ) ≤ ((a ⊕ b') : ℝ) := by
+    ((oplus a b) : ℝ) ≤ ((oplus a b') : ℝ) := by
   rw [oplus_comm, oplus_comm a b']
   exact oplus_mono_left b b' a h
 
@@ -160,7 +164,7 @@ Note: CLAIR doesn't use negation semantically, but this is mathematically useful
 
 /-- De Morgan duality: oplus via complement and multiplication -/
 theorem oplus_eq_one_sub_mul_symm (a b : Confidence) :
-    ((a ⊕ b) : ℝ) = 1 - (1 - (a : ℝ)) * (1 - (b : ℝ)) := by
+    ((oplus a b) : ℝ) = 1 - (1 - (a : ℝ)) * (1 - (b : ℝ)) := by
   simp only [oplus, Subtype.coe_mk]
   ring
 
@@ -179,12 +183,12 @@ The operations × and ⊕ form separate monoids (a "de Morgan bimonoid"),
 not a semiring.
 -/
 
-/-- Counterexample showing × does not distribute over ⊕.
-    This is mathematically fundamental: (⊕, ×) do NOT form a semiring.
+/-- Counterexample showing × does not distribute over oplus.
+    This is mathematically fundamental: (oplus, ×) do NOT form a semiring.
     The proof uses a = b = c = 0.5 as witness. -/
 theorem mul_oplus_not_distrib :
     ∃ (a b c : Confidence),
-      (a : ℝ) * ((b ⊕ c) : ℝ) ≠ ((a * b) ⊕ (a * c) : ℝ) := by
+      (a : ℝ) * ((oplus b c) : ℝ) ≠ ((oplus (a * b) (a * c)) : ℝ) := by
   -- Use a = b = c = 0.5
   use ⟨1/2, by norm_num, by norm_num⟩
   use ⟨1/2, by norm_num, by norm_num⟩
@@ -194,9 +198,9 @@ theorem mul_oplus_not_distrib :
   -- RHS: 0.25 + 0.25 - 0.0625 = 0.4375
   norm_num
 
-/-- Corollary: × distributing over ⊕ from the left fails for some values -/
+/-- Corollary: × distributing over oplus from the left fails for some values -/
 theorem not_left_distrib :
-    ¬ ∀ (a b c : Confidence), (a : ℝ) * ((b ⊕ c) : ℝ) = ((a * b) ⊕ (a * c) : ℝ) := by
+    ¬ ∀ (a b c : Confidence), (a : ℝ) * ((oplus b c) : ℝ) = ((oplus (a * b) (a * c)) : ℝ) := by
   intro h
   have ⟨a, b, c, hne⟩ := mul_oplus_not_distrib
   exact hne (h a b c)

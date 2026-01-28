@@ -18,7 +18,7 @@ of multiplication.
 See: exploration/thread-8-verification.md §12.3.2
 -/
 
-import CLAIR.Confidence.Basic
+import CLAIR.Confidence.Oplus
 
 namespace CLAIR
 
@@ -36,7 +36,7 @@ Result is always one of the operands, so trivially in [0,1].
 
 /-- Minimum for conservative combination of confidence.
     Returns the lower of two confidences. -/
-def min (a b : Confidence) : Confidence :=
+noncomputable def min (a b : Confidence) : Confidence :=
   if (a : ℝ) ≤ (b : ℝ) then a else b
 
 /-!
@@ -91,16 +91,13 @@ theorem le_min (c a b : Confidence) (ha : (c : ℝ) ≤ (a : ℝ)) (hb : (c : �
 /-- Min is commutative -/
 theorem min_comm (a b : Confidence) : min a b = min b a := by
   unfold min
-  split_ifs with h1 h2
+  split_ifs with h1 h2 h3 h4
+  all_goals try rfl
   · -- a ≤ b and b ≤ a → a = b
     apply Subtype.ext
     linarith
-  · -- a ≤ b and ¬(b ≤ a) → a < b, so min is a
-    rfl
-  · -- ¬(a ≤ b) and b ≤ a → b < a, so min is b
-    rfl
   · -- ¬(a ≤ b) and ¬(b ≤ a) → contradiction (trichotomy)
-    push_neg at h1 h2
+    push_neg at h1 h3
     exfalso; linarith
 
 /-- Min is associative -/
@@ -115,9 +112,12 @@ theorem min_assoc (a b c : Confidence) : min (min a b) c = min a (min b c) := by
 theorem one_min (a : Confidence) : min 1 a = a := by
   unfold min
   split_ifs with h
-  · simp only [unitInterval.coe_one] at h
+  · -- 1 ≤ a means a = 1 (since a ≤ 1)
     apply Subtype.ext
-    linarith [a.le_one]
+    have h1 : (1 : Confidence) = (1 : ℝ) := rfl
+    have h2 := le_one a
+    simp only [coe_one] at h
+    linarith
   · rfl
 
 /-- One is the identity for min (right) -/
@@ -131,9 +131,9 @@ theorem zero_min (a : Confidence) : min 0 a = 0 := by
   split_ifs with h
   · rfl
   · push_neg at h
-    simp only [unitInterval.coe_zero] at h
+    simp only [coe_zero] at h
     exfalso
-    linarith [a.nonneg]
+    linarith [nonneg a]
 
 /-- Zero absorbs under min (right) -/
 theorem min_zero (a : Confidence) : min a 0 = 0 := by
@@ -164,12 +164,12 @@ theorem mul_le_min (a b : Confidence) : (a : ℝ) * (b : ℝ) ≤ ((min a b) : �
   split_ifs with h
   · -- Case a ≤ b: show a × b ≤ a
     calc (a : ℝ) * (b : ℝ)
-      ≤ (a : ℝ) * 1 := by apply mul_le_mul_of_nonneg_left b.le_one a.nonneg
+      ≤ (a : ℝ) * 1 := by apply mul_le_mul_of_nonneg_left (le_one b) (nonneg a)
       _ = (a : ℝ) := mul_one _
   · -- Case b < a: show a × b ≤ b
     push_neg at h
     calc (a : ℝ) * (b : ℝ)
-      ≤ 1 * (b : ℝ) := by apply mul_le_mul_of_nonneg_right a.le_one b.nonneg
+      ≤ 1 * (b : ℝ) := by apply mul_le_mul_of_nonneg_right (le_one a) (nonneg b)
       _ = (b : ℝ) := one_mul _
 
 /-!
@@ -181,10 +181,15 @@ theorem min_mono_left (a a' b : Confidence) (h : (a : ℝ) ≤ (a' : ℝ)) :
     ((min a b) : ℝ) ≤ ((min a' b) : ℝ) := by
   unfold min
   split_ifs with h1 h2
-  · exact h
-  · exact le_refl _
-  · linarith
-  · exact le_refl _
+  · -- h1: a ≤ b, h2: a' ≤ b, goal: a ≤ a'
+    exact h
+  · -- h1: a ≤ b, h2: ¬(a' ≤ b), goal: a ≤ b
+    exact h1
+  · -- h1: ¬(a ≤ b), h2: a' ≤ b, goal: b ≤ a'
+    push_neg at h1
+    linarith
+  · -- h1: ¬(a ≤ b), h2: ¬(a' ≤ b), goal: b ≤ b
+    exact le_refl (b : ℝ)
 
 /-- Min is monotone in the second argument -/
 theorem min_mono_right (a b b' : Confidence) (h : (b : ℝ) ≤ (b' : ℝ)) :

@@ -17,8 +17,7 @@ Design decisions (per Thread 8.12):
 See: exploration/thread-8.12-clair-syntax-lean.md
 -/
 
-import Mathlib.Data.Rat.Basic
-import Mathlib.Data.Rat.Order
+import Mathlib.Data.Rat.Init
 
 namespace CLAIR.Syntax
 
@@ -40,8 +39,8 @@ abbrev ConfBound := ℚ
 /-- Check that a confidence bound is valid (in [0,1]) -/
 def ConfBound.valid (c : ConfBound) : Prop := 0 ≤ c ∧ c ≤ 1
 
-instance : DecidablePred ConfBound.valid := fun c =>
-  And.decidable
+instance (c : ConfBound) : Decidable (c.valid) :=
+  inferInstanceAs (Decidable (0 ≤ c ∧ c ≤ 1))
 
 /-!
 ## Base Types
@@ -204,59 +203,50 @@ A type is well-formed if all confidence bounds are in [0,1].
 
 /-- A type is well-formed if all confidence bounds are valid -/
 inductive WellFormedTy : Ty → Prop where
-  | base   : WellFormedTy (Ty.base b)
-  | fn     : WellFormedTy A → WellFormedTy B → WellFormedTy (Ty.fn A B)
-  | prod   : WellFormedTy A → WellFormedTy B → WellFormedTy (Ty.prod A B)
-  | sum    : WellFormedTy A → WellFormedTy B → WellFormedTy (Ty.sum A B)
-  | belief : WellFormedTy A → c.valid → WellFormedTy (Ty.belief A c)
-  | meta   : WellFormedTy A → c.valid → WellFormedTy (Ty.meta A n c)
+  | base   : (b : BaseTy) → WellFormedTy (Ty.base b)
+  | fn     : {A B : Ty} → WellFormedTy A → WellFormedTy B → WellFormedTy (Ty.fn A B)
+  | prod   : {A B : Ty} → WellFormedTy A → WellFormedTy B → WellFormedTy (Ty.prod A B)
+  | sum    : {A B : Ty} → WellFormedTy A → WellFormedTy B → WellFormedTy (Ty.sum A B)
+  | belief : {A : Ty} → (c : ConfBound) → WellFormedTy A → ConfBound.valid c → WellFormedTy (Ty.belief A c)
+  | meta   : {A : Ty} → (n : Nat) → (c : ConfBound) → WellFormedTy A → ConfBound.valid c → WellFormedTy (Ty.meta A n c)
 
 /-- Well-formedness is decidable -/
-instance : DecidablePred WellFormedTy := fun ty => by
-  induction ty with
-  | base b => exact isTrue WellFormedTy.base
-  | fn A B ihA ihB =>
-    cases ihA with
+@[instance]
+def decidableWellFormedTy (ty : Ty) : Decidable (WellFormedTy ty) :=
+  match ty with
+  | Ty.base b => isTrue (WellFormedTy.base b)
+  | Ty.fn A B =>
+    match decidableWellFormedTy A, decidableWellFormedTy B with
+    | isTrue hA, isTrue hB => isTrue (WellFormedTy.fn hA hB)
+    | isTrue hA, isFalse hB => isFalse (fun h => by cases h; contradiction)
+    | isFalse hA, _ => isFalse (fun h => by cases h; contradiction)
+  | Ty.prod A B =>
+    match decidableWellFormedTy A, decidableWellFormedTy B with
+    | isTrue hA, isTrue hB => isTrue (WellFormedTy.prod hA hB)
+    | isTrue hA, isFalse hB => isFalse (fun h => by cases h; contradiction)
+    | isFalse hA, _ => isFalse (fun h => by cases h; contradiction)
+  | Ty.sum A B =>
+    match decidableWellFormedTy A, decidableWellFormedTy B with
+    | isTrue hA, isTrue hB => isTrue (WellFormedTy.sum hA hB)
+    | isTrue hA, isFalse hB => isFalse (fun h => by cases h; contradiction)
+    | isFalse hA, _ => isFalse (fun h => by cases h; contradiction)
+  | Ty.belief A c =>
+    match decidableWellFormedTy A with
     | isTrue hA =>
-      cases ihB with
-      | isTrue hB => exact isTrue (WellFormedTy.fn hA hB)
-      | isFalse hB => exact isFalse (fun h => by cases h; contradiction)
-    | isFalse hA => exact isFalse (fun h => by cases h; contradiction)
-  | prod A B ihA ihB =>
-    cases ihA with
+      if hcv : ConfBound.valid c then
+        isTrue (WellFormedTy.belief c hA hcv)
+      else
+        isFalse (fun h => by cases h; contradiction)
+    | isFalse hA => isFalse (fun h => by cases h; contradiction)
+  | Ty.meta A n c =>
+    match decidableWellFormedTy A with
     | isTrue hA =>
-      cases ihB with
-      | isTrue hB => exact isTrue (WellFormedTy.prod hA hB)
-      | isFalse hB => exact isFalse (fun h => by cases h; contradiction)
-    | isFalse hA => exact isFalse (fun h => by cases h; contradiction)
-  | sum A B ihA ihB =>
-    cases ihA with
-    | isTrue hA =>
-      cases ihB with
-      | isTrue hB => exact isTrue (WellFormedTy.sum hA hB)
-      | isFalse hB => exact isFalse (fun h => by cases h; contradiction)
-    | isFalse hA => exact isFalse (fun h => by cases h; contradiction)
-  | belief A c ihA =>
-    cases ihA with
-    | isTrue hA =>
-      cases inferInstance : (c.valid).decide with
-      | true h =>
-        have hc : c.valid := of_decide_eq_true h
-        exact isTrue (WellFormedTy.belief hA hc)
-      | false h =>
-        have hc : ¬c.valid := of_decide_eq_false h
-        exact isFalse (fun h => by cases h; contradiction)
-    | isFalse hA => exact isFalse (fun h => by cases h; contradiction)
-  | meta A n c ihA =>
-    cases ihA with
-    | isTrue hA =>
-      cases inferInstance : (c.valid).decide with
-      | true h =>
-        have hc : c.valid := of_decide_eq_true h
-        exact isTrue (WellFormedTy.meta hA hc)
-      | false h =>
-        have hc : ¬c.valid := of_decide_eq_false h
-        exact isFalse (fun h => by cases h; contradiction)
-    | isFalse hA => exact isFalse (fun h => by cases h; contradiction)
+      if hcv : ConfBound.valid c then
+        isTrue (WellFormedTy.meta n c hA hcv)
+      else
+        isFalse (fun h => by cases h; contradiction)
+    | isFalse hA => isFalse (fun h => by cases h; contradiction)
+
+instance : DecidablePred WellFormedTy := decidableWellFormedTy
 
 end CLAIR.Syntax

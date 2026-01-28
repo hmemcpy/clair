@@ -25,6 +25,7 @@ See: exploration/thread-8.11-stratified-belief-lean.md
 import CLAIR.Confidence.Basic
 import CLAIR.Confidence.Oplus
 import CLAIR.Confidence.Undercut
+import CLAIR.Belief.Basic
 
 namespace CLAIR
 
@@ -44,7 +45,6 @@ structure Meta (α : Type*) where
   original : α
   /-- Optional description for reflection -/
   description : Option String := none
-  deriving Repr
 
 namespace Meta
 
@@ -78,7 +78,6 @@ structure StratifiedBelief (level : Nat) (α : Type*) where
   value : α
   /-- Confidence in [0,1] representing epistemic commitment -/
   confidence : Confidence
-  deriving Repr
 
 namespace StratifiedBelief
 
@@ -120,12 +119,12 @@ The proof obligation h : m < n ensures well-foundedness.
 
     This prevents Liar-like paradoxes: a belief cannot introspect itself
     because that would require m < m, which is impossible. -/
-def introspect (h : m < n) (b : StratifiedBelief m α) : StratifiedBelief n (Meta α) :=
+def introspect (_h : m < n) (b : StratifiedBelief m α) : StratifiedBelief n (Meta α) :=
   { value := ⟨b.value, none⟩
     confidence := b.confidence }
 
 /-- Introspect with a description -/
-def introspectWithDesc (h : m < n) (b : StratifiedBelief m α) (desc : String) :
+def introspectWithDesc (_h : m < n) (b : StratifiedBelief m α) (desc : String) :
     StratifiedBelief n (Meta α) :=
   { value := ⟨b.value, some desc⟩
     confidence := b.confidence }
@@ -200,17 +199,19 @@ theorem derive₂_le_right (f : α → β → γ)
     Uses ⊕ (probabilistic OR) for confidence combination. -/
 def aggregate (b₁ b₂ : StratifiedBelief n α) (combine : α → α → α) :
     StratifiedBelief n α :=
-  ⟨combine b₁.value b₂.value, b₁.confidence ⊕ b₂.confidence⟩
+  ⟨combine b₁.value b₂.value, Confidence.oplus b₁.confidence b₂.confidence⟩
 
 /-- Aggregation increases confidence: result ≥ first premise -/
 theorem aggregate_ge_left (b₁ b₂ : StratifiedBelief n α) (combine : α → α → α) :
-    (b₁.confidence : ℝ) ≤ ((aggregate b₁ b₂ combine).confidence : ℝ) :=
-  le_oplus_left b₁.confidence b₂.confidence
+    (b₁.confidence : ℝ) ≤ ((aggregate b₁ b₂ combine).confidence : ℝ) := by
+  simp only [aggregate]
+  exact Confidence.le_oplus_left b₁.confidence b₂.confidence
 
 /-- Aggregation increases confidence: result ≥ second premise -/
 theorem aggregate_ge_right (b₁ b₂ : StratifiedBelief n α) (combine : α → α → α) :
-    (b₂.confidence : ℝ) ≤ ((aggregate b₁ b₂ combine).confidence : ℝ) :=
-  le_oplus_right b₁.confidence b₂.confidence
+    (b₂.confidence : ℝ) ≤ ((aggregate b₁ b₂ combine).confidence : ℝ) := by
+  simp only [aggregate]
+  exact Confidence.le_oplus_right b₁.confidence b₂.confidence
 
 /-!
 ### Defeat (Level-Preserving)
@@ -261,12 +262,11 @@ No introspection targets level 0 as source.
 /-- Type alias for ground-level beliefs -/
 abbrev GroundBelief := StratifiedBelief 0
 
-/-- Ground beliefs cannot be the source of introspection (level 0 has no predecessors).
-    Note: Ground beliefs CAN be introspected BY higher levels. -/
--- This is captured by level_zero_cannot_introspect_from
+/- Ground beliefs cannot be the source of introspection (level 0 has no predecessors).
+   Note: Ground beliefs CAN be introspected BY higher levels.
+   This is captured by level_zero_cannot_introspect_from. -/
 
-/-!
-## Monadic Structure (Graded, Level-Preserving)
+/- Section: Monadic Structure (Graded, Level-Preserving)
 
 StratifiedBelief forms a graded monad at each level.
 -/
@@ -288,13 +288,13 @@ theorem pure_confidence (v : α) : (pure (n := n) v).confidence = 1 := rfl
 theorem bind_pure_left_confidence (v : α) (f : α → StratifiedBelief n β) :
     ((bind (pure v) f).confidence : ℝ) = ((f v).confidence : ℝ) := by
   simp only [bind, pure, certain, Subtype.coe_mk]
-  simp only [unitInterval.coe_one, one_mul]
+  simp only [coe_one, one_mul]
 
 /-- Right identity for confidence -/
 theorem bind_pure_right_confidence (b : StratifiedBelief n α) :
     ((bind b pure).confidence : ℝ) = (b.confidence : ℝ) := by
   simp only [bind, pure, certain, Subtype.coe_mk]
-  simp only [unitInterval.coe_one, mul_one]
+  simp only [coe_one, mul_one]
 
 end StratifiedBelief
 

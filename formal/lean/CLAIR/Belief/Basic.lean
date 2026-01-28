@@ -40,7 +40,6 @@ structure Belief (α : Type*) where
   value : α
   /-- Confidence in [0,1] representing epistemic commitment -/
   confidence : Confidence
-  deriving Repr
 
 namespace Belief
 
@@ -120,12 +119,11 @@ def deriveWithStrength (f : α → β → γ) (s : Confidence)
       constructor
       · apply mul_nonneg
         exact h1.1
-        exact b₂.confidence.nonneg
-      · calc (s : ℝ) * (b₁.confidence : ℝ) * (b₂.confidence : ℝ)
-          ≤ (s : ℝ) * (b₁.confidence : ℝ) * 1 := by
-            apply mul_le_mul_of_nonneg_left b₂.confidence.le_one h1.1
-          _ = (s : ℝ) * (b₁.confidence : ℝ) := mul_one _
-          _ ≤ 1 := h1.2⟩⟩
+        exact nonneg b₂.confidence
+      · have h2 : (s : ℝ) * (b₁.confidence : ℝ) * (b₂.confidence : ℝ) ≤
+                  (s : ℝ) * (b₁.confidence : ℝ) * 1 :=
+          mul_le_mul_of_nonneg_left (le_one b₂.confidence) h1.1
+        linarith [h1.2]⟩⟩
 
 /-!
 ### Derivation Theorems
@@ -152,14 +150,14 @@ theorem derive₂_mono_left (f : α → β → γ) (b₁ b₁' : Belief α) (b�
     (h : (b₁.confidence : ℝ) ≤ (b₁'.confidence : ℝ)) :
     ((derive₂ f b₁ b₂).confidence : ℝ) ≤ ((derive₂ f b₁' b₂).confidence : ℝ) := by
   simp only [derive₂, Subtype.coe_mk]
-  exact mul_le_mul_of_nonneg_right h b₂.confidence.nonneg
+  exact mul_le_mul_of_nonneg_right h (nonneg b₂.confidence)
 
 /-- Derivation is monotone in second argument -/
 theorem derive₂_mono_right (f : α → β → γ) (b₁ : Belief α) (b₂ b₂' : Belief β)
     (h : (b₂.confidence : ℝ) ≤ (b₂'.confidence : ℝ)) :
     ((derive₂ f b₁ b₂).confidence : ℝ) ≤ ((derive₂ f b₁ b₂').confidence : ℝ) := by
   simp only [derive₂, Subtype.coe_mk]
-  exact mul_le_mul_of_nonneg_left h b₁.confidence.nonneg
+  exact mul_le_mul_of_nonneg_left h (nonneg b₁.confidence)
 
 /-!
 ## Aggregation: Combining Independent Evidence
@@ -172,15 +170,15 @@ Uses ⊕ (probabilistic OR): P(at least one succeeds).
 -/
 
 /-- Aggregate two beliefs about the same value with independent evidence.
-    Uses ⊕ (probabilistic OR) for confidence combination.
+    Uses oplus (probabilistic OR) for confidence combination.
     The value combiner handles potential disagreements. -/
 def aggregate (b₁ b₂ : Belief α) (combine : α → α → α) : Belief α :=
-  ⟨combine b₁.value b₂.value, b₁.confidence ⊕ b₂.confidence⟩
+  ⟨combine b₁.value b₂.value, oplus b₁.confidence b₂.confidence⟩
 
 /-- Aggregate two beliefs known to have equal values (confidence only).
     This is the common case where multiple sources support the same conclusion. -/
-def aggregateSame (b₁ b₂ : Belief α) (h : b₁.value = b₂.value) : Belief α :=
-  ⟨b₁.value, b₁.confidence ⊕ b₂.confidence⟩
+def aggregateSame (b₁ b₂ : Belief α) (_h : b₁.value = b₂.value) : Belief α :=
+  ⟨b₁.value, oplus b₁.confidence b₂.confidence⟩
 
 /-!
 ### Aggregation Theorems
@@ -204,10 +202,9 @@ theorem aggregate_ge_right (b₁ b₂ : Belief α) (combine : α → α → α) 
 
 /-- Aggregation is commutative in confidence -/
 theorem aggregate_comm (b₁ b₂ : Belief α) (combine combine' : α → α → α)
-    (hc : combine b₁.value b₂.value = combine' b₂.value b₁.value) :
-    (aggregate b₁ b₂ combine).confidence = (aggregate b₂ b₁ combine').confidence := by
-  simp only [aggregate]
-  exact oplus_comm b₁.confidence b₂.confidence
+    (_hc : combine b₁.value b₂.value = combine' b₂.value b₁.value) :
+    (aggregate b₁ b₂ combine).confidence = (aggregate b₂ b₁ combine').confidence :=
+  oplus_comm b₁.confidence b₂.confidence
 
 /-!
 ## Defeat Operations
@@ -256,12 +253,12 @@ theorem undercut_one (b : Belief α) :
   simp only [applyUndercut]
   exact Confidence.undercut_one b.confidence
 
-/-- Sequential undercuts compose via ⊕ -/
+/-- Sequential undercuts compose via oplus -/
 theorem undercut_compose (b : Belief α) (d₁ d₂ : Confidence) :
-    applyUndercut (applyUndercut b d₁) d₂ = applyUndercut b (d₁ ⊕ d₂) := by
+    applyUndercut (applyUndercut b d₁) d₂ = applyUndercut b (oplus d₁ d₂) := by
   simp only [applyUndercut]
   congr 1
-  exact undercut_compose b.confidence d₁ d₂
+  exact Confidence.undercut_compose b.confidence d₁ d₂
 
 /-!
 ## Conservative Combination (Min)
@@ -274,7 +271,7 @@ but we don't want the multiplicative effect of derivation.
 -/
 
 /-- Combine beliefs conservatively using minimum confidence -/
-def combineConservative (b₁ b₂ : Belief α) (combine : α → α → α) : Belief α :=
+noncomputable def combineConservative (b₁ b₂ : Belief α) (combine : α → α → α) : Belief α :=
   ⟨combine b₁.value b₂.value, Confidence.min b₁.confidence b₂.confidence⟩
 
 /-- Conservative combination is at most either input -/
@@ -289,7 +286,7 @@ theorem conservative_le_right (b₁ b₂ : Belief α) (combine : α → α → �
 
 /-- Conservative combination is at least derivation -/
 theorem derive_le_conservative (f : α → β → γ) (b₁ : Belief α) (b₂ : Belief β)
-    (combine : γ → γ → γ) :
+    (_combine : γ → γ → γ) :
     let derived := derive₂ f b₁ b₂
     let conservative := combineConservative ⟨derived.value, b₁.confidence⟩
                                             ⟨derived.value, b₂.confidence⟩
@@ -345,15 +342,13 @@ theorem pure_confidence (v : α) : (pure v).confidence = 1 := rfl
     (when we account for the multiplication by 1) -/
 theorem bind_pure_left_confidence (v : α) (f : α → Belief β) :
     ((bind (pure v) f).confidence : ℝ) = ((f v).confidence : ℝ) := by
-  simp only [bind, pure, certain, Subtype.coe_mk]
-  simp only [unitInterval.coe_one, one_mul]
+  simp only [bind, pure, certain, Subtype.coe_mk, coe_one, one_mul]
 
 /-- Right identity: b >>= pure has same confidence as b
     (when we account for the multiplication by 1) -/
 theorem bind_pure_right_confidence (b : Belief α) :
     ((bind b pure).confidence : ℝ) = (b.confidence : ℝ) := by
-  simp only [bind, pure, certain, Subtype.coe_mk]
-  simp only [unitInterval.coe_one, mul_one]
+  simp only [bind, pure, certain, Subtype.coe_mk, coe_one, mul_one]
 
 /-!
 ## Full Graded Monad Laws
@@ -368,29 +363,23 @@ not just confidence components.
     This is the full equality, combining value and confidence components. -/
 theorem bind_pure_left (v : α) (f : α → Belief β) :
     bind (pure v) f = f v := by
-  simp only [bind, pure, certain]
-  constructor <;> rfl
+  simp only [bind, pure, certain, coe_one, one_mul]
 
 /-- Right identity law: bind b pure = b
     This is the full equality, combining value and confidence components. -/
 theorem bind_pure_right (b : Belief α) :
     bind b pure = b := by
-  simp only [bind, pure, certain]
-  constructor
-  · rfl
-  · apply Subtype.ext
-    simp only [Subtype.coe_mk, unitInterval.coe_one, mul_one]
+  simp only [bind, pure, certain, coe_one, mul_one]
 
 /-- Associativity law: bind (bind b f) g = bind b (λx. bind (f x) g)
     Values match definitionally; confidences match via × associativity. -/
 theorem bind_assoc (b : Belief α) (f : α → Belief β) (g : β → Belief γ) :
     bind (bind b f) g = bind b (fun x => bind (f x) g) := by
   simp only [bind]
-  constructor
-  · rfl  -- values match definitionally
-  · apply Subtype.ext
-    simp only [Subtype.coe_mk]
-    ring  -- confidence associativity
+  congr 1
+  apply Subtype.ext
+  simp only [Subtype.coe_mk]
+  ring
 
 /-- Associativity for confidence only (may be useful separately) -/
 theorem bind_assoc_confidence (b : Belief α) (f : α → Belief β) (g : β → Belief γ) :

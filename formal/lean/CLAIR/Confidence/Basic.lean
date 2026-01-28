@@ -35,15 +35,10 @@ abbrev Confidence := unitInterval
 namespace Confidence
 
 /-- Zero confidence: complete lack of commitment -/
-instance : Zero Confidence := unitInterval.instZero
+instance : Zero Confidence := unitInterval.hasZero
 
 /-- Full confidence: complete commitment (but not certainty in the epistemological sense) -/
-instance : One Confidence := unitInterval.instOne
-
-/-- Ordering on confidence values -/
-instance : LE Confidence := unitInterval.instLE
-
-instance : LT Confidence := unitInterval.instLT
+instance : One Confidence := unitInterval.hasOne
 
 /-- Coercion to real number for calculations -/
 instance : Coe Confidence ℝ := ⟨Subtype.val⟩
@@ -61,10 +56,10 @@ theorem nonneg (c : Confidence) : 0 ≤ (c : ℝ) := c.2.1
 theorem le_one (c : Confidence) : (c : ℝ) ≤ 1 := c.2.2
 
 /-- The complement (1 - c) is also in [0,1] -/
-theorem one_minus_nonneg (c : Confidence) : 0 ≤ 1 - (c : ℝ) := by linarith [c.le_one]
+theorem one_minus_nonneg (c : Confidence) : 0 ≤ 1 - (c : ℝ) := by linarith [Confidence.le_one c]
 
 /-- The complement (1 - c) is at most 1 -/
-theorem one_minus_le_one (c : Confidence) : 1 - (c : ℝ) ≤ 1 := by linarith [c.nonneg]
+theorem one_minus_le_one (c : Confidence) : 1 - (c : ℝ) ≤ 1 := by linarith [Confidence.nonneg c]
 
 /-!
 ## Multiplication
@@ -78,14 +73,14 @@ Key property: Derivation can only decrease confidence.
 
 /-- Multiplication is closed on Confidence (from Mathlib) -/
 theorem mul_mem' (a b : Confidence) : (a : ℝ) * (b : ℝ) ∈ Icc 0 1 :=
-  ⟨mul_nonneg a.nonneg b.nonneg,
-   calc (a : ℝ) * b ≤ (a : ℝ) * 1 := by apply mul_le_mul_of_nonneg_left b.le_one a.nonneg
+  ⟨mul_nonneg (nonneg a) (nonneg b),
+   calc (a : ℝ) * b ≤ (a : ℝ) * 1 := by apply mul_le_mul_of_nonneg_left (le_one b) (nonneg a)
      _ = a := mul_one _
-     _ ≤ 1 := a.le_one⟩
+     _ ≤ 1 := le_one a⟩
 
 /-- Derivation can only decrease confidence -/
 theorem mul_le_left (a b : Confidence) : (a : ℝ) * (b : ℝ) ≤ (a : ℝ) := by
-  calc (a : ℝ) * b ≤ (a : ℝ) * 1 := by apply mul_le_mul_of_nonneg_left b.le_one a.nonneg
+  calc (a : ℝ) * b ≤ (a : ℝ) * 1 := by apply mul_le_mul_of_nonneg_left (le_one b) (nonneg a)
     _ = a := mul_one _
 
 /-- Derivation can only decrease confidence (symmetric) -/
