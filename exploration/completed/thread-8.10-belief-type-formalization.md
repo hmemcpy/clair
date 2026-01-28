@@ -37,7 +37,7 @@ The challenge: How do we formalize this in Lean 4 in a way that:
 The `formal/lean/` directory already contains:
 - `Confidence` type as `abbrev Confidence := unitInterval`
 - Four operations: multiplication (inherited), `oplus`, `undercut`, `rebut`, `min`
-- Key theorems: boundedness preservation, monoid structures, composition laws
+- Key theorems: boundedness preservation and monoid structures; rebut monotonicity still needs Mathlib v4.15 updates
 
 ### 2.2 Theoretical Foundations
 

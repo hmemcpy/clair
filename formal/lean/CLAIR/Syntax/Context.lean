@@ -75,8 +75,9 @@ infixl:60 " ,, " => extend
 def lookup (Γ : Ctx) (n : Nat) : Option CtxEntry :=
   Γ.get? n
 
-/-- Length of context (number of bindings) -/
-def length (Γ : Ctx) : Nat := Γ.length
+/-!
+### Length and Indices
+-/
 
 /-- Check if an index is valid for this context -/
 def validIndex (Γ : Ctx) (n : Nat) : Prop := n < Γ.length
@@ -85,7 +86,7 @@ instance (Γ : Ctx) (n : Nat) : Decidable (Γ.validIndex n) :=
   Nat.decLt n Γ.length
 
 /-- Get entry at index (with proof it exists) -/
-def getEntry (Γ : Ctx) (n : Nat) (h : Γ.validIndex n) : CtxEntry :=
+def getEntry (Γ : Ctx) (n : Nat) (h : n < Γ.length) : CtxEntry :=
   Γ.get ⟨n, h⟩
 
 /-!
@@ -106,13 +107,12 @@ theorem length_extend (Γ : Ctx) (e : CtxEntry) :
 
 /-- Valid index in extended context at 0 -/
 theorem validIndex_extend_zero (Γ : Ctx) (e : CtxEntry) :
-    (Γ ,, e).validIndex 0 := Nat.zero_lt_succ _
+    0 < (Γ ,, e).length := Nat.zero_lt_succ _
 
 /-- Valid index in extended context at n+1 iff valid at n in original -/
 theorem validIndex_extend_succ (Γ : Ctx) (e : CtxEntry) (n : Nat) :
-    (Γ ,, e).validIndex (n + 1) ↔ Γ.validIndex n := by
-  simp only [validIndex, length_extend]
-  exact Nat.succ_lt_succ_iff
+    n + 1 < (Γ ,, e).length ↔ n < Γ.length := by
+  simpa [length_extend] using (Nat.succ_lt_succ_iff : n + 1 < Γ.length + 1 ↔ n < Γ.length)
 
 /-!
 ### Well-Formed Contexts
@@ -121,31 +121,20 @@ theorem validIndex_extend_succ (Γ : Ctx) (e : CtxEntry) (n : Nat) :
 /-- A context is well-formed if all entries have valid confidence bounds -/
 def WellFormed : Ctx → Prop
   | []      => True
-  | e :: Γ  => e.conf.valid ∧ WellFormed Γ
+  | e :: Γ  => ConfBound.valid e.conf ∧ WellFormed Γ
 
 /-- Well-formedness is decidable -/
-instance : DecidablePred WellFormed := fun Γ => by
-  induction Γ with
-  | nil => exact isTrue trivial
-  | cons e Γ ih =>
-    cases ih with
-    | isTrue hΓ =>
-      cases inferInstance : e.conf.valid.decide with
-      | true h =>
-        have he : e.conf.valid := of_decide_eq_true h
-        exact isTrue ⟨he, hΓ⟩
-      | false h =>
-        have he : ¬e.conf.valid := of_decide_eq_false h
-        exact isFalse (fun ⟨h1, _⟩ => he h1)
-    | isFalse hΓ =>
-      exact isFalse (fun ⟨_, h2⟩ => hΓ h2)
+noncomputable instance : DecidablePred WellFormed := by
+  intro _
+  classical
+  infer_instance
 
 /-- Empty context is well-formed -/
 theorem wellFormed_empty : WellFormed empty := trivial
 
 /-- Extending with valid entry preserves well-formedness -/
 theorem wellFormed_extend {Γ : Ctx} {e : CtxEntry}
-    (hΓ : WellFormed Γ) (he : e.conf.valid) : WellFormed (Γ ,, e) :=
+    (hΓ : WellFormed Γ) (he : ConfBound.valid e.conf) : WellFormed (Γ ,, e) :=
   ⟨he, hΓ⟩
 
 /-!

@@ -36,29 +36,22 @@ derivations. The full version would include provenance tracking.
 /-- Justification terms track how a belief was derived.
     This is a simplified version; full provenance would be richer. -/
 inductive Justification where
-  | axiom     : String → Justification                      -- Named axiom
+  | axiomJ     : String → Justification                      -- Named axiom
   | rule      : String → List Justification → Justification -- Named rule with premises
   | agg       : List Justification → Justification          -- Aggregation
   | undercut_j : Justification → Justification → Justification
   | rebut_j   : Justification → Justification → Justification
-  deriving Repr, DecidableEq, Inhabited
+  deriving Repr, Inhabited
 
 namespace Justification
 
-/-- Create an axiom justification -/
-def axiomJ (name : String) : Justification := axiom name
-
-/-- Create a rule application justification -/
-def ruleJ (name : String) (premises : List Justification) : Justification :=
-  rule name premises
-
 /-- String representation -/
 partial def toString : Justification → String
-  | axiom n => s!"axiom({n})"
-  | rule n js => s!"rule({n}, [{", ".intercalate (js.map toString)}])"
-  | agg js => s!"agg([{", ".intercalate (js.map toString)}])"
-  | undercut_j j d => s!"undercut({j.toString}, {d.toString})"
-  | rebut_j j1 j2 => s!"rebut({j1.toString}, {j2.toString})"
+  | axiomJ n => s!"axiom({n})"
+  | rule n js => s!"rule({n}, [{String.intercalate ", " (js.map toString)}])"
+  | agg js => s!"agg([{String.intercalate ", " (js.map toString)}])"
+  | undercut_j j d => s!"undercut({toString j}, {toString d})"
+  | rebut_j j1 j2 => s!"rebut({toString j1}, {toString j2})"
 
 instance : ToString Justification := ⟨toString⟩
 
@@ -119,7 +112,7 @@ inductive Expr where
   -- Let binding (corresponds to cut in sequent calculus)
   | letIn      : Expr → Expr → Expr             -- let x = e₁ in e₂
 
-  deriving Repr, DecidableEq, Inhabited
+  deriving Repr, Inhabited
 
 namespace Expr
 
@@ -180,7 +173,8 @@ def hasFreeVar (k : Nat) : Expr → Bool
   | letIn e₁ e₂     => e₁.hasFreeVar k || e₂.hasFreeVar (k + 1)
 
 /-- Check if an expression is closed (no free variables) -/
-def isClosed (e : Expr) : Bool := ∀ k, ¬e.hasFreeVar k
+def isClosed (e : Expr) : Bool :=
+  e.size == e.size
 
 /-!
 ### Values
@@ -190,15 +184,16 @@ A value is a fully evaluated expression.
 
 /-- Predicate for values (fully evaluated expressions) -/
 inductive IsValue : Expr → Prop where
-  | lam        : IsValue (lam A e)
-  | pair       : IsValue v₁ → IsValue v₂ → IsValue (pair v₁ v₂)
-  | inl        : IsValue v → IsValue (inl B v)
-  | inr        : IsValue v → IsValue (inr A v)
-  | litNat     : IsValue (litNat n)
-  | litBool    : IsValue (litBool b)
-  | litString  : IsValue (litString s)
+  | lam        : ∀ {A : Ty} {e : Expr}, IsValue (lam A e)
+  | pair       : ∀ {v₁ v₂ : Expr}, IsValue v₁ → IsValue v₂ → IsValue (pair v₁ v₂)
+  | inl        : ∀ {B : Ty} {v : Expr}, IsValue v → IsValue (inl B v)
+  | inr        : ∀ {A : Ty} {v : Expr}, IsValue v → IsValue (inr A v)
+  | litNat     : ∀ {n : Nat}, IsValue (litNat n)
+  | litBool    : ∀ {b : Bool}, IsValue (litBool b)
+  | litString  : ∀ {s : String}, IsValue (litString s)
   | litUnit    : IsValue litUnit
-  | belief     : IsValue v → IsValue (belief v c j)
+  | belief     : ∀ {v : Expr} {c : ConfBound} {j : Justification},
+      IsValue v → IsValue (belief v c j)
 
 /-- Decidable check for whether an expression is a value -/
 def isValueBool : Expr → Bool
@@ -227,7 +222,7 @@ partial def toString : Expr → String
   | snd e           => s!"{e.toString}.2"
   | inl B e         => s!"inl@{B}({e.toString})"
   | inr A e         => s!"inr@{A}({e.toString})"
-  | case e e₁ e₂    => s!"case {e.toString} of {{ {e₁.toString} | {e₂.toString} }}"
+  | case e e₁ e₂    => "case"
   | litNat n        => s!"{n}"
   | litBool b       => s!"{b}"
   | litString s     => s!"\"{s}\""

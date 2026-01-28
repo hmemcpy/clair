@@ -26,7 +26,7 @@ CLAIR's Lean formalization has two confidence representations:
 **Semantic Confidence** (`CLAIR.Confidence`):
 - Type: `unitInterval` (subtype of ℝ with `0 ≤ c ∧ c ≤ 1`)
 - Operations: `oplus`, `undercut`, `rebut`, multiplication, min
-- All operations proven to preserve bounds
+- Bounds proofs exist; rebut monotonicity proofs still need Mathlib v4.15 updates
 
 **Syntactic Confidence** (`CLAIR.Syntax.ConfBound`):
 - Type: `ℚ` (rationals, for decidable type checking)

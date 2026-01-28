@@ -20,14 +20,14 @@ Let me analyze what's already done and what remains.
 
 ### 2.1 Confidence Operations (Complete)
 
-All core confidence operations are proven in Lean:
+All core confidence operations are formalized in Lean. Rebut monotonicity proofs still need Mathlib v4.15 updates:
 
 | Operation | File | Status | Key Theorems |
 |-----------|------|--------|--------------|
 | Multiplication (×) | Basic.lean | ✓ Complete | `mul_mem'`, `mul_le_left/right` |
 | Oplus (⊕) | Oplus.lean | ✓ Complete | Commutative monoid, `oplus_assoc/comm`, `le_oplus_left/right` |
 | Undercut | Undercut.lean | ✓ Complete | `undercut_compose`, `undercut_le` |
-| Rebut | Rebut.lean | ✓ Complete | Boundedness, anti-symmetry, monotonicity |
+| Rebut | Rebut.lean | ◐ Partial | Boundedness + anti-symmetry proven; monotonicity proofs need Mathlib v4.15 updates |
 | Min | Min.lean | ✓ Complete | Bounded meet-semilattice |
 
 ### 2.2 Belief Operations (Partially Complete)

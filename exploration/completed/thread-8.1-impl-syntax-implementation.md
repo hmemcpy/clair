@@ -219,7 +219,7 @@ formal/lean/CLAIR/
 
 ## 6. Verification Status
 
-**Note**: The implementation follows the design from Thread 8.12. Build verification requires a Lean 4 environment with Mathlib 4. The code is written to compile but has not been verified in this session due to environment constraints.
+**Note**: The implementation follows the design from Thread 8.12. Build verification requires a Lean 4 environment with Mathlib 4. The code is written to compile but has not been verified in this session due to environment constraints. Several theorems remain `sorry` (progress, preservation, type safety), so the proofs are not yet machine-checked.
 
 Key theorems have statements but proofs marked `sorry`:
 - `weakening_statement`

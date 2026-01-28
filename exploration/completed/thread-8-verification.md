@@ -12,7 +12,7 @@ CLAIR's confidence is described as:
 - A value in the closed interval [0,1]
 - Semantically representing "epistemic commitment" (not probability)
 - With operations: multiplication (×), min, and "probabilistic or" (⊕)
-- Forming algebraic structures: commutative monoid under ×, semiring with ⊕ and ×
+- Forming algebraic structures: commutative monoid under ×, commutative monoid under ⊕ (no semiring; distributivity fails)
 
 The challenge: How do we formalize this in Lean 4 in a way that:
 1. Enforces the [0,1] bounds at the type level
@@ -156,30 +156,25 @@ After considering the options, I propose a **layered design**:
 Define the algebraic structure confidence must satisfy:
 
 ```lean4
-/-- A confidence semiring over a type C -/
-class ConfidenceSemiring (C : Type*) extends Zero C, One C, Add C, Mul C where
-  -- Additive structure (⊕ operation)
-  add_assoc : ∀ a b c : C, a + b + c = a + (b + c)
-  add_comm : ∀ a b : C, a + b = b + a
-  zero_add : ∀ a : C, 0 + a = a
-
+/-- Confidence does not form a semiring; ⊕ and × are separate monoids. -/
+class ConfidenceMonoids (C : Type*) extends Zero C, One C, Mul C where
   -- Multiplicative structure (× operation)
   mul_assoc : ∀ a b c : C, a * b * c = a * (b * c)
   mul_comm : ∀ a b : C, a * b = b * a
   one_mul : ∀ a : C, 1 * a = a
   mul_one : ∀ a : C, a * 1 = a
-
-  -- Distributivity
-  mul_add : ∀ a b c : C, a * (b + c) = a * b + a * c
-
-  -- Annihilation
   zero_mul : ∀ a : C, 0 * a = 0
+
+  -- Additive structure (⊕ operation)
+  oplus : C → C → C
+  oplus_assoc : ∀ a b c : C, oplus (oplus a b) c = oplus a (oplus b c)
+  oplus_comm : ∀ a b : C, oplus a b = oplus b a
+  zero_oplus : ∀ a : C, oplus 0 a = a
 
   -- Bounds (confidence-specific)
   bounded : ∀ a : C, 0 ≤ a ∧ a ≤ 1
 
-  -- Note: standard + is probabilistic OR, so a + b = a + b - a*b
-  -- We'll need a different operator or adjust
+  -- Note: distributivity fails for ⊕ and ×.
 ```
 
 Wait—there's a tension here. The "probabilistic or" ⊕ is defined as:
@@ -408,7 +403,7 @@ Based on this exploration, I propose the following plan for Thread 8:
 - [ ] Define min-based combination
 - [ ] Define ⊕ (probabilistic OR)
 - [ ] Prove both form valid monoids
-- [ ] Prove semiring laws for (⊕, ×)
+- [ ] Document non-semiring structure (distributivity fails for ⊕ and ×)
 
 ### Phase 3: Connection to Belief
 - [ ] Define Belief type with Confidence component
@@ -499,7 +494,7 @@ With key operations:
 And key properties to prove:
 - Boundedness preservation
 - Monoid laws for × and min
-- Semiring laws for (⊕, ×)
+- Non-semiring structure for (⊕, ×)
 - Monotonicity (derivation decreases confidence)
 
 This exploration is **complete for Task 8.5**. The next steps are:
@@ -728,7 +723,7 @@ Proof:
 
 ### 12.4 The Semiring Structure
 
-The pair (⊕, ×) forms a **commutative semiring** on [0,1]:
+The pair (⊕, ×) does **not** form a commutative semiring on [0,1].
 
 ```
 ([0,1], ⊕, ×, 0, 1)
@@ -740,7 +735,7 @@ Multiplicative structure (×, 1):
   Associativity, Commutativity, Identity  ✓
 
 Distributivity:
-  a × (b ⊕ c) = a × b ⊕ a × c
+  a × (b ⊕ c) = a × b ⊕ a × c  (fails in general)
 
 Annihilation:
   0 × a = a × 0 = 0

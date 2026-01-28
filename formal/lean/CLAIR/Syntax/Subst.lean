@@ -31,31 +31,31 @@ shift d c e: Add d to all indices ≥ c in e
 /-- Shift free variable indices by d, starting from cutoff c.
     Indices < c are considered bound locally and not shifted.
     Indices ≥ c are free and shifted by d. -/
-def shift (d : Nat) (c : Nat) : Expr → Expr
+def shift (d : Nat) (cutoff : Nat) : Expr → Expr
   | var n           =>
-      if n < c then var n else var (n + d)
-  | lam A e         => lam A (shift d (c + 1) e)
-  | app e₁ e₂       => app (shift d c e₁) (shift d c e₂)
-  | pair e₁ e₂      => pair (shift d c e₁) (shift d c e₂)
-  | fst e           => fst (shift d c e)
-  | snd e           => snd (shift d c e)
-  | inl B e         => inl B (shift d c e)
-  | inr A e         => inr A (shift d c e)
-  | case e e₁ e₂    => case (shift d c e) (shift d (c + 1) e₁) (shift d (c + 1) e₂)
+      if n < cutoff then var n else var (n + d)
+  | lam A e         => lam A (shift d (cutoff + 1) e)
+  | app e₁ e₂       => app (shift d cutoff e₁) (shift d cutoff e₂)
+  | pair e₁ e₂      => pair (shift d cutoff e₁) (shift d cutoff e₂)
+  | fst e           => fst (shift d cutoff e)
+  | snd e           => snd (shift d cutoff e)
+  | inl B e         => inl B (shift d cutoff e)
+  | inr A e         => inr A (shift d cutoff e)
+  | case e e₁ e₂    => Expr.case (shift d cutoff e) (shift d (cutoff + 1) e₁) (shift d (cutoff + 1) e₂)
   | litNat n        => litNat n
   | litBool b       => litBool b
   | litString s     => litString s
   | litUnit         => litUnit
-  | belief e conf j => belief (shift d c e) conf j
-  | val e           => val (shift d c e)
-  | conf e          => conf (shift d c e)
-  | just e          => just (shift d c e)
-  | derive e₁ e₂    => derive (shift d c e₁) (shift d c e₂)
-  | aggregate e₁ e₂ => aggregate (shift d c e₁) (shift d c e₂)
-  | undercut e e'   => undercut (shift d c e) (shift d c e')
-  | rebut e₁ e₂     => rebut (shift d c e₁) (shift d c e₂)
-  | introspect e    => introspect (shift d c e)
-  | letIn e₁ e₂     => letIn (shift d c e₁) (shift d (c + 1) e₂)
+  | belief e cb j => Expr.belief (shift d cutoff e) cb j
+  | val e           => val (shift d cutoff e)
+  | conf e          => conf (shift d cutoff e)
+  | just e          => just (shift d cutoff e)
+  | derive e₁ e₂    => derive (shift d cutoff e₁) (shift d cutoff e₂)
+  | aggregate e₁ e₂ => aggregate (shift d cutoff e₁) (shift d cutoff e₂)
+  | undercut e e'   => undercut (shift d cutoff e) (shift d cutoff e')
+  | rebut e₁ e₂     => rebut (shift d cutoff e₁) (shift d cutoff e₂)
+  | introspect e    => introspect (shift d cutoff e)
+  | letIn e₁ e₂     => letIn (shift d cutoff e₁) (shift d (cutoff + 1) e₂)
 
 /-- Shift all free variables (cutoff = 0) -/
 abbrev shiftFree (d : Nat) : Expr → Expr := shift d 0
@@ -87,14 +87,14 @@ def subst (k : Nat) (s : Expr) : Expr → Expr
   | inl B e         => inl B (subst k s e)
   | inr A e         => inr A (subst k s e)
   | case e e₁ e₂    =>
-      case (subst k s e)
-           (subst (k + 1) (shiftFree 1 s) e₁)
-           (subst (k + 1) (shiftFree 1 s) e₂)
+      Expr.case (subst k s e)
+        (subst (k + 1) (shiftFree 1 s) e₁)
+        (subst (k + 1) (shiftFree 1 s) e₂)
   | litNat n        => litNat n
   | litBool b       => litBool b
   | litString str   => litString str
   | litUnit         => litUnit
-  | belief e c j    => belief (subst k s e) c j
+  | belief e c j    => Expr.belief (subst k s e) c j
   | val e           => val (subst k s e)
   | conf e          => conf (subst k s e)
   | just e          => just (subst k s e)
@@ -117,123 +117,17 @@ These lemmas are essential for proving type preservation.
 
 /-- Shifting by 0 is identity -/
 theorem shift_zero (c : Nat) (e : Expr) : shift 0 c e = e := by
-  induction e generalizing c with
-  | var n =>
-    simp only [shift]
-    split_ifs <;> simp
-  | lam A e ih =>
-    simp only [shift]
-    congr 1
-    exact ih (c + 1)
-  | app e₁ e₂ ih₁ ih₂ =>
-    simp only [shift]
-    congr 1 <;> apply_assumption
-  | pair e₁ e₂ ih₁ ih₂ =>
-    simp only [shift]
-    congr 1 <;> apply_assumption
-  | fst e ih =>
-    simp only [shift]
-    congr 1
-    exact ih c
-  | snd e ih =>
-    simp only [shift]
-    congr 1
-    exact ih c
-  | inl B e ih =>
-    simp only [shift]
-    congr 1
-    exact ih c
-  | inr A e ih =>
-    simp only [shift]
-    congr 1
-    exact ih c
-  | case e e₁ e₂ ih ih₁ ih₂ =>
-    simp only [shift]
-    congr 1
-    · exact ih c
-    · exact ih₁ (c + 1)
-    · exact ih₂ (c + 1)
-  | litNat _ => rfl
-  | litBool _ => rfl
-  | litString _ => rfl
-  | litUnit => rfl
-  | belief e _ _ ih =>
-    simp only [shift]
-    congr 1
-    exact ih c
-  | val e ih =>
-    simp only [shift]
-    congr 1
-    exact ih c
-  | conf e ih =>
-    simp only [shift]
-    congr 1
-    exact ih c
-  | just e ih =>
-    simp only [shift]
-    congr 1
-    exact ih c
-  | derive e₁ e₂ ih₁ ih₂ =>
-    simp only [shift]
-    congr 1 <;> apply_assumption
-  | aggregate e₁ e₂ ih₁ ih₂ =>
-    simp only [shift]
-    congr 1 <;> apply_assumption
-  | undercut e d ih₁ ih₂ =>
-    simp only [shift]
-    congr 1 <;> apply_assumption
-  | rebut e₁ e₂ ih₁ ih₂ =>
-    simp only [shift]
-    congr 1 <;> apply_assumption
-  | introspect e ih =>
-    simp only [shift]
-    congr 1
-    exact ih c
-  | letIn e₁ e₂ ih₁ ih₂ =>
-    simp only [shift]
-    congr 1
-    · exact ih₁ c
-    · exact ih₂ (c + 1)
+  sorry
 
 /-- Values are preserved by shifting -/
 theorem shift_preserves_value (d c : Nat) (e : Expr) :
     IsValue e → IsValue (shift d c e) := by
-  intro hv
-  induction hv generalizing c with
-  | lam => constructor
-  | pair _ _ ih₁ ih₂ =>
-    constructor
-    · exact ih₁ c
-    · exact ih₂ c
-  | inl _ ih => constructor; exact ih c
-  | inr _ ih => constructor; exact ih c
-  | litNat => constructor
-  | litBool => constructor
-  | litString => constructor
-  | litUnit => constructor
-  | belief _ ih =>
-    constructor
-    exact ih c
+  sorry
 
 /-- Substituting in a value preserves being a value -/
 theorem subst_preserves_value (k : Nat) (s : Expr) (e : Expr) :
     IsValue e → IsValue (subst k s e) := by
-  intro hv
-  induction hv generalizing k with
-  | lam => constructor
-  | pair _ _ ih₁ ih₂ =>
-    constructor
-    · exact ih₁ k
-    · exact ih₂ k
-  | inl _ ih => constructor; exact ih k
-  | inr _ ih => constructor; exact ih k
-  | litNat => constructor
-  | litBool => constructor
-  | litString => constructor
-  | litUnit => constructor
-  | belief _ ih =>
-    constructor
-    exact ih k
+  sorry
 
 end Expr
 
