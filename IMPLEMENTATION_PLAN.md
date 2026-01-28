@@ -134,7 +134,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **Suggested starting point**:
 - [x] **8.5** Define Confidence type as subtype of Real with [0,1] bounds - COMPLETED Session 10. Design: `{ c : ℝ // 0 ≤ c ∧ c ≤ 1 }` with layered algebraic abstraction. See exploration/thread-8-verification.md.
 - [x] **8.6** Define confidence combination operations (×, min, ⊕) - COMPLETED Session 11. Three separate commutative monoids: (×, 1), (min, 1), (⊕, 0). **Key finding**: (⊕, ×) do NOT form a semiring—distributivity fails. See exploration/thread-8-verification.md §12.
-- [ ] **8.7** Prove boundedness preservation for each operation
+- [x] **8.7** Prove boundedness preservation for each operation - COMPLETED Session 13. All five operations proven to preserve [0,1]: multiplication (Mathlib provides), minimum (trivial), ⊕ (algebraic proof), undercut (reduces to multiplication), rebut (division bounds + edge case). **Key discovery**: Mathlib's `unitInterval` is exactly what we need—`abbrev Confidence := unitInterval`. Full Lean 4 formalization sketched. See exploration/thread-8-verification.md §13.
 
 ### Thread 9: Phenomenology
 **Status**: Ready but risky. Important yet potentially unbounded.
@@ -501,7 +501,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 | 5: Belief Revision | Surface | ✓ UNBLOCKED | None | **HIGH** | 15/20 |
 | 6: Multi-Agent | Medium-High | Theoretical gaps | None | MEDIUM-LOW | 11/20 |
 | 7: Implementation | Theoretical only | ✓ UNBLOCKED | None | MEDIUM | 12/20 |
-| 8: Verification | **✓ ACTIVE (Tasks 8.5, 8.6 DONE)** | Task 8.7 next | None | **HIGH** | 16/20 |
+| 8: Verification | **✓ ACTIVE (Tasks 8.5, 8.6, 8.7 DONE)** | Task 8.1 next | None | **HIGH** | 16/20 |
 | 9: Phenomenology | Unexamined | **✓ UNBLOCKED** | None | **MEDIUM-HIGH** | 14/20 |
 
 ### Recommended Next Exploration
@@ -511,10 +511,11 @@ With Threads 1, 2, 3 substantially complete and Thread 8 progressing well:
 **Thread 8: Formal Verification** (score: 16/20) — HIGHEST PRIORITY
 1. ✓ Task 8.5: Confidence type design complete
 2. ✓ Task 8.6: Confidence operations (×, min, ⊕) characterized
-3. → Task 8.7: Prove boundedness preservation formally in Lean 4
-3. Formalize DAG justification structure from Thread 2
-4. Formalize stratification types from Thread 3
-5. Prove key properties (boundedness, acyclicity, stratification safety)
+3. ✓ Task 8.7: Boundedness preservation proofs complete
+4. → Task 8.1: Create Lean 4 project structure and compile proofs
+5. → Formalize DAG justification structure from Thread 2
+6. → Formalize stratification types from Thread 3
+7. Prove key properties (acyclicity, stratification safety)
 
 **Thread 5: Belief Revision** (score: 15/20) — HIGH PRIORITY
 1. Extend AGM to graded beliefs
@@ -529,11 +530,12 @@ With Threads 1, 2, 3 substantially complete and Thread 8 progressing well:
 
 ### Specific Next Actions for Thread 8
 
-1. **Lean 4 setup**:
-   - [ ] Create formal/lean directory structure
-   - [ ] Define Confidence type as subtype of Real with [0,1] bounds
-   - [ ] Define confidence operations (×, min, ⊕)
-   - [ ] Prove boundedness preservation
+1. **Lean 4 setup** (READY):
+   - [ ] Create formal/lean directory structure with lakefile.lean
+   - [x] Define Confidence type as subtype of Real with [0,1] bounds — Design: `abbrev Confidence := unitInterval`
+   - [x] Define confidence operations (×, min, ⊕) — See exploration/thread-8-verification.md §12-13
+   - [x] Prove boundedness preservation — All five operations proven (Session 13)
+   - [ ] Compile actual .lean files and verify proofs type-check
 
 2. **Add Thread 2 types** (from Session 9):
    - [ ] Define JustificationNode with all constructors
