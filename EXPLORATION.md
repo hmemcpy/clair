@@ -488,7 +488,8 @@ What I believe I know:
 | Dissertation structure established | 0.95 | Session 30: LaTeX infrastructure + Chapter 1 | Find structural flaw | ✓ Session 30 |
 | Chapter 1 captures correct framing | 0.90 | Session 30: tracking vs proving, contributions | Find missing element | ✓ Session 30 |
 | Chapter 2 prior art survey adequate | 0.90 | Session 34: 5 major traditions surveyed, gap identified | Find significant omission | ✓ Session 34 |
-| Dissertation will be completed | 0.85 | Session 30/34: 2 of 13 chapters done, feasibility confirmed | Find blocking obstacle | ⚠ Session 34 |
+| Dissertation will be completed | 0.90 | Session 37: 5 of 13 chapters done, momentum established | Find blocking obstacle | ✓ Session 37 |
+| Chapter 5 CPL formalization adequate | 0.90 | Session 37: Graded Löb, anti-bootstrap, decidability | Find logical flaw | ✓ Session 37 |
 
 ---
 
@@ -1700,3 +1701,28 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Dissertation Chapter 4 complete" → NEW (confidence: 0.95)
   - "Justification DAG structure adequately formalized" → CONFIRMED (confidence: 0.95)
   - "Reinstatement emerges compositionally" → CONFIRMED (confidence: 0.99)
+
+### Session 37: Dissertation Chapter 5 (Task 10.1e - Self-Reference and Gödelian Limits)
+- **COMPLETED TASK 10.1e: Dissertation Chapter 5**
+- **Chapter 5: Self-Reference and the Gödelian Limits** (~25 pages)
+- **Key formalizations**:
+  - Stratified Belief Type: Bel<n, A> with level constraint m < n
+  - Stratification Safety Theorem: no Liar paradoxes by construction
+  - Graded Kripke Frame definition with transitivity + converse well-foundedness
+  - CPL (Confidence-Bounded Provability Logic) full syntax and semantics
+  - Graded Löb Axiom: B_c(B_c φ → φ) → B_{g(c)} φ with g(c) = c²
+  - Anti-Bootstrapping Theorem: self-soundness claims cap confidence at g(c)
+  - CPL-finite Decidability via finite model property (Bou et al. 2011)
+  - CPL-Gödel variant analysis: decidable but semantically inappropriate for CLAIR
+- **Key contributions highlighted**:
+  - CPL is presented as the first graded extension of Gödel-Löb provability logic
+  - Anti-bootstrapping theorem as central theoretical result
+  - Two-layer design recommendation: stratification by default, Kripke fixed points as escape hatch
+- **Prior art engaged**: Löb (1955), Tarski (1933), Kripke (1975), Boolos (1993), Vidal (2019), Bou et al. (2011)
+- **Output**: `formal/dissertation/chapters/05-self-reference.tex`
+- **Status**: Chapter 5 COMPLETED
+- **Dissertation progress**: Chapters 1-5 complete; Chapters 6-13 remaining
+- **Beliefs updated**:
+  - "Dissertation Chapter 5 complete" → NEW (confidence: 0.95)
+  - "CPL formalization adequate for dissertation" → CONFIRMED (confidence: 0.90)
+  - "Self-reference design two-layer approach validated" → CONFIRMED (confidence: 0.95)

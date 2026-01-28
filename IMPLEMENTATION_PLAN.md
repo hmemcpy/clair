@@ -1246,6 +1246,33 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 
 190. **Non-uniqueness is rare**: Multiple fixed points only arise with degenerate confidences (0 or 1) which violate CLAIR's fallibilism principle.
 
+### Session 37 Discoveries (Task 10.1e Dissertation Chapter 5 Complete)
+
+191. **DISSERTATION CHAPTER 5 COMPLETE** — Self-Reference and the Gödelian Limits (~25 pages) written.
+
+192. **Chapter structure**:
+    - The problem of self-reference in belief systems
+    - Löb's theorem and anti-bootstrapping
+    - Tarski's hierarchy: stratified introspection
+    - Kripke's fixed points: safe self-reference
+    - Provability logic and CLAIR (GL alignment)
+    - CPL (Confidence-Bounded Provability Logic) full development
+    - Decidability analysis: CPL undecidable, CPL-finite decidable
+    - Design recommendations: two-layer approach
+
+193. **Key formalizations included**:
+    - Definition: Stratified Belief Type (Bel<n, A>)
+    - Theorem: Stratification Safety (no Liar paradoxes)
+    - Definition: Graded Kripke Frame for CPL
+    - Axiom: Graded Löb with g(c) = c²
+    - Theorem: Anti-Bootstrapping (self-soundness caps confidence)
+    - Theorem: CPL-finite Decidability
+    - Definition: CPL-0, CPL-Gödel variants analyzed
+
+194. **Novel contribution highlighted**: CPL is presented as the first graded extension of Gödel-Löb provability logic, with formal semantics and decidability analysis. The anti-bootstrapping theorem is the central theoretical result.
+
+195. **Dissertation progress**: Chapters 1-5 complete (Introduction, Background, Confidence, Justification, Self-Reference). Remaining: Chapters 6-13 and appendices.
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -1504,7 +1531,8 @@ With Threads 1, 2, 3 complete, priority shifts to:
 - [x] **10.1b Write Chapter 2: Background & Related Work** — COMPLETED Session 34. Comprehensive survey of prior art: formal epistemology (foundationalism, coherentism, infinitism, Agrippa's trilemma), modal and provability logic (epistemic logic, GL, Löb's theorem, graded modalities), TMS and argumentation (JTMS, ATMS, Dung's AAF, Pollock's defeaters), belief revision (AGM, ranking theory, DEL), and type-theoretic approaches (information flow, refinement types, dependent types, probabilistic programming, Justification Logic). Synthesis table identifies the gap CLAIR fills. ~25 pages. See `formal/dissertation/chapters/02-background.tex`.
 - [x] **10.1c Write Chapter 3: The Confidence System** — COMPLETED Session 35. Formal definition and algebraic structure of confidence: three monoids (multiplication, minimum, oplus), non-semiring structure (distributivity failure with counterexample), defeat operations (undercut with composition theorem, rebut with antisymmetry), and Lean 4 formalization summary. Key theorems: derivation monotonicity, min dominates mul, oplus is confidence-increasing, undercut composition via ⊕. ~25 pages. See `formal/dissertation/chapters/03-confidence.tex`.
 - [x] **10.1d Write Chapter 4: Justification as Labeled DAGs** — COMPLETED Session 36. Established structural foundation: DAG necessity (shared premises), acyclicity requirement (well-foundedness), labeled edges (support/undercut/rebut). Confidence propagation algorithm with bottom-up evaluation. Reinstatement emerges compositionally (boost = a×d×e). Infinite chain convergence to d/(1+d). Mutual defeat fixed points with existence (Brouwer) and uniqueness (Banach contraction when b_max×d_max<1). Correlated evidence with dependency-adjusted aggregation interpolating between ⊕ and average. Connection to TMS, argumentation, Subjective Logic, Justification Logic. ~25 pages. See `formal/dissertation/chapters/04-justification.tex`.
-- [ ] **10.1 Complete remaining dissertation chapters** — IN PROGRESS. Chapters 5-13 and appendices remain.
+- [x] **10.1e Write Chapter 5: Self-Reference and the Gödelian Limits** — COMPLETED Session 37. Full treatment of self-reference: Löb's theorem and anti-bootstrapping, Tarski's stratification hierarchy, Kripke's fixed points for safe self-reference, CPL (Confidence-Bounded Provability Logic) as novel extension of GL with graded Löb axiom g(c)=c², anti-bootstrapping theorem, decidability analysis (CPL undecidable, CPL-finite decidable, CPL-Gödel semantically inappropriate). Two-layer design recommendation: stratification by default, Kripke fixed points as escape hatch. ~25 pages. See `formal/dissertation/chapters/05-self-reference.tex`.
+- [ ] **10.1 Complete remaining dissertation chapters** — IN PROGRESS. Chapters 6-13 and appendices remain.
 
   **Objective**: Synthesize all exploration findings into a coherent, PhD-level academic document that formalizes CLAIR as a novel contribution to the intersection of programming language theory, epistemology, and AI reasoning.
 
