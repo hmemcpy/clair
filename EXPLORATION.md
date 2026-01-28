@@ -176,8 +176,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 3: Self-Reference and Introspection
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27, 29, 32, 33)
-**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md, thread-3.20-cpl-finite-formalization.md, thread-3.21-cpl-godel-variant.md, thread-3.22-cpl-undecidability.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27, 29, 32, 33, 63, 67, 68)
+**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md, thread-3.20-cpl-finite-formalization.md, thread-3.21-cpl-godel-variant.md, thread-3.22-cpl-undecidability.md, thread-3.27-optimal-lattice-choice.md, thread-3.12-fixedpoint-complexity.md, thread-3.30-loeb-fixedpoint-interaction.md)
 
 CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 
@@ -304,6 +304,24 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
   - Require domain annotations for `self_ref_belief`
   - Bounded iteration with convergence detection + timeout at runtime
 - See exploration/thread-3.12-fixedpoint-complexity.md
+
+**Löb Discount × Fixed-Point Interaction (Session 68)**:
+- **Task 3.30 answered**: How does g(c) = c² interact with fixed-point computation?
+- **Pure introspection degeneracy**: c = c² has fixed points only at 0 and 1
+  - For any c₀ ∈ (0,1), iteration converges to 0 (doubly exponential decay)
+  - Validates anti-bootstrapping: without external grounding, self-reference collapses
+- **External evidence creates structure**: For c = a ⊕ c² where a is external evidence:
+  - When a < 0.5: Stable interior fixed point at c* = a/(1-a)
+  - When a ≥ 0.5: Unique stable fixed point at c = 1
+  - **Critical threshold at a = 0.5** determines fixed-point structure
+- **The formula c* = a/(1-a)** shows evidence amplification is bounded:
+  - a = 0.1 → c* = 0.111; a = 0.3 → c* = 0.429; a = 0.49 → c* = 0.961
+  - Only strong evidence (a ≥ 0.5) enables full confidence
+- **Defeat annihilation**: undercut(introspect, d) → c = 0 for any d > 0
+  - Defeat + self-reference penalty is fatal to confidence
+- **Discretization effects in L₅**: Floor rounding can create spurious fixed points
+- **Design implications**: Require external evidence; warn near threshold; warn on defeat + introspection
+- See exploration/thread-3.30-loeb-fixedpoint-interaction.md
 
 ---
 

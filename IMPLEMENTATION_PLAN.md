@@ -95,8 +95,14 @@ This is not a software implementation plan—it's a research exploration plan. E
 **New tasks discovered (Session 67)**:
 - [ ] **3.28 Automatic contractivity detection** - What syntactic patterns guarantee |f'| < 1 for automatic convergence proof?
 - [ ] **3.29 Gradual self-reference typing** - Should CLAIR allow unchecked self-reference with incremental verification?
-- [ ] **3.30 Löb discount and fixed points** - How does g(c) = c² interact with fixed-point computation?
+- [x] **3.30 Löb discount and fixed points** - ANSWERED Session 68: The Löb discount g(c) = c² creates specific fixed-point dynamics. Pure introspection has fixed points only at 0 and 1 (degeneracy). With external evidence a, a stable interior fixed point c* = a/(1-a) exists when a < 0.5. Critical threshold at a = 0.5: below this, interior FP is stable; above, c = 1 is unique attractor. Defeat with Löb-discounted introspection collapses to c = 0. Validates anti-bootstrapping: external grounding is required for non-trivial confidence. See exploration/thread-3.30-loeb-fixedpoint-interaction.md
 - [ ] **3.31 Probabilistic fixed-point approximation** - Can random sampling provide useful bounds for undecidable cases?
+
+**New tasks discovered (Session 68)**:
+- [ ] **3.32 External evidence warnings** - Should CLAIR provide syntactic warnings when self-referential beliefs lack external evidence?
+- [ ] **3.33 Multi-level introspection threshold** - How does the a = 0.5 threshold interact with meta-meta-beliefs (double Löb discount c⁴)?
+- [ ] **3.34 Aggregated introspection** - For c = ⊕ᵢ introspect(selfᵢ) across multiple self-beliefs, how do fixed points behave?
+- [ ] **3.35 Discrete Löb rounding** - Should CLAIR use ceiling instead of floor for discrete Löb discount to reduce spurious fixed points?
 
 **New tasks discovered (Session 22)**:
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
@@ -2146,6 +2152,55 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Task 3.29: Gradual self-reference typing
     - Task 3.30: Löb discount and fixed points interaction
     - Task 3.31: Probabilistic approximation for undecidable cases
+
+### Session 68 Discoveries (Task 3.30 Löb Discount × Fixed-Point Interaction)
+
+338. **LÖB DISCOUNT × FIXED-POINT INTERACTION CHARACTERIZED** — The quadratic Löb discount g(c) = c² creates specific fixed-point dynamics that validate anti-bootstrapping.
+
+339. **Pure introspection degeneracy theorem**:
+    - The equation c = c² (pure self-introspection) has exactly two fixed points: c = 0 and c = 1
+    - For any initial c₀ ∈ (0,1), iteration converges to 0 (doubly exponential decay)
+    - This validates anti-bootstrapping: without external grounding, self-reference cannot sustain non-trivial confidence
+
+340. **External evidence creates structured fixed points**:
+    - For self-reference combined with external evidence a: c = a ⊕ c²
+    - When a < 0.5: Stable interior fixed point at c* = a/(1-a), plus unstable c = 1
+    - When a ≥ 0.5: Unique stable fixed point at c = 1
+    - Critical threshold at a = 0.5 determines fixed-point structure
+
+341. **The anti-bootstrapping formula c* = a/(1-a)**:
+    - External evidence acts as "seed" that gets amplified but bounded
+    - a = 0.1 → c* = 0.111 (weak evidence → weak confidence)
+    - a = 0.3 → c* = 0.429 (moderate evidence → moderate confidence)
+    - a = 0.49 → c* = 0.961 (near-threshold → high but not full confidence)
+    - Only strong evidence (a ≥ 0.5) can enable full confidence c = 1
+
+342. **Defeat annihilation theorem**:
+    - Combining defeat with Löb-discounted introspection: c = c² × (1 - d)
+    - For any d > 0, the only fixed point in [0,1] is c = 0
+    - Defeat + self-reference penalty is fatal to confidence
+
+343. **Stability and convergence analysis**:
+    - At c* = a/(1-a): f'(c*) = 2a < 1 when a < 0.5 → stable
+    - At c = 1: f'(1) = 2(1-a), stable only when a > 0.5
+    - Convergence rate = 2a; slow convergence near threshold a ≈ 0.5
+
+344. **Discretization effects in L₅**:
+    - Floor rounding for Löb discount can introduce spurious fixed points
+    - Example: For a = 0.5 in continuous case, unique FP at 1; in L₅, three FPs at {0.5, 0.75, 1}
+    - Recommendation: Use least fixed point or closest to continuous solution
+
+345. **Design implications for CLAIR**:
+    - Require external evidence for self-referential beliefs
+    - Provide expected confidence computation: c* = a/(1-a) when a < 0.5
+    - Warn when a ≈ 0.5 (slow convergence)
+    - Warn when combining defeat with introspection (will collapse to 0)
+
+346. **New questions raised**:
+    - Task 3.32: External evidence warnings for self-ref beliefs
+    - Task 3.33: Multi-level introspection (double Löb discount c⁴)
+    - Task 3.34: Aggregated introspection across multiple self-beliefs
+    - Task 3.35: Ceiling vs floor for discrete Löb discount
 
 ## Impossibilities Encountered
 
