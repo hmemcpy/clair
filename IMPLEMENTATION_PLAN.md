@@ -51,7 +51,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] Toulmin (1958) - Argument model with rebuttals
 
 **New tasks discovered (Session 50)**:
-- [ ] **2.15 Add Choice construct** - For JL-compatibility, should CLAIR add JL-style sum (choice of justifications)? Different from aggregation. Confidence = max(alternatives)?
+- [x] **2.15 Add Choice construct** - SUBSTANTIALLY COMPLETE Session 59: Choice construct fully designed for JL compatibility. Key findings: (1) Choice represents "alternative justifications" (any suffices), distinct from aggregation (independent evidence), (2) Confidence semantics: max(c₁, c₂, ..., cₙ), (3) Algebraic properties: commutative, associative, idempotent, (4) Undercut distributes over choice, aggregate distributes over choice, (5) Choice ≤ Aggregation (max ≤ ⊕), (6) With Choice, CLAIR conservative extension over JL becomes cleaner—JL's sum (+) maps exactly to CLAIR's choice, (7) Adding choice doesn't affect decidability of CLAIR fragments. See exploration/thread-2.15-choice-construct.md
 - [x] **2.16 Sequent calculus for CLAIR** - COMPLETED Session 51: Full sequent calculus designed with graded judgments Γ ⊢ A @c : j. Structural rules (Id, Cut, Weak, Contr with aggregation), logical rules (∧, →), defeat rules (Undercut, Rebut), aggregation rule, and stratified belief rules. Cut elimination conjectured. Soundness theorem stated. See exploration/thread-2.16-sequent-calculus.md
 - [x] **2.17 Justification equivalence** - SUBSTANTIALLY COMPLETE Session 58: Normal form equivalence defined as the correct notion. Key findings: (1) Two justifications are equivalent iff they have the same normal form (cut-free, flattened, ordered), (2) Cut elimination (Thread 2.19) provides normal forms, (3) Non-distributivity of × and ⊕ constrains equivalence—cannot freely reorganize derivation/aggregation, (4) Defeat does NOT distribute over aggregation (counterexample: undercut(agg(a,b), d) ≠ agg(undercut(a,d), undercut(b,d))), (5) Equivalence decidable for CLAIR-finite-stratified. See exploration/thread-2.17-justification-equivalence.md
 - [x] **2.18 Conservative extension** - SUBSTANTIALLY COMPLETE Session 56: CLAIR is a conservative extension of JL for the JL-fragment at confidence 1. Key findings: (1) When restricted to JL-expressible formulas without defeat and with confidence = 1, CLAIR derivations correspond exactly to JL derivations, (2) CLAIR is NOT conservative in general—graded confidence (c < 1), defeat operations (undercut, rebut), and aggregation (vs JL's choice/sum) are genuine extensions, (3) The extension is orthogonal in three dimensions: Binary→Graded confidence, Positive-only→Positive+Defeat, Choice→Choice+Aggregation, (4) Adding a JL-compatible Choice construct (max confidence) distinct from aggregation (⊕ combination) would clarify the relationship, (5) JL's decidability and meta-theory transfer to CLAIR's conservative fragment. See exploration/thread-2.18-conservative-extension.md
@@ -1958,6 +1958,48 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Reduction rules for cuts, aggregation flattening, ordering, identity removal
     - Local confluence proven; by Newman's lemma, unique normal forms exist
     - Strong normalization from cut elimination
+
+### Session 59 Discoveries (Task 2.15 Choice Construct)
+
+307. **CHOICE CONSTRUCT FULLY DESIGNED** — JL-compatible choice operation with max semantics designed and ready for implementation.
+
+308. **Choice vs Aggregation distinction clarified**:
+    - **Aggregation (⊕)**: "Both contribute" — independent evidence for same conclusion
+    - **Choice (max)**: "Either suffices" — alternative justifications for same conclusion
+    - These are semantically distinct operations, both needed in CLAIR
+    - JL's sum (+) corresponds to CLAIR's choice, NOT aggregation
+
+309. **Confidence semantics established**:
+    - `choice(b₁, b₂, ..., bₙ) = max(c₁, c₂, ..., cₙ)`
+    - "Best alternative" interpretation: we're as confident as our best option
+    - Unlike aggregation, choice does NOT combine evidence — it selects among alternatives
+
+310. **Algebraic properties proven**:
+    - **Commutativity**: choice(a, b) ≡ choice(b, a)
+    - **Associativity**: choice(choice(a, b), c) ≡ choice(a, choice(b, c))
+    - **Idempotence**: choice(a, a) ≡ a
+    - **Undercut distributes**: undercut(choice(a, b), d) = choice(undercut(a, d), undercut(b, d))
+    - **Aggregate distributes**: aggregate(choice(a, b), c) = choice(aggregate(a, c), aggregate(b, c))
+
+311. **Key inequality**:
+    - `max(c₁, c₂) ≤ c₁ ⊕ c₂` always (aggregation gives higher confidence than choice)
+    - This reflects the semantic difference: independent evidence > alternative routes
+
+312. **Type-theoretic analysis**:
+    - Choice is like a sum type (A + B), but non-linear — alternatives aren't consumed
+    - Derivation distributes over choice: derive(choice(a, b), f) ≡ choice(derive(a, f), derive(b, f))
+    - Term assignment: `choice(e₁, e₂) : Belief<A>[max(c₁, c₂)]`
+
+313. **Conservative extension clarified**:
+    - With Choice, CLAIR conservative extension over JL becomes cleaner
+    - JL's `+` (sum) maps exactly to CLAIR's `choice`
+    - JL's `·` (application) maps to CLAIR's `derive`
+    - JL's `!` (proof checker) maps to CLAIR's `introspect`
+
+314. **Decidability preserved**:
+    - Adding choice doesn't affect decidability of CLAIR fragments
+    - max is simpler than ⊕; no new complexity introduced
+    - CLAIR-finite + Choice and CLAIR-stratified + Choice remain decidable
 
 ## Impossibilities Encountered
 
