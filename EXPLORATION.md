@@ -70,8 +70,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 3: Self-Reference and Introspection
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Session 8)
-**Depth**: Deep (see exploration/thread-3-self-reference.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25)
+**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md)
 
 CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 
@@ -89,13 +89,20 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 
 **Design proposal**: Stratification by default with `Belief<n, A>` types, plus `self_ref_belief` escape hatch for fixed-point-stable cases.
 
-**Prior work surveyed**: Löb (1955), Tarski (1933), Kripke (1975), Boolos (1993), Gupta & Belnap (1993)
-**Formal tools**: Modal logic GL (not S4/S5), Kripke fixed-point construction
+**Prior work surveyed**: Löb (1955), Tarski (1933), Kripke (1975), Boolos (1993), Gupta & Belnap (1993), Vidal (2019)
+**Formal tools**: Modal logic GL (not S4/S5), Kripke fixed-point construction, CPL (Confidence-Bounded Provability Logic)
 **Questions answered**:
 - Q3.1: ✓ Safe = stratified + fixed-point-stable; Dangerous = Liar/Curry/Löbian
 - Q3.2: ✓ Yes, via stratification (level-1 can reference level-0 confidence)
 - Q3.3: ✓ Tarski-style hierarchy with typed belief levels
 - Q3.4: ✓ Yes, with escape hatch for fixed-point-stable cases
+- Q3.5: ✓ CPL likely undecidable (Session 25); use decidable fragments or stratification
+
+**CPL Decidability (Session 25)**:
+- Full CPL (graded GL with [0,1] confidence) is **likely undecidable**
+- Cause: transitivity + continuous values (Vidal 2019)
+- Decidable fragments: CPL-finite (discrete values), CPL-0 (stratified only)
+- Implication: Stratification is primary safety mechanism; anti-bootstrapping is guideline
 
 ---
 
@@ -384,6 +391,14 @@ What I believe I know:
 | Strict evaluation appropriate for CLAIR | 0.90 | Session 24: confidence tracking requires it | Find lazy alternative | ✓ Session 24 |
 | Justification DAG most complex part | 0.90 | Session 24: acyclicity, defeat order | Find simpler structure | ✓ Session 24 |
 | Thread 7 now unblocked | 0.95 | Session 24: design validates implementability | Find blocker | ✓ Session 24 |
+| CPL decidable | 0.25 | Session 25: **LIKELY UNDECIDABLE** due to Vidal (2019) | Prove decidability via quasimodels | ✗ Likely False |
+| CPL undecidable | 0.75 | Session 25: transitivity + continuous values | Prove decidability | ⚠ Likely True |
+| CPL-finite decidable | 0.90 | Session 25: finite lattice theorem (Bou 2011) | Find undecidable fragment | ✓ Session 25 |
+| CPL-0 (stratified) decidable | 0.85 | Session 25: no self-reference removes encodings | Find encoding despite stratification | ✓ Session 25 |
+| Stratification is primary safety mechanism | 0.90 | Session 25: CPL undecidability implies this | Find CPL-checkable alternative | ✓ Session 25 |
+| Anti-bootstrapping is guideline not invariant | 0.85 | Session 25: cannot check full CPL | Find decidable checking method | ⚠ Pragmatic |
+| Transitive fuzzy modal logic undecidable | 0.95 | Session 25: Vidal (2019) formal proof | Find error in Vidal | ✓ Session 25 |
+| Quasimodel approach for CPL uncertain | 0.40 | Session 25: unproven, non-trivial | Prove quasimodel completeness | ⚠ Unknown |
 
 ---
 

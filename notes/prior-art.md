@@ -841,3 +841,54 @@ See exploration/thread-3.13-graded-provability-logic.md for detailed exploration
 - Aggregation is truth-tracking when: shared framework + independence + competence + good faith
 
 See exploration/thread-6.1-objective-truth.md for detailed exploration.
+
+### ✓ SURVEYED (Session 25)
+
+**Thread 3.16 (CPL Decidability):** ✓ CPL likely undecidable; decidable fragments identified
+
+**Amanda Vidal, "On Transitive Modal Many-Valued Logics" (2019)**:
+- Key result: Transitive modal Łukasiewicz logic is **undecidable** (even over finite models)
+- Local modal Łukasiewicz (without transitivity) is decidable
+- First example of "a decidable modal logic whose transitive expansion is undecidable"
+- Extends to Product algebras and other MV-algebras
+- Proof encodes undecidable problems via transitivity + continuous values
+- Reference: [arXiv:1904.01407](https://arxiv.org/abs/1904.01407), [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0165011418310893)
+- **For CLAIR**: CPL requires transitivity (axiom 4) + continuous [0,1] → likely undecidable
+
+**Caicedo, Metcalfe, Rodríguez, Rogger, "A Finite Model Property for Gödel Modal Logics" (2013)**:
+- Gödel modal logics lack finite model property w.r.t. standard [0,1] semantics
+- Alternative "quasimodel" semantics with finite model property
+- PSPACE-complete decision procedure via quasimodels
+- Reference: [Springer WoLLIC 2013](https://link.springer.com/chapter/10.1007/978-3-642-39992-3_20)
+- **For CLAIR**: Quasimodel approach might rescue CPL decidability, but unproven and non-trivial
+
+**Bou, Esteva, Godo, "On the Minimum Many-Valued Modal Logic over a Finite Residuated Lattice" (2011)**:
+- Many-valued modal logics over **finite** residuated lattices are decidable
+- Finite lattice = finite truth values (no continuous [0,1])
+- Axiomatization and completeness results
+- Reference: [Journal of Logic and Computation](https://academic.oup.com/logcom/article-abstract/21/5/739/971984)
+- **For CLAIR**: CPL-finite (discrete confidence {0, 0.25, 0.5, 0.75, 1.0}) is decidable
+
+**Classical GL Decidability (Boolos 1993, Segerberg 1971)**:
+- GL is complete for finite transitive irreflexive trees
+- PSPACE-complete decision procedure
+- Key property: converse well-foundedness limits model depth
+- Reference: [Stanford Encyclopedia: Provability Logic](https://plato.stanford.edu/entries/logic-provability/)
+- **For CLAIR**: Classical GL decidability relies on finite model property; graded CPL may not inherit this
+
+**Key findings for CLAIR (Session 25)**:
+- CPL is **very likely undecidable** (0.75 confidence)
+  - Transitivity + continuous [0,1] values matches Vidal's undecidability pattern
+  - Converse well-foundedness (GL's frame condition) unlikely to rescue decidability
+  - Multiplicative operations (×, ⊕) behave like Product/Łukasiewicz, not Gödel (min/max)
+- **Decidable fragments identified**:
+  - **CPL-finite**: Discrete confidence values (Bou et al. 2011)
+  - **CPL-0**: Stratified only, no self-reference (removes problematic encodings)
+  - **CPL-bounded**: Maximum formula depth (trivially decidable)
+- **Design implications**:
+  - Stratification (Thread 3) is the primary safety mechanism
+  - Anti-bootstrapping becomes semantic guideline, not checked invariant
+  - Consider finite confidence for type-level operations
+  - Honest uncertainty about full CPL decidability is appropriate
+
+See exploration/thread-3.16-cpl-decidability.md for detailed exploration.

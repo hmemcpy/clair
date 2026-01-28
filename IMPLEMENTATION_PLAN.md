@@ -76,10 +76,15 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [ ] **3.15 Formalize stratification in Lean** - Moves to Thread 8
 
 **New tasks discovered (Session 22)**:
-- [ ] **3.16 CPL decidability** - Is Confidence-Bounded Provability Logic decidable? Likely via finite model property
-- [ ] **3.17 CPL soundness/completeness** - Formulate and prove for CPL
+- [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
+- [ ] **3.17 CPL soundness/completeness** - Formulate and prove for CPL (or decidable fragments)
 - [ ] **3.18 Graded Löb discount function** - Choose the right g(c) function: g(c) = c², c×(1-c), or other?
-- [ ] **3.19 Type-level anti-bootstrapping** - Implement Löb constraints in CLAIR's type checker
+- [ ] **3.19 Type-level anti-bootstrapping** - Implement Löb constraints in CLAIR's type checker (use stratification, not full CPL)
+
+**New tasks discovered (Session 25)**:
+- [ ] **3.20 CPL-finite formalization** - Formalize CPL with finite confidence values {0, 0.25, 0.5, 0.75, 1.0}; prove decidability
+- [ ] **3.21 CPL-Gödel variant** - Investigate CPL using Gödel algebra (min/max) instead of product; may be decidable
+- [ ] **3.22 Undecidability proof** - Formally prove CPL undecidability via reduction from known undecidable problem
 
 ### Thread 4: Grounding
 **Status**: ✓ SUBSTANTIALLY EXPLORED (Session 17). See exploration/thread-4-grounding.md
@@ -901,6 +906,50 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Graded modalities in epistemic logic (de Rijke, Fine)
     - Possibilistic modal logic over Gödel logic
 
+### Session 25 Discoveries (Task 3.16 CPL Decidability)
+
+128. **CPL IS LIKELY UNDECIDABLE** — The combination of transitivity + continuous [0,1] values matches the undecidability pattern proven by Vidal (2019).
+
+129. **The Vidal result is key**:
+    - Transitive modal Łukasiewicz logic is **undecidable** (even over finite models)
+    - Local modal Łukasiewicz (without transitivity) is decidable
+    - This is "an example of a decidable modal logic whose transitive expansion is undecidable"
+    - CPL requires transitivity (axiom 4: □A → □□A) and continuous values
+
+130. **Classical GL decidability does not extend**:
+    - Classical GL: PSPACE-complete via finite model property
+    - Converse well-foundedness forces finite-depth trees
+    - But graded values introduce new encoding power
+    - Transitivity + continuity allows encoding undecidable problems
+
+131. **Three decidable fragments identified**:
+    - **CPL-finite**: Discrete confidence values {0, 0.25, 0.5, 0.75, 1.0} — decidable via Bou et al. (2011)
+    - **CPL-0**: Stratified beliefs only (no self-reference) — removes problematic encodings
+    - **CPL-bounded**: Maximum formula depth — trivially decidable
+
+132. **Quasimodel approach uncertain**:
+    - Gödel modal logic uses quasimodels to recover decidability
+    - CPL uses multiplicative operations (like Product/Łukasiewicz), not min/max
+    - Quasimodel completeness for CPL is unproven
+
+133. **Design implication for CLAIR**:
+    - Stratification (Thread 3) is the primary safety mechanism
+    - Anti-bootstrapping becomes semantic guideline, not checked invariant
+    - Consider finite confidence for type-level operations
+    - Honest uncertainty about full decidability is appropriate
+
+134. **Prior art surveyed**:
+    - Vidal (2019): "On Transitive Modal Many-Valued Logics" — key undecidability
+    - Caicedo et al. (2013): Gödel modal logic quasimodels
+    - Bou et al. (2011): Finite residuated lattice decidability
+    - Boolos (1993): Classical GL decidability
+
+135. **Confidence assessment**:
+    - CPL undecidable: 0.75 (strong analogy to Vidal result)
+    - CPL-finite decidable: 0.90 (follows from finite lattice theorem)
+    - CPL-0 decidable: 0.85 (no self-reference removes encodings)
+    - Quasimodel approach works: 0.40 (unproven, non-trivial)
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -921,6 +970,8 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 
 6. **Cannot enumerate axioms** - ✓ CONFIRMED (Session 17): If grounding is pragmatic/coherentist, there is no fixed finite axiom set. Axioms are pragmatic stopping points, not a definable list. This is a feature (flexibility), not a bug.
 
+7. **CPL is likely undecidable** - ✓ LIKELY CONFIRMED (Session 25): Full CPL (Confidence-Bounded Provability Logic) is very likely undecidable due to transitivity + continuous [0,1] values (Vidal 2019). Decidable fragments: CPL-finite, CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
+
 ## Workarounds Found
 
 *Record practical approaches despite theoretical limits.*
@@ -940,6 +991,8 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 5. **Stratification for safe introspection** - ✓ DESIGNED (Session 8). Tarski-style hierarchy with typed levels `Belief<n, A>`. Formalization moves to Thread 8.
 
 6. **Kripke fixed points for stable self-reference** - ✓ DESIGNED (Session 8). `self_ref_belief` combinator attempts fixed-point computation. Returns Ill_formed if no fixed point.
+
+7. **For CPL undecidability: Decidable fragments** - ✓ IDENTIFIED (Session 25). Three workarounds: (a) CPL-finite with discrete confidence {0, 0.25, 0.5, 0.75, 1.0}; (b) CPL-0 using stratification (no self-reference); (c) Conservative type checking that rejects unclear cases. Anti-bootstrapping becomes semantic guideline, not checked invariant.
 
 ---
 
