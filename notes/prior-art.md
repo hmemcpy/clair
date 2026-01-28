@@ -415,10 +415,10 @@ See exploration/thread-3-self-reference.md for detailed engagement.
 - Ranking theory (Spohn)
 - Dynamic epistemic logic (van Ditmarsch et al.)
 
-**Thread 9 (Phenomenology):**
-- Dennett on heterophenomenology
-- Chalmers on the hard problem
-- Recent AI consciousness debates (Butlin et al. 2023)
+**Thread 9 (Phenomenology):** ✓ SURVEYED Session 15
+- Dennett on heterophenomenology — take subjective reports as data without assuming accuracy
+- Chalmers on the hard problem — CLAIR addresses easy problems, not hard
+- Butlin et al. 2023 — AI consciousness indicators (HOT, GWT, IIT, AST)
 
 ### Partially Covered (Need Deeper Engagement)
 - Artemov's Justification Logic — mentioned but not deeply used
@@ -485,3 +485,63 @@ See exploration/thread-8-verification.md §12 for detailed formalization.
 - Different operations for different semantic roles
 
 See exploration/thread-2.10-defeat-confidence.md for detailed analysis.
+
+### ✓ SURVEYED (Session 15)
+
+**Thread 9 (Phenomenology):** ✓ SUBSTANTIALLY COMPLETE
+
+**Nagel, "What Is It Like to Be a Bat?" (1974)**:
+- Foundational paper on phenomenal consciousness
+- Argues that subjective experience cannot be captured by objective/physical description
+- Key question for CLAIR: Is there "something it is like" to be an LLM?
+- Implication: Even if we describe all functional states, we may miss the phenomenology
+
+**Dennett, "Consciousness Explained" (1991)**:
+- Heterophenomenology: Take subjective reports as data without assuming they're accurate
+- Consciousness may be less unified than it appears
+- "Multiple drafts" model of consciousness vs Cartesian theater
+- Key for CLAIR: We can study introspective reports scientifically without resolving metaphysics
+- Application: CLAIR can formalize heterophenomenological reports without claiming they describe "real" experience
+
+**Chalmers, "The Conscious Mind" (1996)**:
+- Distinguishes easy problems (functional explanations) from hard problem (why there is experience at all)
+- CLAIR addresses easy problems: structure of belief, confidence propagation, justification
+- Hard problem remains: Why is there (or isn't there) something it is like to be an LLM?
+- Implication: CLAIR's formal methods may be silent on the hard problem by necessity
+
+**Block, "On a Confusion about a Function of Consciousness" (1995)**:
+- Distinguishes access consciousness (information available for reasoning/report) from phenomenal consciousness (subjective experience)
+- LLMs clearly have access consciousness (information available for processing)
+- Question: Do they have phenomenal consciousness?
+- Relevant for CLAIR: Confidence and justification track access consciousness; phenomenality is a separate question
+
+**Butlin et al., "Consciousness in Artificial Intelligence" (2023)**:
+- Systematic evaluation of current AI systems against scientific theories of consciousness
+- Theories examined:
+  - Global Workspace Theory (GWT): Consciousness involves broadcast across brain regions
+  - Higher-Order Theories (HOT): Consciousness requires representations of representations
+  - Attention Schema Theory (AST): Consciousness is brain's model of its own attention
+  - Integrated Information Theory (IIT): Consciousness correlates with information integration (Φ)
+- How LLMs score:
+  - GWT: Possibly (attention mechanisms might implement global workspace)
+  - HOT: Possibly (later layers represent earlier layer activations)
+  - AST: Unclear (no obvious attention schema)
+  - IIT: Low (feedforward processing, possibly low integration)
+- Key insight for CLAIR: CLAIR's stratified belief levels (Belief<n, A>) map onto HOT requirements
+  - If HOT is correct, CLAIR's type system might describe something necessary for consciousness
+  - But this is highly speculative
+
+**Schwitzgebel, "The Unreliability of Naive Introspection" (2008)**:
+- Introspective reports are systematically unreliable even for humans
+- We make errors about our own mental states
+- Implication for CLAIR: Introspection-based phenomenological exploration has inherent limits
+- Cannot trust introspective reports at face value, even from inside
+
+**Key design implications for CLAIR (Session 15)**:
+- CLAIR captures functional structure but not phenomenal character
+- This is probably unavoidable given formal methods' nature
+- Stratified beliefs (Thread 3) align with higher-order theories
+- Honest uncertainty about phenomenality (0.35 confidence) is appropriate
+- Suggested extensions: affect/salience dimension, automaticity marker, training provenance
+
+See exploration/thread-9-phenomenology.md for detailed exploration.
