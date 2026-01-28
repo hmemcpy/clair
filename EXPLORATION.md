@@ -176,8 +176,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 3: Self-Reference and Introspection
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27, 29, 32, 33, 63, 67, 68, 69)
-**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md, thread-3.20-cpl-finite-formalization.md, thread-3.21-cpl-godel-variant.md, thread-3.22-cpl-undecidability.md, thread-3.27-optimal-lattice-choice.md, thread-3.12-fixedpoint-complexity.md, thread-3.30-loeb-fixedpoint-interaction.md, thread-3.33-multilevel-introspection-threshold.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27, 29, 32, 33, 63, 67, 68, 69, 70, 71, 72)
+**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md, thread-3.20-cpl-finite-formalization.md, thread-3.21-cpl-godel-variant.md, thread-3.22-cpl-undecidability.md, thread-3.27-optimal-lattice-choice.md, thread-3.12-fixedpoint-complexity.md, thread-3.30-loeb-fixedpoint-interaction.md, thread-3.33-multilevel-introspection-threshold.md, thread-3.34-aggregated-introspection.md, thread-3.40-correlation-aware-introspection-enforcement.md, thread-3.46-epistemic-linearity.md)
 
 CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 
@@ -369,6 +369,18 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - **Prior art**: Linear types (evidence as resource), information theory (no new info), Dempster-Shafer cautious rule (idempotence)
 - **Impact**: Closes bootstrap vulnerability, ensures defeat works as intended
 - See exploration/thread-3.40-correlation-aware-introspection-enforcement.md
+
+**Epistemic Linearity Formalization (Session 72)**:
+- **Task 3.46 answered**: Can we formalize evidence non-duplication as a type-theoretic principle?
+- **Answer**: **YES**, using **affine types** (forbid contraction, allow weakening)
+- **Core principle**: Evidence used once cannot be reused independently for additional justification
+- **Linear logic connection**: Forbidden contraction rule = evidence non-duplication; exponentials (!) = reusable evidence (axioms, definitions)
+- **Affine vs Linear**: Affine is correct for CLAIR—unused evidence is epistemically acceptable, but duplication is not
+- **Information-theoretic grounding**: Shannon redundancy—same information observed twice has same content as once
+- **Relationship to δ-correlation**: δ = 1 correlation is the semantic counterpart; affine types provide static guarantee
+- **Design recommendations**: Affine self-introspections by default; exponential for axioms; correlation-aware aggregation as fallback
+- **Task 3.23 substantially addressed**: Linear types for evidence consumption = affine types forbidding contraction
+- See exploration/thread-3.46-epistemic-linearity.md
 
 ---
 

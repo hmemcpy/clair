@@ -119,7 +119,13 @@ This is not a software implementation plan—it's a research exploration plan. E
 **New tasks discovered (Session 71)**:
 - [ ] **3.44 `@independent` enforcement level** - Should `@independent` on same-self introspection be an error (hard enforcement) or warning (soft enforcement)?
 - [ ] **3.45 Correlation inference for non-introspective sources** - How should CLAIR extend automatic δ inference to non-introspective (general) aggregation?
-- [ ] **3.46 Epistemic linearity formalization** - Can we formalize "epistemic evidence as non-duplicable resource" as a general type-theoretic principle?
+- [x] **3.46 Epistemic linearity formalization** - ANSWERED Session 72: YES, epistemic evidence as non-duplicable resource can be formalized using affine types. Key findings: (1) Linear logic's forbidden contraction rule captures evidence non-duplication, (2) Affine discipline (forbid contraction, allow weakening) is the right choice for CLAIR, (3) Exponentials (!) mark reusable evidence (axioms, definitions), (4) Correlation-aware aggregation (δ=1) is the semantic counterpart when static typing insufficient, (5) Information theory grounds the principle—redundant information doesn't add content. See exploration/thread-3.46-epistemic-linearity.md
+
+**New tasks discovered (Session 72)**:
+- [ ] **3.47 Affine evidence types in Lean** - Full Lean 4 formalization of affine evidence types with context splitting for aggregation.
+- [ ] **3.48 Epistemic linearity and defeat interaction** - How does affine evidence interact with defeat? Can undercut evidence be reused elsewhere?
+- [ ] **3.49 Decidability of affine CLAIR** - Prove decidability of type checking for CLAIR with affine evidence types.
+- [ ] **3.50 Gradual linearity adoption** - Design gradual typing approach for incremental adoption of affine evidence discipline.
 
 **New tasks discovered (Session 22)**:
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
@@ -128,7 +134,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **3.19 Type-level anti-bootstrapping** - ANSWERED Session 47: Two-layer approach using stratification (structural safety) + finite confidence caps (semantic safety). Key design: `Belief<level : Nat, content : Type, cap : FiniteConf>` with Löb discount g(c) = c² applied at type level. Decidable via finite lattice L₅. Sound by construction (loeb_discount ensures no amplification). See exploration/thread-3.19-type-anti-bootstrapping.md
 
 **New tasks discovered (Session 47)**:
-- [ ] **3.23 Linear types for evidence** - Could linear types help track "evidence consumption"? Relates to bootstrapping prevention.
+- [x] **3.23 Linear types for evidence** - SUBSTANTIALLY ANSWERED Session 72 via Task 3.46. Affine types (forbid contraction, allow weakening) track evidence usage. Key insight: evidence "consumption" = forbidding contraction rule. Implementation: affine evidence types with exponentials for reusable evidence. See exploration/thread-3.46-epistemic-linearity.md
 - [ ] **3.24 Dependent confidence types** - Can confidence bounds depend on runtime values? Requires dependent type features.
 - [ ] **3.25 Dynamic confidence narrowing** - Can runtime checks refine confidence bounds within type system?
 - [ ] **3.26 Multi-level Löb discount** - Should chained self-soundness (level n+2 about n+1 about n) discount multiplicatively?
@@ -2274,6 +2280,54 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Task 3.37: Total epistemic cost metric for belief graphs
     - Task 3.38: Maximum introspection depth limits
     - Task 3.39: Multi-level threshold with additional aggregation
+
+### Session 72 Discoveries (Task 3.46 Epistemic Linearity Formalization)
+
+356. **EPISTEMIC LINEARITY PRINCIPLE FORMALIZED** — Evidence non-duplication can be expressed as a type-theoretic principle using affine types from linear logic.
+
+357. **Linear logic provides the foundation**:
+    - Girard's linear logic (1987) restricts the contraction rule (which allows duplication)
+    - Forbidding contraction = forbidding evidence duplication
+    - This is exactly what CLAIR needs for evidence counting
+
+358. **Affine types are the correct discipline** (not strict linear):
+    - Affine: allows weakening (unused evidence OK), forbids contraction (duplication not OK)
+    - Relevant: forbids weakening, allows contraction (wrong for evidence)
+    - Linear: forbids both (too strict—unused evidence is epistemically acceptable)
+    - CLAIR should adopt affine semantics for evidence
+
+359. **Exponentials mark reusable evidence**:
+    - !A (of course A) in linear logic allows free duplication
+    - Maps to: axioms, definitions, established facts that can support multiple conclusions
+    - Key design: introspective evidence is affine (no duplication), axioms get exponential (!)
+
+360. **Information-theoretic grounding**:
+    - Shannon redundancy: same information observed twice has same content as once
+    - Mutual information I(A;A) = H(A), not 2H(A)
+    - This grounds the logical principle in information theory
+
+361. **Relationship to correlation-aware aggregation**:
+    - Thread 2.13's δ parameter is the SEMANTIC counterpart to epistemic linearity
+    - δ = 1 (full correlation) achieves idempotence: e ⊕_δ=1 e = e
+    - Affine types provide STATIC guarantee when possible
+    - Correlation-aware aggregation provides DYNAMIC fallback
+    - Together they ensure evidence non-duplication at both levels
+
+362. **The core axiom**:
+    - Epistemic Non-Duplication: e ⊕_id e = e
+    - Same evidence, counted twice, provides no more justification than counted once
+    - This is idempotence over evidence identity
+
+363. **Task 3.23 substantially addressed**:
+    - "Linear types for evidence" answered: YES, but use AFFINE types (forbid contraction, allow weakening)
+    - Evidence "consumption" = using evidence in a derivation removes it from context for re-aggregation
+    - Exponentials (!) mark reusable evidence like axioms
+
+364. **New questions raised**:
+    - Task 3.47: Full Lean 4 formalization of affine evidence types
+    - Task 3.48: How epistemic linearity interacts with defeat
+    - Task 3.49: Decidability proof for CLAIR with affine evidence
+    - Task 3.50: Gradual linearity for incremental adoption
 
 ## Impossibilities Encountered
 
