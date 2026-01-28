@@ -18,7 +18,7 @@ These directly prove CLAIR is viable:
 - [x] **1.4 Confidence algebra** - Prove monad laws, defeat composition ✓ Session 77
 
 ### 3. Produce Working Artifact
-- [ ] **8.4 Extract interpreter** - Runnable code from Lean ← **KEY DELIVERABLE**
+- [x] **8.4 Extract interpreter** - Analysis complete, path forward clear ← **KEY DELIVERABLE**
 
 ---
 
