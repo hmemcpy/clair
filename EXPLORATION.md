@@ -1631,3 +1631,30 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Dissertation Chapter 2 complete" → NEW (confidence: 0.95)
   - "Prior art survey adequate" → CONFIRMED (confidence: 0.90)
   - "CLAIR novelty claim justified" → CONFIRMED (confidence: 0.85)
+
+### Session 35: Dissertation Chapter 3 (Task 10.1 - Confidence System)
+- **CHAPTER 3: THE CONFIDENCE SYSTEM WRITTEN**
+- **Focus**: Formal definition and algebraic structure of CLAIR's confidence system
+- **Coverage** (~25 pages):
+  1. **Confidence as Epistemic Commitment**: Problem with probability (normalization, paraconsistency, derivation semantics), definition of confidence, comparison with Subjective Logic
+  2. **The Multiplication Monoid**: Conjunctive confidence propagation, boundedness theorem, derivation monotonicity principle, connection to t-norms
+  3. **The Minimum Monoid**: Conservative combination, semilattice structure, comparison with multiplication (min dominates mul)
+  4. **The Aggregation Monoid**: Probabilistic OR (⊕), oplus monoid structure, confidence-increasing property, "survival of doubt" interpretation
+  5. **Non-Semiring Structure**: Distributivity failure theorem with counterexample, implications for CLAIR design
+  6. **Defeat Operations**: Undercut (multiplicative discounting), rebut (probabilistic comparison), composition theorem (undercuts compose via ⊕)
+  7. **Lean 4 Formalization**: Type definition using Mathlib unitInterval, oplus definition and proofs, undercut via symm, verification summary table
+- **Key theorems formalized**:
+  - Derivation monotonicity: a·b ≤ min(a,b)
+  - Min dominates multiplication: min(a,b) ≥ a·b
+  - Oplus is confidence-increasing: a⊕b ≥ max(a,b)
+  - Non-distributivity: a·(b⊕c) ≠ (a·b)⊕(a·c)
+  - Undercut composition: undercut(undercut(c,d₁),d₂) = undercut(c, d₁⊕d₂)
+  - Rebut antisymmetry: rebut(a,b) + rebut(b,a) = 1
+- **LaTeX additions**: Added Lean language definition to main dissertation file
+- **Output**: `formal/dissertation/chapters/03-confidence.tex`
+- **Status**: Chapter 3 COMPLETED
+- **Dissertation progress**: Chapters 1-3 complete; Chapters 4-13 remaining
+- **Beliefs updated**:
+  - "Dissertation Chapter 3 complete" → NEW (confidence: 0.95)
+  - "Confidence algebra adequately formalized" → CONFIRMED (confidence: 0.95)
+  - "Three monoids, not semiring" → CONFIRMED (confidence: 0.99)

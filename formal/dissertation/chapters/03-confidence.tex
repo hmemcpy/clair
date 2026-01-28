@@ -1,0 +1,796 @@
+% Chapter 3: The Confidence System
+% Formalizes confidence as epistemic commitment and its algebraic structure
+
+\chapter{The Confidence System}
+\label{ch:confidence}
+
+\epigraph{%
+  ``Probability is not about what is true. It is about what is reasonable to believe.''
+}{E.T. Jaynes, \textit{Probability Theory: The Logic of Science}}
+
+The confidence system is the algebraic foundation of CLAIR. This chapter defines
+confidence formally, distinguishes it from probability, and develops the three
+monoid structures that govern how confidence values combine. We prove key
+properties in Lean~4, connecting abstract theory to machine-verified implementation.
+
+\section{Confidence as Epistemic Commitment}
+\label{sec:conf-definition}
+
+\subsection{The Problem with Probability}
+\label{subsec:probability-problem}
+
+Standard approaches to uncertain reasoning use probability. A probability measure
+$P$ on a set $\Omega$ of outcomes satisfies the Kolmogorov axioms:
+\begin{align}
+  P(A) &\geq 0 & \text{(Non-negativity)} \\
+  P(\Omega) &= 1 & \text{(Normalization)} \\
+  P(A \cup B) &= P(A) + P(B) - P(A \cap B) & \text{(Additivity)}
+\end{align}
+
+For propositions, this implies the fundamental constraint:
+\[
+  P(\phi) + P(\lnot\phi) = 1
+\]
+
+This \emph{normalization requirement} creates three problems for modeling epistemic
+states:
+
+\paragraph{Balanced uncertainty.}
+An agent confronting an unfamiliar topic may be uncertain about both $\phi$ and
+$\lnot\phi$. If asked ``Is there intelligent life elsewhere in the universe?''
+a reasonable response is low confidence in \emph{both} yes and no---not because
+the evidence is balanced, but because there is insufficient evidence either way.
+Probability forces $P(\text{yes}) + P(\text{no}) = 1$, conflating ``I don't know''
+with ``the evidence is exactly balanced.''
+
+\paragraph{Paraconsistent reasoning.}
+Evidence sometimes supports both $\phi$ and $\lnot\phi$ before contradiction
+resolution. A detective might have testimony that a suspect was present (supporting
+guilt) and an alibi (supporting innocence), without yet knowing which is false.
+Probability makes this impossible: $P(\phi) > 0.5$ and $P(\lnot\phi) > 0.5$ is
+a contradiction.
+
+\paragraph{Derivation semantics.}
+In Bayesian reasoning, $P(A \land B) = P(A) \cdot P(B|A)$, where conditioning
+captures the dependency structure. But for derivation---where $B$ follows from $A$
+by some rule---there is no clear conditional to use. The semantics of ``$A$ is a
+premise for $B$'' differs from ``$B$ is probable given $A$ is true.''
+
+\subsection{Definition of Confidence}
+\label{subsec:confidence-def}
+
+CLAIR's confidence addresses these problems by dropping normalization:
+
+\begin{definition}[Confidence]
+\label{def:confidence}
+A \emph{confidence value} is a real number $c \in [0,1]$. We write $\mathbf{C}$
+for the set of confidence values:
+\[
+  \mathbf{C} = \{c \in \mathbb{R} \mid 0 \leq c \leq 1\}
+\]
+\end{definition}
+
+The semantic interpretation differs from probability:
+
+\begin{itemize}
+  \item $c = 1$: Axiomatic acceptance (treated as foundational)
+  \item $c = 0$: Complete rejection (treated as impossibility)
+  \item $c = 0.5$: Maximal uncertainty (no evidence either direction)
+  \item $c > 0.5$: Net evidence for acceptance
+  \item $c < 0.5$: Net evidence for rejection
+\end{itemize}
+
+\begin{definition}[Epistemic commitment]
+\label{def:epistemic-commitment}
+Confidence represents \emph{epistemic commitment}: the degree to which an agent
+commits to a proposition based on available evidence and reasoning. Unlike
+probability:
+\begin{enumerate}
+  \item \textbf{No normalization}: $\conf(\phi) + \conf(\lnot\phi)$ need not equal 1.
+  \item \textbf{Not frequency}: $\conf(\phi) = 0.9$ does not mean ``true 90\% of
+        the time.''
+  \item \textbf{Derivation-based}: Confidence propagates through inference rules,
+        not conditioning.
+\end{enumerate}
+\end{definition}
+
+\begin{example}[Non-normalized confidence]
+Consider the proposition ``This code has no security vulnerabilities.'' An honest
+assessment might be:
+\begin{align*}
+  \conf(\text{no vulnerabilities}) &= 0.4 \quad \text{(some evidence from testing)} \\
+  \conf(\text{has vulnerabilities}) &= 0.3 \quad \text{(some evidence from complexity)}
+\end{align*}
+The sum $0.4 + 0.3 = 0.7 < 1$ reflects residual uncertainty---neither hypothesis
+is well-supported. This is inexpressible in probability.
+\end{example}
+
+\subsection{Comparison with Subjective Logic}
+\label{subsec:subjective-logic-comparison}
+
+Jøsang's Subjective Logic~\citep{josang2016subjective} extends probability with
+explicit uncertainty. An \emph{opinion} is a tuple $\omega = (b, d, u, a)$:
+\begin{itemize}
+  \item $b$: belief mass (evidence for)
+  \item $d$: disbelief mass (evidence against)
+  \item $u$: uncertainty mass (lack of evidence)
+  \item $a$: base rate (prior probability)
+\end{itemize}
+with constraint $b + d + u = 1$.
+
+CLAIR's confidence can be viewed as a simplification of Subjective Logic:
+\[
+  c = b + u \cdot a
+\]
+where we collapse uncertainty into the confidence value via the base rate. This
+loses the $b/d/u$ decomposition but gains simplicity. The trade-off is appropriate
+for CLAIR's focus on derivation tracking rather than uncertainty quantification.
+
+\begin{remark}
+CLAIR could be extended to full Subjective Logic opinions. The algebraic
+structure developed in this chapter would generalize, with the three monoids
+operating on opinion tuples. We leave this extension to future work.
+\end{remark}
+
+\section{The Multiplication Monoid}
+\label{sec:multiplication-monoid}
+
+When a conclusion is derived from premises, its confidence depends on the
+premises' confidences. The simplest case is conjunctive derivation: both
+premises must hold for the conclusion to follow.
+
+\subsection{Conjunctive Confidence Propagation}
+\label{subsec:conjunctive-propagation}
+
+\begin{definition}[Confidence multiplication]
+\label{def:conf-multiplication}
+For confidence values $a, b \in \mathbf{C}$, their \emph{multiplicative combination}
+is standard multiplication:
+\[
+  a \cdot b = a \times b
+\]
+\end{definition}
+
+This models the intuition that deriving $C$ from $A$ and $B$ requires both to
+be true. If we are 90\% confident in $A$ and 80\% confident in $B$, our
+confidence in $C$ (derived from both) is at most $0.9 \times 0.8 = 0.72$.
+
+\begin{theorem}[Multiplication preserves bounds]
+\label{thm:mul-bounded}
+For all $a, b \in \mathbf{C}$:
+\[
+  a \cdot b \in \mathbf{C}
+\]
+\end{theorem}
+
+\begin{proof}
+We prove both bounds:
+\begin{enumerate}
+  \item $a \cdot b \geq 0$: Since $a \geq 0$ and $b \geq 0$, their product is
+        non-negative.
+  \item $a \cdot b \leq 1$: Since $b \leq 1$, we have $a \cdot b \leq a \cdot 1 = a \leq 1$.
+\end{enumerate}
+\end{proof}
+
+\begin{theorem}[Multiplication monoid]
+\label{thm:mul-monoid}
+$(\mathbf{C}, \cdot, 1)$ is a commutative monoid with absorbing element $0$:
+\begin{enumerate}
+  \item Associativity: $(a \cdot b) \cdot c = a \cdot (b \cdot c)$
+  \item Commutativity: $a \cdot b = b \cdot a$
+  \item Identity: $1 \cdot a = a \cdot 1 = a$
+  \item Absorption: $0 \cdot a = a \cdot 0 = 0$
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+All properties follow from standard real number arithmetic on $[0,1]$.
+\end{proof}
+
+\subsection{The Derivation Monotonicity Principle}
+\label{subsec:derivation-monotonicity}
+
+A fundamental property of CLAIR is that derivation can only decrease confidence:
+
+\begin{theorem}[Derivation monotonicity]
+\label{thm:derivation-monotonicity}
+For all $a, b \in \mathbf{C}$:
+\[
+  a \cdot b \leq \min(a, b)
+\]
+In particular, $a \cdot b \leq a$ and $a \cdot b \leq b$.
+\end{theorem}
+
+\begin{proof}
+Since $b \leq 1$, we have $a \cdot b \leq a \cdot 1 = a$.
+By commutativity, $a \cdot b \leq b$.
+Therefore $a \cdot b \leq \min(a, b)$.
+\end{proof}
+
+\begin{corollary}[No confidence amplification]
+No sequence of conjunctive derivations can increase confidence. If $c_0$ is
+the confidence of a foundational belief and $c_n$ is derived through $n$
+multiplicative steps, then $c_n \leq c_0$.
+\end{corollary}
+
+This principle is essential for CLAIR's epistemology: derived beliefs are
+never more confident than their sources. Certainty ($c = 1$) is reserved for
+axioms, not conclusions.
+
+\subsection{Connection to T-norms}
+\label{subsec:tnorms}
+
+Confidence multiplication is an instance of a \emph{t-norm} from fuzzy logic.
+A t-norm $T : [0,1]^2 \to [0,1]$ is a binary operation satisfying:
+\begin{enumerate}
+  \item Commutativity: $T(a, b) = T(b, a)$
+  \item Associativity: $T(T(a, b), c) = T(a, T(b, c))$
+  \item Monotonicity: $a \leq a' \Rightarrow T(a, b) \leq T(a', b)$
+  \item Identity: $T(a, 1) = a$
+\end{enumerate}
+
+The standard t-norms are:
+\begin{itemize}
+  \item \textbf{Product} (Algebraic): $T_P(a, b) = a \cdot b$
+  \item \textbf{G\"odel} (Minimum): $T_G(a, b) = \min(a, b)$
+  \item \textbf{\L ukasiewicz} (Bounded): $T_L(a, b) = \max(0, a + b - 1)$
+\end{itemize}
+
+CLAIR uses the product t-norm for conjunctive derivation. The choice is
+motivated by its ``survival probability'' interpretation: if $a$ and $b$
+are independent probabilities of ``success,'' then $a \cdot b$ is the
+probability both succeed.
+
+\begin{remark}
+The G\"odel t-norm (minimum) provides an alternative that preserves more
+confidence---see \S\ref{sec:minimum-monoid}. The choice between them
+is semantic, not algebraic.
+\end{remark}
+
+\section{The Minimum Monoid}
+\label{sec:minimum-monoid}
+
+Sometimes a conservative estimate is more appropriate than multiplicative
+combination. The minimum operation captures ``confidence limited by the
+weakest link.''
+
+\subsection{Conservative Combination}
+\label{subsec:conservative-combination}
+
+\begin{definition}[Minimum combination]
+\label{def:minimum}
+For confidence values $a, b \in \mathbf{C}$:
+\[
+  \min(a, b) = \begin{cases} a & \text{if } a \leq b \\ b & \text{otherwise} \end{cases}
+\]
+\end{definition}
+
+\begin{theorem}[Minimum preserves bounds]
+\label{thm:min-bounded}
+For all $a, b \in \mathbf{C}$:
+\[
+  \min(a, b) \in \mathbf{C}
+\]
+\end{theorem}
+
+\begin{proof}
+$\min(a, b)$ is either $a$ or $b$, both in $[0,1]$.
+\end{proof}
+
+\begin{theorem}[Minimum semilattice]
+\label{thm:min-semilattice}
+$(\mathbf{C}, \min, 1)$ is a bounded meet-semilattice:
+\begin{enumerate}
+  \item Associativity: $\min(\min(a, b), c) = \min(a, \min(b, c))$
+  \item Commutativity: $\min(a, b) = \min(b, a)$
+  \item Idempotence: $\min(a, a) = a$
+  \item Identity: $\min(1, a) = a$
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Standard properties of the minimum operation on ordered sets.
+\end{proof}
+
+\subsection{Comparison with Multiplication}
+\label{subsec:min-vs-mul}
+
+An important relationship between the two operations:
+
+\begin{theorem}[Minimum dominates multiplication]
+\label{thm:min-ge-mul}
+For all $a, b \in \mathbf{C}$:
+\[
+  \min(a, b) \geq a \cdot b
+\]
+\end{theorem}
+
+\begin{proof}
+Without loss of generality, assume $a \leq b$. Then $\min(a, b) = a$.
+Since $b \leq 1$, we have $a \cdot b \leq a \cdot 1 = a = \min(a, b)$.
+\end{proof}
+
+This means minimum is \emph{more optimistic} than multiplication: it preserves
+more confidence. The semantic difference:
+\begin{itemize}
+  \item \textbf{Multiplication}: ``Both premises independently needed; compound
+        failure modes.''
+  \item \textbf{Minimum}: ``Conclusion limited by weakest link; no additional
+        failure from combination.''
+\end{itemize}
+
+\begin{example}[When to use each]
+Consider deriving $C$ from premises $A$ (confidence 0.9) and $B$ (confidence 0.8):
+\begin{itemize}
+  \item If $A$ and $B$ are \emph{independent} conditions for $C$, use
+        multiplication: $\conf(C) = 0.9 \times 0.8 = 0.72$.
+  \item If $B$ is a \emph{weaker version} of $A$, use minimum:
+        $\conf(C) = \min(0.9, 0.8) = 0.8$.
+\end{itemize}
+\end{example}
+
+\section{The Aggregation Monoid}
+\label{sec:aggregation-monoid}
+
+When multiple independent pieces of evidence support the same conclusion,
+confidence should \emph{increase}. This requires a different operation.
+
+\subsection{Probabilistic OR}
+\label{subsec:oplus-definition}
+
+\begin{definition}[Probabilistic OR / Oplus]
+\label{def:oplus}
+For confidence values $a, b \in \mathbf{C}$, their \emph{aggregation} is:
+\[
+  a \oplus b = a + b - a \cdot b
+\]
+\end{definition}
+
+The formula has several equivalent forms:
+\begin{align}
+  a \oplus b &= a + b(1 - a) \label{eq:oplus-form1} \\
+  a \oplus b &= a(1 - b) + b \label{eq:oplus-form2} \\
+  a \oplus b &= 1 - (1 - a)(1 - b) \label{eq:oplus-demorgan}
+\end{align}
+
+The last form (\ref{eq:oplus-demorgan}) reveals the De Morgan duality with
+multiplication: $a \oplus b$ is the complement of the product of complements.
+
+\begin{theorem}[Oplus preserves bounds]
+\label{thm:oplus-bounded}
+For all $a, b \in \mathbf{C}$:
+\[
+  a \oplus b \in \mathbf{C}
+\]
+\end{theorem}
+
+\begin{proof}
+\textbf{Lower bound}: Using form (\ref{eq:oplus-form1}):
+\[
+  a \oplus b = a + b(1 - a)
+\]
+Since $a \geq 0$, $b \geq 0$, and $(1 - a) \geq 0$ (because $a \leq 1$),
+we have $b(1 - a) \geq 0$, thus $a \oplus b \geq 0$.
+
+\textbf{Upper bound}: Using form (\ref{eq:oplus-form1}) again:
+\[
+  a \oplus b = a + b(1 - a)
+\]
+Since $b \leq 1$ and $(1 - a) \leq 1$, we have $b(1 - a) \leq 1 - a$.
+Therefore $a \oplus b \leq a + (1 - a) = 1$.
+\end{proof}
+
+\subsection{Aggregation Monoid Structure}
+\label{subsec:oplus-monoid}
+
+\begin{theorem}[Oplus monoid]
+\label{thm:oplus-monoid}
+$(\mathbf{C}, \oplus, 0)$ is a commutative monoid with absorbing element $1$:
+\begin{enumerate}
+  \item Associativity: $(a \oplus b) \oplus c = a \oplus (b \oplus c)$
+  \item Commutativity: $a \oplus b = b \oplus a$
+  \item Identity: $0 \oplus a = a \oplus 0 = a$
+  \item Absorption: $1 \oplus a = a \oplus 1 = 1$
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\textbf{Commutativity}: $a \oplus b = a + b - ab = b + a - ba = b \oplus a$.
+
+\textbf{Associativity}:
+\begin{align*}
+  (a \oplus b) \oplus c &= (a + b - ab) + c - (a + b - ab)c \\
+  &= a + b + c - ab - ac - bc + abc
+\end{align*}
+\begin{align*}
+  a \oplus (b \oplus c) &= a + (b + c - bc) - a(b + c - bc) \\
+  &= a + b + c - bc - ab - ac + abc
+\end{align*}
+Both expressions equal $a + b + c - ab - ac - bc + abc$.
+
+\textbf{Identity}: $0 \oplus a = 0 + a - 0 \cdot a = a$.
+
+\textbf{Absorption}: $1 \oplus a = 1 + a - 1 \cdot a = 1$.
+\end{proof}
+
+\subsection{Confidence-Increasing Property}
+\label{subsec:confidence-increasing}
+
+Unlike multiplication, $\oplus$ \emph{increases} confidence:
+
+\begin{theorem}[Oplus is confidence-increasing]
+\label{thm:oplus-increasing}
+For all $a, b \in \mathbf{C}$:
+\[
+  a \oplus b \geq \max(a, b)
+\]
+\end{theorem}
+
+\begin{proof}
+Using form (\ref{eq:oplus-form1}): $a \oplus b = a + b(1-a)$.
+Since $b(1-a) \geq 0$, we have $a \oplus b \geq a$.
+By commutativity, $a \oplus b \geq b$.
+Therefore $a \oplus b \geq \max(a, b)$.
+\end{proof}
+
+\begin{corollary}[Diminishing returns]
+\label{cor:diminishing-returns}
+The marginal gain from additional evidence decreases as confidence grows:
+\[
+  \frac{\partial}{\partial b}(a \oplus b) = 1 - a
+\]
+When $a$ is already high, additional evidence contributes less.
+\end{corollary}
+
+\begin{example}[Aggregation of weak evidence]
+Suppose we have ten independent pieces of weak evidence, each with confidence
+$0.3$. The combined confidence is:
+\[
+  \underbrace{0.3 \oplus 0.3 \oplus \cdots \oplus 0.3}_{10 \text{ times}}
+  = 1 - (1 - 0.3)^{10} = 1 - 0.7^{10} \approx 0.972
+\]
+Ten weak independent witnesses produce high combined confidence.
+\end{example}
+
+\subsection{The ``Survival of Doubt'' Interpretation}
+\label{subsec:survival-of-doubt}
+
+The formula $a \oplus b = 1 - (1-a)(1-b)$ admits a probability-theoretic
+interpretation:
+\begin{itemize}
+  \item $(1 - a)$ is the ``doubt'' in evidence $a$
+  \item $(1 - a)(1 - b)$ is the probability \emph{both} pieces of evidence
+        fail (assuming independence)
+  \item $a \oplus b$ is the probability \emph{at least one} succeeds
+\end{itemize}
+
+This ``survival of doubt'' interpretation explains why aggregation increases
+confidence: more independent evidence means more chances for at least one
+to be correct.
+
+\section{Non-Semiring Structure}
+\label{sec:non-semiring}
+
+A natural question: do $\oplus$ and $\cdot$ form a semiring? The answer is no.
+
+\subsection{Distributivity Failure}
+\label{subsec:distributivity-failure}
+
+\begin{theorem}[Non-distributivity]
+\label{thm:non-distributivity}
+The operations $\oplus$ and $\cdot$ do \emph{not} satisfy distributivity:
+\[
+  a \cdot (b \oplus c) \neq (a \cdot b) \oplus (a \cdot c)
+\]
+in general.
+\end{theorem}
+
+\begin{proof}
+By counterexample. Let $a = b = c = 0.5$:
+\begin{align*}
+  a \cdot (b \oplus c) &= 0.5 \cdot (0.5 + 0.5 - 0.25) = 0.5 \cdot 0.75 = 0.375 \\
+  (a \cdot b) \oplus (a \cdot c) &= 0.25 + 0.25 - 0.25 \cdot 0.25 = 0.5 - 0.0625 = 0.4375
+\end{align*}
+Since $0.375 \neq 0.4375$, distributivity fails.
+\end{proof}
+
+\subsection{Implications for CLAIR}
+\label{subsec:non-semiring-implications}
+
+The failure of distributivity means:
+
+\begin{enumerate}
+  \item \textbf{Operations are context-dependent}: The choice between $\cdot$,
+        $\min$, and $\oplus$ depends on the justification structure, not
+        algebraic laws.
+
+  \item \textbf{Order matters}: In expressions mixing $\cdot$ and $\oplus$,
+        parentheses are semantically significant.
+
+  \item \textbf{No ring-theoretic tools}: We cannot apply ring homomorphisms
+        or ideals to confidence algebra.
+\end{enumerate}
+
+This is not a limitation but a \emph{feature}: the algebra correctly models
+that aggregation and derivation are fundamentally different operations that
+do not interact algebraically.
+
+\section{Defeat Operations}
+\label{sec:defeat-operations}
+
+Beyond derivation and aggregation, CLAIR requires operations for \emph{defeat}:
+when evidence undermines a belief.
+
+\subsection{Undercut: Attacking the Inference}
+\label{subsec:undercut}
+
+Following Pollock~\citep{pollock1987defeasible}, an \emph{undercutting defeater}
+attacks the inferential link, not the conclusion directly.
+
+\begin{definition}[Undercut]
+\label{def:undercut}
+For confidence $c$ in a conclusion and defeat strength $d$:
+\[
+  \undercut(c, d) = c \cdot (1 - d)
+\]
+\end{definition}
+
+\begin{example}[Undercutting defeat]
+Consider the inference: ``The object looks red, therefore it is red.''
+An undercut ``The room has red lighting'' doesn't claim the object isn't red;
+it undermines the inference from appearance to reality.
+
+If $\conf(\text{looks red} \Rightarrow \text{is red}) = 0.9$ and
+$\conf(\text{red lighting}) = 0.6$, then:
+\[
+  \undercut(0.9, 0.6) = 0.9 \cdot (1 - 0.6) = 0.9 \cdot 0.4 = 0.36
+\]
+The inference confidence drops from 0.9 to 0.36.
+\end{example}
+
+\begin{theorem}[Undercut preserves bounds]
+\label{thm:undercut-bounded}
+For all $c, d \in \mathbf{C}$:
+\[
+  \undercut(c, d) \in \mathbf{C}
+\]
+\end{theorem}
+
+\begin{proof}
+Since $d \leq 1$, we have $(1 - d) \geq 0$.
+Since $c \geq 0$, we have $c \cdot (1 - d) \geq 0$.
+Since $c \leq 1$ and $(1 - d) \leq 1$, we have $c \cdot (1 - d) \leq 1$.
+\end{proof}
+
+\begin{theorem}[Undercut composition]
+\label{thm:undercut-composition}
+Sequential undercuts compose via $\oplus$:
+\[
+  \undercut(\undercut(c, d_1), d_2) = \undercut(c, d_1 \oplus d_2)
+\]
+\end{theorem}
+
+\begin{proof}
+\begin{align*}
+  \undercut(\undercut(c, d_1), d_2) &= c(1 - d_1)(1 - d_2) \\
+  &= c(1 - d_1 - d_2 + d_1 d_2) \\
+  &= c(1 - (d_1 + d_2 - d_1 d_2)) \\
+  &= c(1 - (d_1 \oplus d_2)) \\
+  &= \undercut(c, d_1 \oplus d_2)
+\end{align*}
+\end{proof}
+
+This beautiful result shows that defeat strengths aggregate via $\oplus$: multiple
+undercuts combine as if their doubts aggregated.
+
+\subsection{Rebut: Competing Evidence}
+\label{subsec:rebut}
+
+A \emph{rebutting defeater} provides counter-evidence for the conclusion directly.
+
+\begin{definition}[Rebut]
+\label{def:rebut}
+For confidence $c_{\text{for}}$ in favor and $c_{\text{against}}$ against:
+\[
+  \rebut(c_{\text{for}}, c_{\text{against}}) =
+  \begin{cases}
+    \displaystyle\frac{c_{\text{for}}}{c_{\text{for}} + c_{\text{against}}} & \text{if } c_{\text{for}} + c_{\text{against}} > 0 \\[2ex]
+    0.5 & \text{if } c_{\text{for}} = c_{\text{against}} = 0
+  \end{cases}
+\]
+\end{definition}
+
+The formula treats evidence symmetrically: the resulting confidence is the
+``market share'' of supporting evidence.
+
+\begin{theorem}[Rebut preserves bounds]
+\label{thm:rebut-bounded}
+For all $c_{\text{for}}, c_{\text{against}} \in \mathbf{C}$:
+\[
+  \rebut(c_{\text{for}}, c_{\text{against}}) \in \mathbf{C}
+\]
+\end{theorem}
+
+\begin{proof}
+If $c_{\text{for}} + c_{\text{against}} = 0$, the result is $0.5 \in [0,1]$.
+Otherwise:
+\begin{itemize}
+  \item $\rebut \geq 0$ because $c_{\text{for}} \geq 0$ and the denominator is positive.
+  \item $\rebut \leq 1$ because $c_{\text{for}} \leq c_{\text{for}} + c_{\text{against}}$.
+\end{itemize}
+\end{proof}
+
+\begin{theorem}[Rebut antisymmetry]
+\label{thm:rebut-antisymmetry}
+\[
+  \rebut(a, b) + \rebut(b, a) = 1
+\]
+\end{theorem}
+
+\begin{proof}
+When $a + b > 0$:
+\[
+  \rebut(a, b) + \rebut(b, a) = \frac{a}{a+b} + \frac{b}{a+b} = \frac{a+b}{a+b} = 1
+\]
+When $a = b = 0$: $\rebut(a,b) = \rebut(b,a) = 0.5$, so the sum is $1$.
+\end{proof}
+
+\subsection{Semantic Difference: Undercut vs.\ Rebut}
+\label{subsec:undercut-vs-rebut}
+
+The two defeat mechanisms serve different roles:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{Undercut} & \textbf{Rebut} \\
+\midrule
+Target & Inference link & Conclusion \\
+Effect & Multiplicative discount & Proportional competition \\
+Formula & $c \cdot (1 - d)$ & $c_{\text{for}} / (c_{\text{for}} + c_{\text{against}})$ \\
+Composition & Via $\oplus$ & Via weighted average \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Both are essential for modeling defeasible reasoning in the justification DAG
+(see \Cref{ch:justification}).
+
+\section{Lean 4 Formalization}
+\label{sec:lean-formalization}
+
+The confidence algebra is formalized in Lean~4 using Mathlib's \texttt{unitInterval}
+type.
+
+\subsection{Type Definition}
+\label{subsec:lean-type}
+
+Mathlib defines:
+\begin{lstlisting}[language=Lean]
+abbrev unitInterval : Set ℝ := Set.Icc 0 1
+notation "I" => unitInterval
+\end{lstlisting}
+
+CLAIR uses this directly:
+\begin{lstlisting}[language=Lean]
+abbrev Confidence := unitInterval
+\end{lstlisting}
+
+This provides:
+\begin{itemize}
+  \item Multiplication as a closed operation (via \texttt{LinearOrderedCommMonoidWithZero})
+  \item The \texttt{symm} operation $x \mapsto 1 - x$ with full properties
+  \item Bound lemmas (\texttt{nonneg}, \texttt{le\_one})
+  \item The \texttt{unit\_interval} tactic for automating proofs
+\end{itemize}
+
+\subsection{Oplus Definition and Proofs}
+\label{subsec:lean-oplus}
+
+\begin{lstlisting}[language=Lean]
+def oplus (a b : Confidence) : Confidence :=
+  ⟨(a : ℝ) + (b : ℝ) - (a : ℝ) * (b : ℝ), by
+    constructor
+    · -- Lower bound: 0 ≤ a + b - ab
+      have h1 : 0 ≤ 1 - (a : ℝ) := a.one_minus_nonneg
+      have h2 : 0 ≤ (b : ℝ) * (1 - (a : ℝ)) := mul_nonneg b.nonneg h1
+      linarith [a.nonneg]
+    · -- Upper bound: a + b - ab ≤ 1
+      have h1 : (b : ℝ) * (1 - (a : ℝ)) ≤ 1 - (a : ℝ) := by
+        apply mul_le_of_le_one_left a.one_minus_nonneg b.le_one
+      linarith [a.le_one]⟩
+\end{lstlisting}
+
+Key theorems are proven using the \texttt{ring} tactic:
+\begin{lstlisting}[language=Lean]
+theorem oplus_comm (a b : Confidence) : a ⊕ b = b ⊕ a := by
+  apply Subtype.ext; simp only [oplus]; ring
+
+theorem oplus_assoc (a b c : Confidence) : (a ⊕ b) ⊕ c = a ⊕ (b ⊕ c) := by
+  apply Subtype.ext; simp only [oplus]; ring
+\end{lstlisting}
+
+\subsection{Undercut via Symm}
+\label{subsec:lean-undercut}
+
+Undercut leverages Mathlib's \texttt{symm}:
+\begin{lstlisting}[language=Lean]
+def undercut (c d : Confidence) : Confidence := c * symm d
+\end{lstlisting}
+
+The composition theorem:
+\begin{lstlisting}[language=Lean]
+theorem undercut_compose (c d₁ d₂ : Confidence) :
+    undercut (undercut c d₁) d₂ = undercut c (d₁ ⊕ d₂) := by
+  apply Subtype.ext; simp [undercut, oplus, symm]; ring
+\end{lstlisting}
+
+\subsection{Verification Summary}
+\label{subsec:verification-summary}
+
+The Lean formalization verifies:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Operation} & \textbf{Property} & \textbf{Status} \\
+\midrule
+Multiplication & Bounded & $\checkmark$ (Mathlib) \\
+Multiplication & Commutative monoid & $\checkmark$ (Mathlib) \\
+Minimum & Bounded & $\checkmark$ \\
+Minimum & Semilattice & $\checkmark$ \\
+Oplus & Bounded & $\checkmark$ \\
+Oplus & Commutative monoid & $\checkmark$ \\
+Oplus & Confidence-increasing & $\checkmark$ \\
+Undercut & Bounded & $\checkmark$ \\
+Undercut & Composition via $\oplus$ & $\checkmark$ \\
+Rebut & Bounded & $\checkmark$ \\
+Rebut & Antisymmetry & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Total: approximately 500 lines of Lean code including proofs.
+
+\section{Conclusion}
+\label{sec:confidence-conclusion}
+
+This chapter established the algebraic foundation of CLAIR:
+
+\begin{enumerate}
+  \item \textbf{Confidence is not probability}: It represents epistemic commitment
+        without normalization, enabling paraconsistent reasoning.
+
+  \item \textbf{Three monoids, not a semiring}: Multiplication (derivation),
+        minimum (conservative), and oplus (aggregation) serve distinct semantic
+        roles and do not distribute.
+
+  \item \textbf{Defeat operations}: Undercut and rebut formalize how evidence
+        can undermine beliefs, with undercuts composing beautifully via oplus.
+
+  \item \textbf{Machine-verified}: The algebra is formalized in Lean~4, ensuring
+        type safety and algebraic correctness.
+\end{enumerate}
+
+The confidence system provides the numeric foundation. The next chapter develops
+the \emph{structural} foundation: how beliefs connect through justification DAGs.
+
+%% ============================================================================
+%% BIBLIOGRAPHY NOTES
+%% ============================================================================
+%
+% Key citations for this chapter:
+%
+% Fuzzy Logic / T-norms:
+% - klement2000triangular: Klement, Mesiar, Pap - Triangular Norms
+% - hajek1998metamathematics: Hájek - Metamathematics of Fuzzy Logic
+%
+% Subjective Logic:
+% - josang2016subjective
+%
+% Defeaters:
+% - pollock1987defeasible
+%
+% Lean formalization:
+% - mathlib documentation
+%

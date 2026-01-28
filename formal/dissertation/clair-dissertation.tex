@@ -131,6 +131,23 @@
            {alpha}{{$\alpha$}}1 {beta}{{$\beta$}}1 {gamma}{{$\gamma$}}1
 }
 
+% Lean 4 language definition
+\definecolor{lean-keyword}{RGB}{0,0,180}
+\definecolor{lean-type}{RGB}{153,51,0}
+\definecolor{lean-comment}{RGB}{0,128,0}
+
+\lstdefinelanguage{Lean}{
+  keywords={def, theorem, lemma, abbrev, instance, where, by, apply, exact, simp, ring, linarith, nlinarith, have, constructor, calc, namespace, end, open, import, notation, infixl, if, then, else, sorry},
+  keywordstyle=\color{lean-keyword}\bfseries,
+  sensitive=true,
+  comment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  commentstyle=\color{lean-comment}\itshape,
+  stringstyle=\color{clair-string},
+  morestring=[b]",
+  literate={→}{{$\rightarrow$}}1 {⊕}{{$\oplus$}}1 {≤}{{$\leq$}}1 {≥}{{$\geq$}}1 {∀}{{$\forall$}}1 {∃}{{$\exists$}}1 {ℕ}{{$\mathbb{N}$}}1 {ℝ}{{$\mathbb{R}$}}1
+}
+
 \lstset{
   language=CLAIR,
   basicstyle=\ttfamily\small,
@@ -206,7 +223,7 @@ AI systems that can explain and audit their own reasoning processes.
 
 \input{chapters/01-introduction}
 \input{chapters/02-background}
-% \input{chapters/03-confidence}
+\input{chapters/03-confidence}
 % \input{chapters/04-justification}
 % \input{chapters/05-self-reference}
 % \input{chapters/06-grounding}
