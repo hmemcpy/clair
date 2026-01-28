@@ -2,23 +2,73 @@
 
 > **Goal**: Prove CLAIR works as LLM lingua franca
 > **Method**: Complete Lean formalization → Extract working interpreter
-> **Deferred**: Theoretical explorations archived for future work
+> **Current Status**: All theoretical work complete. Implementation ready to begin.
 
 ---
 
-## Core Formalization Tasks (3 remaining)
+## Planning Mode Assessment (Session 81)
 
-These directly prove CLAIR is viable:
+### Gap Analysis Results
 
-### 1. Complete Type System in Lean
-- [x] **3.47 Affine evidence types** - Context splitting, usage tracking ✓ Design complete
-- [x] **3.15 Stratification** - Level-indexed beliefs, introspection rules ✓ Analysis complete (Session 76)
+| Thread | Status | Assessment | Next Action |
+|--------|--------|------------|-------------|
+| 1. Confidence | ✓ Complete | All proofs done, monad laws verified | None |
+| 2. Justification | ✓ Complete | DAG structure, defeat composition proven | None |
+| 3. Self-Reference | ✓ Complete | Stratification + Löb discount established | None |
+| 4. Grounding | ✓ Complete | Pragmatic dogmatism foundation solid | None |
+| 5. Belief Revision | ✓ Complete | AGM extension designed | None |
+| 6. Multi-Agent | ⚠ Foundation | Base exists, full protocols undefined | **Ready for exploration** |
+| 7. Implementation | ⚠ Design | Haskell design exists, no code | Blocked on Thread 8 |
+| 8. Verification | ⚠ Analysis | Lean formalization complete, extraction analyzed | **Ready for implementation** |
+| 9. Phenomenology | ⚠ Explored | Honest uncertainty documented | Fundamentally unresolvable |
 
-### 2. Complete Semantics in Lean
-- [x] **1.4 Confidence algebra** - Prove monad laws, defeat composition ✓ Session 77
+### Priority Ranking
 
-### 3. Produce Working Artifact
-- [x] **8.4 Extract interpreter** - Analysis complete, path forward clear ← **KEY DELIVERABLE**
+1. **Thread 8 (Verification/Implementation)** - HIGHEST PRIORITY
+   - Blocks: Thread 7 (Haskell implementation)
+   - Enables: All practical demonstrations
+   - Path: ~450-700 lines of Lean code (Step relation, parser, Main.lean)
+
+2. **Thread 6 (Multi-Agent)** - SECOND PRIORITY
+   - Independent: No blockers
+   - Generative: Rich theoretical territory
+   - Foundation: Pragmatic internal realism established
+
+### Implementation Decision
+
+**Option A**: Complete Thread 8 interpreter (~450-700 lines Lean code)
+- **Pro**: Produces working artifact, unlocks Thread 7, validates theory
+- **Con**: Implementation work, not theoretical exploration
+
+**Option B**: Deep exploration of Thread 6 (Multi-Agent)
+- **Pro**: Generates new theoretical insights, no implementation needed
+- **Con**: Doesn't produce working artifact
+
+---
+
+## Current Tasks (Choose One)
+
+### Option A: Complete Interpreter (Thread 8) ⭐ RECOMMENDED
+- [ ] **8.4.1 Complete Step relation** (~200 lines)
+  - Small-step semantics for all Expr forms
+  - Value and stuck state definitions
+  - Progress and preservation theorems
+- [ ] **8.4.2 Add S-expression parser** (~150 lines)
+  - Tokenizer and parser for CLAIR syntax
+  - Error handling and pretty printing
+- [ ] **8.4.3 Add Main.lean driver** (~100 lines)
+  - REPL with type checking and evaluation
+  - Example CLAIR programs
+- [ ] **8.4.4 Compile and test** (`lake build`)
+  - Verify extracted interpreter runs
+  - Document five key properties
+
+### Option B: Deep Multi-Agent Exploration (Thread 6)
+- [ ] **6.2 Consensus protocols** - Formalize agreement algorithms with confidence
+- [ ] **6.3 Conflict resolution** - Design reconciliation strategies for competing beliefs
+- [ ] **6.4 Swarm coordination** - Analyze fault tolerance and Byzantine resilience
+- [ ] **6.5 Nested beliefs** - Formalize "I believe that you believe that..."
+- [ ] **6.6 Trust dynamics** - Model reputation evolution over time
 
 ---
 

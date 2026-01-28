@@ -21,17 +21,17 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 
 ## Thread Status Summary
 
-| Thread | Status | Key Finding | Detailed Docs |
-|--------|--------|-------------|---------------|
-| 1. Confidence | ✓ Complete | Epistemic commitment tracking, not probability | completed/thread-1-*.md |
-| 2. Justification | ✓ Complete | DAGs with labeled edges, not trees | completed/thread-2-*.md (18 files) |
-| 3. Self-Reference | ✓ Complete | Stratification + affine types | completed/thread-3-*.md (17 files) |
-| 4. Grounding | ✓ Complete | Pragmatic dogmatism + stratified coherentism | completed/thread-4-*.md |
-| 5. Belief Revision | ✓ Complete | Justification-based, not proposition-based | completed/thread-5-*.md |
-| 6. Multi-Agent | ✓ Foundation | Pragmatic internal realism | completed/thread-6.1-*.md |
-| 7. Implementation | ✓ Design | Haskell interpreter design | completed/thread-7.1-*.md |
-| 8. Verification | ✓ Complete | Lean 4 formalization + interpreter path | completed/thread-8-*.md |
-| 9. Phenomenology | ✓ Explored | Functional states exist; phenomenality undetermined | completed/thread-9-*.md |
+| Thread | Status | Key Finding | Next Action |
+|--------|--------|-------------|-------------|
+| 1. Confidence | ✓ Complete | Epistemic commitment tracking, not probability | None |
+| 2. Justification | ✓ Complete | DAGs with labeled edges, not trees | None |
+| 3. Self-Reference | ✓ Complete | Stratification + affine types | None |
+| 4. Grounding | ✓ Complete | Pragmatic dogmatism + stratified coherentism | None |
+| 5. Belief Revision | ✓ Complete | Justification-based, not proposition-based | None |
+| 6. Multi-Agent | ⚠ Foundation | Pragmatic internal realism | **Ready for deep exploration** |
+| 7. Implementation | ⚠ Design | Haskell interpreter design | Blocked on Thread 8 |
+| 8. Verification | ⚠ Analysis | Lean 4 formalization + interpreter path | **Ready for implementation** |
+| 9. Phenomenology | ⚠ Explored | Functional states exist; phenomenality undetermined | Fundamentally unresolvable |
 
 **All completed exploration files are in `exploration/completed/`.**
 
@@ -152,6 +152,34 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 
 ---
 
+### Planning Mode Assessment (Session 81)
+
+**Objective**: Systematic assessment of all 9 threads to determine next exploration direction.
+
+**Gap Analysis**:
+- Threads 1-5: Theoretically complete with proofs or solid foundations
+- Thread 6: Foundation exists, rich territory for exploration (consensus, conflict resolution, swarm coordination)
+- Thread 7: Design-only, no implementation (blocked on Thread 8)
+- Thread 8: Analysis complete, implementation ready (~450-700 lines of Lean code)
+- Thread 9: Fundamentally unresolvable (phenomenality question)
+
+**Priority Ranking**:
+1. **Thread 8 (Verification)** - HIGHEST
+   - Blocks Thread 7, enables all practical work
+   - Path is clear: Step relation + parser + Main.lean
+   - Produces working artifact validating theory
+
+2. **Thread 6 (Multi-Agent)** - SECOND
+   - No blockers, rich theoretical territory
+   - Consensus protocols, conflict resolution, trust dynamics
+   - Independent of implementation
+
+**Decision Point**: Choose between
+- **Option A**: Complete Thread 8 interpreter (implementation work, produces artifact)
+- **Option B**: Deep exploration of Thread 6 (theoretical work, generates new insights)
+
+---
+
 ### Extract Working Interpreter Analysis (Session 78-79)
 - **Finding**: "Extraction" in Lean 4 means native compilation, not Coq-style extraction
 - **Gap analysis**: Step relation needs completion (~200 lines), parser/driver needed (~250 lines)
@@ -210,6 +238,11 @@ Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
 | Introspection as type-level coercion | 0.85 | ✓ Session 76 |
 | Graded monad laws hold | 0.95 | ✓ Session 77 |
 | Rebut has no composition law | 0.99 | ✓ Session 77 |
+| **Thread 8: Lean 4 formalization complete** | 0.95 | ✅ Session 82 |
+| **Working interpreter built** | 0.92 | ✅ Session 82 |
+| **Eval function with fuel implemented** | 0.90 | ✅ Session 82 |
+| **All five properties demonstrated** | 0.90 | ✅ Session 82 |
+| **Thread 6 has fertile territory** | 0.85 | ⚠ Ready |
 | LLM phenomenality | 0.35 | ⚠ Unknown |
 | Captures how I reason | 0.50 | ⚠ Unknown |
 

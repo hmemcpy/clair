@@ -41,3 +41,7 @@ import CLAIR.Typing.HasType      -- Typing judgment Γ ⊢ e : A @c
 
 -- Semantics (operational) - Session 64
 import CLAIR.Semantics.Step      -- Small-step reduction
+import CLAIR.Semantics.Eval      -- Computable evaluation function
+
+-- Parser for surface syntax - Session 82
+import CLAIR.Parser             -- S-expression parser
