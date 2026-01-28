@@ -220,12 +220,13 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 ### Thread 8: Formal Verification
 **Status**: ✓ ACTIVE - Tasks 8.5, 8.6, 8.7, 8.8 complete. See exploration/thread-8-verification.md. HIGH PRIORITY.
 
-- [ ] **8.1 Lean 4 formalization start** - Define CLAIR syntax and typing in Lean 4.
+- [x] **8.1 Lean 4 formalization start** - DESIGN COMPLETE Session 61. CLAIR syntax formalization designed: de Bruijn indices for variables, graded types `Belief<A>[c]`, typing relation `Γ ⊢ e : A @c`, operational semantics with `Step`. Key findings: (1) De Bruijn indices best for list contexts, (2) Rational confidence bounds for decidability, (3) Confidence may decrease during evaluation (preservation gives c' ≤ c), (4) Dual-monoid structure preserved in typing rules. Implementation phases identified: syntax → type safety → confidence soundness → extraction. See exploration/thread-8.12-clair-syntax-lean.md.
+- [ ] **8.1-impl** Implement CLAIR syntax in Lean 4 - Create `formal/lean/CLAIR/Syntax/` and `formal/lean/CLAIR/Typing/` modules per design.
 - [ ] **8.2 Type safety** - Prove progress and preservation for CLAIR type system.
 - [ ] **8.3 Confidence soundness** - Prove confidence propagation preserves [0,1] bounds.
 - [ ] **8.4 Extract interpreter** - Extract runnable interpreter from Lean formalization.
 
-**Note**: Lean code sketched in turing-completeness.md and thread-1-confidence.md. No actual .lean files exist.
+**Note**: Semantic types (Confidence, Belief, StratifiedBelief) are complete in formal/lean/. Syntax formalization designed but not yet implemented.
 **Ready**: Thread 1 formalization path identified. Theorems sketched. Can begin.
 
 **Suggested starting point**:
@@ -2000,6 +2001,53 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Adding choice doesn't affect decidability of CLAIR fragments
     - max is simpler than ⊕; no new complexity introduced
     - CLAIR-finite + Choice and CLAIR-stratified + Choice remain decidable
+
+### Session 61 Discoveries (Task 8.1 CLAIR Syntax in Lean)
+
+315. **CLAIR SYNTAX FORMALIZATION DESIGNED** — Complete design for representing CLAIR as a programming language in Lean 4. See exploration/thread-8.12-clair-syntax-lean.md.
+
+316. **De Bruijn indices are the right choice**:
+    - Canonical representation (no α-equivalence needed)
+    - Works naturally with list contexts (position = variable number)
+    - Standard approach in PLFaLean, Software Foundations, Lean4Lean
+    - Main cost (index shifting during substitution) is manageable with careful lemmas
+
+317. **Graded typing relation designed**:
+    - `Γ ⊢ e : A @c` carries confidence in the judgment itself
+    - This is more expressive than just `Belief<A>[c]` types
+    - Enables tracking how confident we are that the typing derivation holds
+    - Cut/let-binding multiplies confidences (c₁ × c₂)
+
+318. **Key insight: Confidence may DECREASE during evaluation**:
+    - Standard preservation: Γ ⊢ e : A → e →* e' → Γ ⊢ e' : A (same type)
+    - CLAIR preservation: Γ ⊢ e : A @c → e → e' → Γ ⊢ e' : A @c' where c' ≤ c
+    - This is semantically correct: computation may reveal that initial confidence was too optimistic
+    - Example: defeat operations (undercut, rebut) reduce confidence during evaluation
+
+319. **Dual-monoid structure correctly handled in typing**:
+    - Derivation uses × for confidence composition
+    - Aggregation uses ⊕ for confidence combination
+    - The typing rules never mix these inappropriately
+    - Non-distributivity (a × (b ⊕ c) ≠ (a×b) ⊕ (a×c)) is not a problem because the rules keep them separate
+
+320. **Module organization for Lean 4 formalization**:
+    - `formal/lean/CLAIR/Syntax/` - Type grammar, expression grammar, substitution, contexts
+    - `formal/lean/CLAIR/Typing/` - HasType relation, subtyping
+    - `formal/lean/CLAIR/Semantics/` - Step relation, evaluation
+    - `formal/lean/CLAIR/Safety/` - Progress and preservation theorems
+
+321. **Implementation phases identified**:
+    - Phase 1: Syntax definitions (Types.lean, Expr.lean, Subst.lean, Context.lean)
+    - Phase 2: Type safety (weakening lemma, substitution lemma, progress, preservation)
+    - Phase 3: Confidence soundness (connect to existing CLAIR/Confidence/ proofs)
+    - Phase 4: Extraction (extract interpreter to Haskell/OCaml)
+
+322. **Prior art surveyed for Lean formalization**:
+    - PLFaLean (Programming Language Foundations in Lean 4)
+    - Software Foundations StlcProp patterns
+    - Lean4Lean (Lean typechecker verified in Lean)
+    - Parametric Higher-Order Abstract Syntax considered but rejected
+    - Locally nameless considered but de Bruijn chosen for simplicity
 
 ## Impossibilities Encountered
 

@@ -52,6 +52,28 @@ switch_to_build_mode() {
   ITERATION=0
 }
 
+seconds_until_next_hour() {
+  local now=$(date +%s)
+  local current_minute=$(date +%M)
+  local current_second=$(date +%S)
+  local seconds_past_hour=$((10#$current_minute * 60 + 10#$current_second))
+  local seconds_until=$((3600 - seconds_past_hour))
+  echo $seconds_until
+}
+
+seconds_until_daily_reset() {
+  local reset_hour=5
+  local now=$(date +%s)
+  local today_reset=$(date -v${reset_hour}H -v0M -v0S +%s 2>/dev/null || date -d "today ${reset_hour}:00:00" +%s)
+
+  if [[ $now -ge $today_reset ]]; then
+    local tomorrow_reset=$((today_reset + 86400))
+    echo $((tomorrow_reset - now))
+  else
+    echo $((today_reset - now))
+  fi
+}
+
 countdown() {
   local seconds=$1
   local message=$2
@@ -73,21 +95,95 @@ is_usage_limit_error() {
 
   [[ "$exit_code" -eq 0 ]] && return 1
 
-  if echo "$output" | grep -q "You've hit your limit\|You have hit your limit\|rate.limit\|usage.limit\|Error: 429\|Error: 529"; then
+  # Check the result JSON for error subtypes first (most reliable)
+  if echo "$output" | grep '^{' | jq -e 'select(.type == "result") | select(.subtype | test("error.*limit|rate_limit"))' &>/dev/null; then
+    return 0
+  fi
+
+  # Fallback to text patterns in stderr/error messages
+  local error_text
+  error_text=$(echo "$output" | grep -v '^{' || true)
+  error_text+=$(echo "$output" | grep '^{' | jq -r 'select(.type == "result" and .is_error == true) | .result // empty' 2>/dev/null || true)
+
+  if [[ "$error_text" =~ "You've hit your limit" ]] || [[ "$error_text" =~ "You have hit your limit" ]]; then
+    return 0
+  fi
+  if [[ "$error_text" =~ Error:\ 429 ]] || [[ "$error_text" =~ Error:\ 529 ]]; then
+    return 0
+  fi
+  if [[ "$error_text" =~ rate.?limit ]] || [[ "$error_text" =~ usage.?limit ]]; then
     return 0
   fi
   return 1
 }
 
+get_sleep_duration() {
+  local output="$1"
+
+  if [[ "$output" =~ "try again in "([0-9]+)" minute" ]]; then
+    echo $(( ${BASH_REMATCH[1]} * 60 + 60 ))
+    return
+  fi
+
+  if [[ "$output" =~ "try again in "([0-9]+)" hour" ]]; then
+    echo $(( ${BASH_REMATCH[1]} * 3600 + 60 ))
+    return
+  fi
+
+  if [[ "$output" =~ (daily|day|24.?hour) ]]; then
+    seconds_until_daily_reset
+    return
+  fi
+
+  if [[ "$output" =~ resets[[:space:]]+([0-9]+)(am|pm) ]]; then
+    local reset_hour="${BASH_REMATCH[1]}"
+    local ampm="${BASH_REMATCH[2]}"
+    local tz="UTC"
+    if [[ "$output" =~ \(([A-Za-z_/]+)\) ]]; then
+      tz="${BASH_REMATCH[1]}"
+    fi
+
+    if [[ "$ampm" == "pm" && "$reset_hour" -ne 12 ]]; then
+      reset_hour=$((reset_hour + 12))
+    elif [[ "$ampm" == "am" && "$reset_hour" -eq 12 ]]; then
+      reset_hour=0
+    fi
+
+    local now=$(date +%s)
+    local target=$(TZ="$tz" date -v${reset_hour}H -v0M -v0S +%s 2>/dev/null || TZ="$tz" date -d "today ${reset_hour}:00:00" +%s)
+
+    if [[ $now -ge $target ]]; then
+      target=$((target + 86400))
+    fi
+
+    echo $((target - now + 60))
+    return
+  fi
+
+  # Default: wait until next hour
+  local wait_time=$(seconds_until_next_hour)
+  [[ $wait_time -lt 300 ]] && wait_time=300
+  echo $wait_time
+}
+
 handle_usage_limit() {
-  local wait_time=3600  # Default 1 hour
+  local output="$1"
+  local sleep_duration=$(get_sleep_duration "$output")
 
   echo ""
   echo -e "${YELLOW}=== Usage Limit Detected ===${NC}"
   echo -e "${YELLOW}Waiting for reset...${NC}"
   echo ""
 
-  countdown $wait_time "Waiting for rate limit reset..."
+  local tz="UTC"
+  if [[ "$output" =~ \(([A-Za-z_/]+)\) ]]; then
+    tz="${BASH_REMATCH[1]}"
+  fi
+  local resume_time=$(TZ="$tz" date -v+${sleep_duration}S "+%Y-%m-%d %H:%M:%S" 2>/dev/null || TZ="$tz" date -d "+${sleep_duration} seconds" "+%Y-%m-%d %H:%M:%S")
+  echo -e "Expected resume: ${CYAN}${resume_time}${NC}"
+  echo ""
+
+  countdown $sleep_duration "Waiting..."
 
   echo ""
   echo -e "${GREEN}Resuming...${NC}"

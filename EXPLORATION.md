@@ -404,8 +404,8 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 8: Formal Verification Strategy
-**Status**: ✓ STRATIFIED BELIEF TYPE COMPLETE (Session 49)
-**Depth**: Deep - Confidence operations + core Belief + stratified beliefs formalized in Lean 4
+**Status**: ✓ SYNTAX FORMALIZATION DESIGNED (Session 61)
+**Depth**: Deep - Confidence operations + core Belief + stratified beliefs formalized in Lean 4; syntax design complete
 
 **Lean 4 Project Created (Sessions 31, 48, 49)**:
 - `formal/lean/` - Complete Lean 4 project with Mathlib 4 dependency
@@ -467,6 +467,16 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - Q8.4: ✓ Boundedness, algebraic properties, monotonicity worth proving first
 - Q8.10: ✓ (Phase 1) Belief type with confidence component formalized
 - Q8.11: ✓ Stratified belief levels capture Tarski hierarchy
+**CLAIR Syntax Design (Session 61)**:
+- **Task 8.1 design phase complete** - see exploration/thread-8.12-clair-syntax-lean.md
+- De Bruijn indices chosen for variable representation (canonical, works with list contexts)
+- Rational confidence bounds (ℚ) for decidable type checking
+- Graded typing relation: `Γ ⊢ e : A @c` (confidence in judgments, not just types)
+- Key insight: **Confidence may decrease during evaluation** - preservation gives c' ≤ c
+- Dual-monoid structure correctly handled: × for derivation, ⊕ for aggregation, never mixed
+- Module organization designed: Syntax/ (types, expr, subst, context), Typing/ (HasType, Subtype), Semantics/ (Step, Eval), Safety/ (Progress, Preservation)
+- Implementation phases: (1) syntax definitions → (2) type safety proofs → (3) confidence soundness → (4) interpreter extraction
+
 **Questions remaining**:
 - Q8.2: Natural language intents remain outside formalization scope
 - Q8.3: Extraction to working interpreter (rebut is noncomputable due to division)
@@ -474,6 +484,7 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - Q8.12: Polymorphic level operations
 - Q8.13: Level inference in Lean
 - Q8.14: Universe interaction with belief levels
+- Q8.15: How to formalize "independence" for aggregation typing rule?
 
 ---
 
