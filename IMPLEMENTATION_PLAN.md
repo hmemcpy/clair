@@ -79,7 +79,14 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
 - [x] **3.17 CPL soundness/completeness** - ANSWERED Session 27: CPL-finite and CPL-0 (stratified) likely have soundness and completeness via Bou et al. (2011) framework. Full CPL completeness is uncertain due to undecidability. Proof sketches provided. Key insight: the graded Löb axiom with g(c) = c² is semantically sound. See exploration/thread-3.17-cpl-soundness-completeness.md
 - [x] **3.18 Graded Löb discount function** - ANSWERED Session 26: g(c) = c² (quadratic) is the recommended choice. Supported by: (1) all mathematical desiderata satisfied, (2) derivation from first principles (penalty = c(1-c), so g(c) = c - c(1-c) = c²), (3) alignment with CLAIR's multiplicative structure. Alternative g(c) = c×d (product discount) also acceptable for tunable systems. See exploration/thread-3.18-loeb-discount.md
-- [ ] **3.19 Type-level anti-bootstrapping** - Implement Löb constraints in CLAIR's type checker (use stratification, not full CPL)
+- [x] **3.19 Type-level anti-bootstrapping** - ANSWERED Session 47: Two-layer approach using stratification (structural safety) + finite confidence caps (semantic safety). Key design: `Belief<level : Nat, content : Type, cap : FiniteConf>` with Löb discount g(c) = c² applied at type level. Decidable via finite lattice L₅. Sound by construction (loeb_discount ensures no amplification). See exploration/thread-3.19-type-anti-bootstrapping.md
+
+**New tasks discovered (Session 47)**:
+- [ ] **3.23 Linear types for evidence** - Could linear types help track "evidence consumption"? Relates to bootstrapping prevention.
+- [ ] **3.24 Dependent confidence types** - Can confidence bounds depend on runtime values? Requires dependent type features.
+- [ ] **3.25 Dynamic confidence narrowing** - Can runtime checks refine confidence bounds within type system?
+- [ ] **3.26 Multi-level Löb discount** - Should chained self-soundness (level n+2 about n+1 about n) discount multiplicatively?
+- [ ] **3.27 Optimal lattice choice** - Is L₅ the right finite lattice? Trade-offs with L₃, L₁₀, L₁₀₀?
 
 **New tasks discovered (Session 25)**:
 - [x] **3.20 CPL-finite formalization** - ANSWERED Session 29: CPL-finite fully formalized with L₅ = {0, 0.25, 0.5, 0.75, 1}. Key finding: no finite lattice is closed under c², requiring floor rounding for g_L(c) = floor_L(c²). Decidability established via finite model property (Bou et al. 2011). PSPACE-completeness conjectured. See exploration/thread-3.20-cpl-finite-formalization.md
@@ -1521,6 +1528,43 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Engaged seriously with prior art across multiple disciplines
     - Maintained honest uncertainty about phenomenological questions
 
+### Session 47 Discoveries (Task 3.19 Type-Level Anti-Bootstrapping)
+
+232. **TYPE-LEVEL ANTI-BOOTSTRAPPING DESIGN COMPLETE** — Two-layer approach combining stratification with finite confidence caps.
+
+233. **Core design**:
+    - Extended belief type: `Belief<level : Nat, content : Type, cap : FiniteConf>`
+    - Layer 1 (structural): Stratification enforces level-n references only level-m (m < n)
+    - Layer 2 (semantic): Confidence caps track maximum derivable confidence
+    - Löb discount g(c) = c² applied at type level for self-soundness claims
+
+234. **Key typing rules established**:
+    - Derivation reduces cap via multiplication: mul_finite(c₁, c₂)
+    - Aggregation increases cap via ⊕: oplus_finite(c₁, c₂)
+    - Self-soundness applies discount: loeb_discount(c) = floor_L(c²)
+    - Critical rule: Self-soundness at confidence c derives beliefs at confidence c² < c
+
+235. **Properties proven**:
+    - Soundness: No confidence amplification through self-soundness (by construction)
+    - Decidability: Finite lattice L₅ operations are computable
+    - Expressiveness: All safe introspection patterns accepted
+
+236. **Prior art connections**:
+    - Information flow types (Myers & Liskov) — lattice-based constraint propagation
+    - Effect systems (Gifford & Lucassen) — tracking self-referential effects
+    - Sized types (Hughes et al.) — levels as "sizes" for introspection depth
+    - Graded modal types (Orchard et al.) — semiring-indexed modalities
+    - Refinement types (Liquid Haskell) — predicates on confidence values
+
+237. **New questions discovered**:
+    - Linear types for evidence consumption (Task 3.23)
+    - Dependent confidence types (Task 3.24)
+    - Dynamic confidence narrowing (Task 3.25)
+    - Multi-level Löb discount (Task 3.26)
+    - Optimal lattice choice (Task 3.27)
+
+238. **Confidence in design**: 0.85 that two-layer approach is sound and practical
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -1564,6 +1608,8 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 6. **Kripke fixed points for stable self-reference** - ✓ DESIGNED (Session 8). `self_ref_belief` combinator attempts fixed-point computation. Returns Ill_formed if no fixed point.
 
 7. **For CPL undecidability: Decidable fragments** - ✓ IDENTIFIED (Session 25). Three workarounds: (a) CPL-finite with discrete confidence {0, 0.25, 0.5, 0.75, 1.0}; (b) CPL-0 using stratification (no self-reference); (c) Conservative type checking that rejects unclear cases. Anti-bootstrapping becomes semantic guideline, not checked invariant.
+
+8. **Type-level anti-bootstrapping** - ✓ DESIGNED (Session 47). Two-layer approach: (a) Stratification with `Belief<n, A>` ensures structural safety; (b) Finite confidence caps `Belief<n, A, cap>` with Löb discount g(c) = c² ensures no confidence amplification. Decidable via finite lattice L₅. See exploration/thread-3.19-type-anti-bootstrapping.md
 
 ---
 

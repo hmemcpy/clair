@@ -148,6 +148,19 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - **Recommendation**: CPL-finite remains the appropriate decidable fragment
 - See exploration/thread-3.21-cpl-godel-variant.md
 
+**Type-Level Anti-Bootstrapping (Session 47)**:
+- **Task 3.19 answered**: How to implement Löb constraints in CLAIR's type checker
+- **Two-layer approach**: Stratification (structural) + Finite confidence caps (semantic)
+- Extended belief type: `Belief<level : Nat, content : Type, cap : FiniteConf>`
+- Key typing rules:
+  - Derivation: cap₃ = mul_finite(cap₁, cap₂)
+  - Aggregation: cap₃ = oplus_finite(cap₁, cap₂)
+  - Self-soundness: cap_derived = loeb_discount(cap_claim) = floor_L(cap²)
+- **Decidability**: Finite lattice L₅ ensures all checks terminate
+- **Soundness**: loeb_discount ensures no confidence amplification
+- **Prior art connections**: Information flow types, effect systems, graded modal types
+- See exploration/thread-3.19-type-anti-bootstrapping.md
+
 ---
 
 ### Thread 4: The Grounding Problem
@@ -505,6 +518,13 @@ What I believe I know:
 | Dissertation chapters 1-13 complete | 0.99 | Session 45: all content written | Find missing chapter | ✓ Session 45 |
 | Dissertation appendices complete | 0.95 | Session 46: A-D all written | Find missing appendix | ✓ Session 46 |
 | CLAIR exploration complete | 0.95 | Session 46: all threads explored, dissertation done | Find remaining essential work | ✓ Session 46 |
+| Type-level anti-bootstrapping achievable | 0.90 | Session 47: two-layer design (stratification + finite caps) | Find typing inconsistency | ✓ Session 47 |
+| Two-layer approach sound | 0.90 | Session 47: loeb_discount ensures no amplification | Find amplification path | ✓ Session 47 |
+| Two-layer approach decidable | 0.95 | Session 47: finite lattice L₅ operations computable | Find undecidable check | ✓ Session 47 |
+| FiniteConf type parameter practical | 0.85 | Session 47: minimal inference needed | Find inference failure | ✓ Session 47 |
+| Löb discount at type level | 0.90 | Session 47: g(c) = floor_L(c²) in typing rules | Find type-level flaw | ✓ Session 47 |
+| Information flow types relevant | 0.80 | Session 47: lattice-based constraint propagation | Find inapplicability | ✓ Session 47 |
+| Graded modal types relevant | 0.85 | Session 47: semiring-indexed modalities | Find mismatch | ✓ Session 47 |
 
 ---
 
