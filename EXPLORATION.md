@@ -525,9 +525,22 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - Recommended simplifications: ignore judgment confidence initially, defer introspection
 - Estimated proof effort: 40-60 lines progress, 100-150 lines preservation + lemmas
 
+**Confidence Soundness Design (Session 66)**:
+- **Task 8.3 exploration complete** - see exploration/thread-8.3-confidence-soundness.md
+- Three dimensions: static (types valid), operational (steps preserve), semantic (ℚ↔ℝ compatible)
+- **Key gap**: Syntactic ConfBound operations (on ℚ) lack bounds proofs
+- Validity proofs needed: `oplus_valid`, `undercut_valid`, `rebut_valid`, `loebDiscount_valid`
+- Proofs are straightforward algebraic, paralleling semantic Confidence proofs on ℝ
+- **Issue discovered**: `HasType.belief` rule doesn't enforce validity premises
+- **Fix**: Add explicit validity premises OR use validated confidence subtype
+- Typing validity theorem: well-typed terms have valid confidence (induction on derivation)
+- Evaluation validity: steps preserve validity (via operation bounds)
+- Semantic embedding: ℚ ∩ [0,1] embeds into unitInterval, operations are homomorphisms
+- Estimated effort: ~260 lines total (validity proofs + theorems + embedding)
+
 **Questions remaining**:
 - Q8.2: Type safety proofs (progress, preservation) - Task 8.2 (strategy designed, Lean impl remains)
-- Q8.3: Confidence soundness (connect syntax to semantics) - Task 8.3
+- Q8.3: Confidence soundness - Task 8.3 (strategy designed, Lean impl remains)
 - Q8.4: Extraction to working interpreter - Task 8.4
 - Q8.10: Phases 2, 4 (justification graph, full metadata)
 - Q8.12: Polymorphic level operations
