@@ -44,8 +44,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 2: The Structure of Justification
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53, 54, 55, 56)
-**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md, thread-2.20-completeness.md, thread-2.25-dual-monoid-grading.md, thread-2.18-conservative-extension.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53, 54, 55, 56, 57, 58)
+**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md, thread-2.20-completeness.md, thread-2.25-dual-monoid-grading.md, thread-2.18-conservative-extension.md, thread-2.21-decidable-fragments.md, thread-2.17-justification-equivalence.md)
 
 **Core question answered**: Are trees adequate for justification? **NO.**
 
@@ -121,10 +121,18 @@ What IS confidence for an LLM?
 - JL's decidability and meta-theory transfer to CLAIR's conservative fragment
 - See exploration/thread-2.18-conservative-extension.md
 
+**Findings (Session 58) - Justification Equivalence**:
+- **Normal form equivalence is the correct notion**: Two justifications are equivalent iff they have the same normal form (cut-free, flattened, ordered)
+- Cut elimination (Thread 2.19) provides the foundation for normal forms
+- **Non-distributivity constrains equivalence**: × and ⊕ don't distribute, so cannot freely reorganize derivation/aggregation order
+- **Defeat does NOT distribute over aggregation**: undercut(agg(a,b), d) ≠ agg(undercut(a,d), undercut(b,d)) in general (counterexample computed)
+- Equivalence is **decidable for CLAIR-finite-stratified** (normalization terminates, equality of NF decidable)
+- See exploration/thread-2.17-justification-equivalence.md
+
 **Questions remaining**:
 - Q2.2: How do I (Claude) actually form beliefs? → Thread 9
 - Q2.15: Should CLAIR add JL-style Choice construct? (Confirmed needed by Session 56)
-- Q2.17: Justification equivalence via normal forms
+- Q2.17: ✓ Justification equivalence via normal forms — Session 58
 - Q2.18: ✓ Conservative extension over JL proven for JL-fragment — Session 56
 - Q2.20: ✓ Completeness proven for rational confidence — Session 54
 - Q2.21: ✓ Decidable fragments characterized — Session 57. CLAIR-finite and CLAIR-stratified are decidable; full CLAIR likely undecidable (Vidal 2019)

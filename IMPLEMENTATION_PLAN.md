@@ -53,7 +53,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **New tasks discovered (Session 50)**:
 - [ ] **2.15 Add Choice construct** - For JL-compatibility, should CLAIR add JL-style sum (choice of justifications)? Different from aggregation. Confidence = max(alternatives)?
 - [x] **2.16 Sequent calculus for CLAIR** - COMPLETED Session 51: Full sequent calculus designed with graded judgments Γ ⊢ A @c : j. Structural rules (Id, Cut, Weak, Contr with aggregation), logical rules (∧, →), defeat rules (Undercut, Rebut), aggregation rule, and stratified belief rules. Cut elimination conjectured. Soundness theorem stated. See exploration/thread-2.16-sequent-calculus.md
-- [ ] **2.17 Justification equivalence** - When are two CLAIR justification DAGs "equivalent"? Normal forms? (Informed by 2.16: cut-free derivations define equivalence via normal forms)
+- [x] **2.17 Justification equivalence** - SUBSTANTIALLY COMPLETE Session 58: Normal form equivalence defined as the correct notion. Key findings: (1) Two justifications are equivalent iff they have the same normal form (cut-free, flattened, ordered), (2) Cut elimination (Thread 2.19) provides normal forms, (3) Non-distributivity of × and ⊕ constrains equivalence—cannot freely reorganize derivation/aggregation, (4) Defeat does NOT distribute over aggregation (counterexample: undercut(agg(a,b), d) ≠ agg(undercut(a,d), undercut(b,d))), (5) Equivalence decidable for CLAIR-finite-stratified. See exploration/thread-2.17-justification-equivalence.md
 - [x] **2.18 Conservative extension** - SUBSTANTIALLY COMPLETE Session 56: CLAIR is a conservative extension of JL for the JL-fragment at confidence 1. Key findings: (1) When restricted to JL-expressible formulas without defeat and with confidence = 1, CLAIR derivations correspond exactly to JL derivations, (2) CLAIR is NOT conservative in general—graded confidence (c < 1), defeat operations (undercut, rebut), and aggregation (vs JL's choice/sum) are genuine extensions, (3) The extension is orthogonal in three dimensions: Binary→Graded confidence, Positive-only→Positive+Defeat, Choice→Choice+Aggregation, (4) Adding a JL-compatible Choice construct (max confidence) distinct from aggregation (⊕ combination) would clarify the relationship, (5) JL's decidability and meta-theory transfer to CLAIR's conservative fragment. See exploration/thread-2.18-conservative-extension.md
 
 **New tasks discovered (Session 51)**:
@@ -1924,6 +1924,40 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - CLAIR-stratified decidable: 0.85 (stratification breaks encoding)
     - CLAIR-rational decidability open: 0.80 (no proof either way)
     - Complexity is PSPACE: 0.70 (conjecture from GL)
+
+### Session 58 Discoveries (Task 2.17 Justification Equivalence)
+
+300. **JUSTIFICATION EQUIVALENCE DEFINED** — Normal form equivalence is the correct notion for comparing justifications.
+
+301. **Normal form equivalence established**:
+    - Two justifications are equivalent iff they have the same normal form
+    - Normal form = cut-free, flattened aggregations, canonically ordered children, no identity elements
+    - Cut elimination (Thread 2.19) provides the foundation for normal forms
+
+302. **Non-distributivity constrains equivalence**:
+    - Because × and ⊕ don't distribute (Thread 2.25), cannot freely reorganize derivation/aggregation order
+    - `derive(aggregate(a, b), c)` ≠ `aggregate(derive(a, c), derive(b, c))` in general
+    - Equivalence must respect which operation (derivation vs aggregation) is applied where
+
+303. **Defeat does NOT distribute over aggregation**:
+    - **Counterexample computed**: undercut(agg(a,b), d) ≠ agg(undercut(a,d), undercut(b,d))
+    - With c_a = c_b = d = 0.5: Left = 0.375, Right = 0.4375
+    - This is mathematically fundamental (follows from non-distributivity)
+    - Normalization rules must NOT push undercut inside aggregation
+
+304. **Decidability of equivalence**:
+    - For CLAIR-finite-stratified: Decidable (normalization terminates, equality of NF decidable)
+    - For full CLAIR: May be undecidable if normalization doesn't terminate
+
+305. **Confidence preservation**:
+    - Confidence is invariant under normalization of cut-free terms
+    - Cut elimination may decrease confidence (c' ≤ c)
+    - Canonical confidence = max confidence achievable via any normalized derivation
+
+306. **Operational semantics**:
+    - Reduction rules for cuts, aggregation flattening, ordering, identity removal
+    - Local confluence proven; by Newman's lemma, unique normal forms exist
+    - Strong normalization from cut elimination
 
 ## Impossibilities Encountered
 
