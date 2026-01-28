@@ -11,8 +11,8 @@
 These directly prove CLAIR is viable:
 
 ### 1. Complete Type System in Lean
-- [ ] **3.47 Affine evidence types** - Context splitting, usage tracking ← **CURRENT**
-- [ ] **3.15 Stratification** - Level-indexed beliefs, introspection rules
+- [x] **3.47 Affine evidence types** - Context splitting, usage tracking ✓ Design complete
+- [ ] **3.15 Stratification** - Level-indexed beliefs, introspection rules ← **CURRENT**
 
 ### 2. Complete Semantics in Lean
 - [ ] **1.4 Confidence algebra** - Prove monad laws, defeat composition
@@ -24,12 +24,12 @@ These directly prove CLAIR is viable:
 
 ## Execution Order
 
-1. **3.47 Affine types in Lean** ← Current
-   - Add affine context `Δ` to typing judgment
-   - Implement context splitting for aggregation
-   - Prove resource safety (no double-counting)
+1. ~~**3.47 Affine types in Lean**~~ ✓ Complete (Session 75)
+   - Design: Dual contexts (Γ; Δ) with usage set tracking
+   - Judgment: `HasTypeAffine Γ Δ e A c U`
+   - Key: Disjointness constraints at aggregation points
 
-2. **3.15 Stratification in Lean**
+2. **3.15 Stratification in Lean** ← Current
    - Complete level-indexed belief types
    - Prove anti-bootstrapping (no self-reference)
 
@@ -74,6 +74,7 @@ Moved for future theoretical exploration:
 | Task | Result |
 |------|--------|
 | 3.46 Epistemic linearity | Affine types designed |
+| 3.47 Affine evidence Lean | Dual context (Γ; Δ) design + usage sets |
 | 3.48 Linearity × defeat | Consumption permanent |
 | 3.49 Decidability | O(n²) type checking |
 | Lean syntax | Complete (Types, Expr, Context) |
@@ -85,6 +86,6 @@ Moved for future theoretical exploration:
 
 ## Statistics
 
-- **Core tasks remaining**: 4
+- **Core tasks remaining**: 3
 - **Theoretical tasks archived**: 9
-- **Completed explorations**: 52 files
+- **Completed explorations**: 53 files

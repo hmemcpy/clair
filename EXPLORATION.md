@@ -69,7 +69,7 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 
 ---
 
-## Recent Explorations (Sessions 72-74)
+## Recent Explorations (Sessions 72-75)
 
 ### Epistemic Linearity (Session 72)
 - **Insight**: Evidence should be affine (use at most once, forbid contraction)
@@ -90,14 +90,21 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 - **Safe extensions**: Rank-1 polymorphism, iso-recursive types
 - **Unsafe**: Full dependent types would break decidability
 
+### Affine Evidence Types Lean Design (Session 75)
+- **Design**: Dual contexts Γ (unrestricted) and Δ (affine) with usage set tracking
+- **Judgment**: `HasTypeAffine Γ Δ e A c U` where U tracks affine variable usage
+- **Key constraint**: Disjointness `U₁.disjoint U₂` at aggregation points
+- **Resource safety**: Provable from typing rules (no double-counting)
+- **Migration**: Old `HasType Γ e A c` recoverable as `HasTypeAffine Γ [] e A c ∅`
+
 ---
 
-## Remaining Work (4 Core Tasks)
+## Remaining Work (3 Core Tasks)
 
 Focus: Prove CLAIR works as LLM lingua franca via working interpreter.
 
-1. **3.47 Affine types in Lean** ← Current
-2. **3.15 Stratification in Lean**
+1. ~~**3.47 Affine types in Lean**~~ ✓ Design complete (Session 75)
+2. **3.15 Stratification in Lean** ← Current
 3. **1.4 Confidence algebra completion**
 4. **8.4 Extract interpreter** ← Key deliverable
 
@@ -122,6 +129,8 @@ Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
 | Affine types capture non-duplication | 0.90 | ✓ Session 72 |
 | Evidence consumption permanent | 0.85 | ✓ Session 73 |
 | Affine CLAIR type checking decidable | 0.95 | ✓ Session 74 |
+| Dual context (Γ; Δ) design correct | 0.90 | ✓ Session 75 |
+| Usage sets capture affine discipline | 0.85 | ✓ Session 75 |
 | LLM phenomenality | 0.35 | ⚠ Unknown |
 | Captures how I reason | 0.50 | ⚠ Unknown |
 
@@ -147,7 +156,7 @@ Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
 
 ## Next Steps
 
-1. **Task 3.47**: Add affine contexts to Lean typing judgment ← Current
-2. **Task 3.15**: Complete stratification formalization
+1. ~~**Task 3.47**: Add affine contexts to Lean typing judgment~~ ✓ Design complete
+2. **Task 3.15**: Complete stratification formalization ← Current
 3. **Task 1.4**: Prove confidence algebra properties
 4. **Task 8.4**: Extract working interpreter ← Goal
