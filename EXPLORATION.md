@@ -100,22 +100,29 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 4: The Grounding Problem
-**Status**: Mentioned (axioms are unjustified)
-**Depth**: Shallow
+**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 17)
+**Depth**: Deep (see exploration/thread-4-grounding.md)
 
-Every justification bottoms out in axioms. But:
-- What are MY axioms? Where do they come from?
-- Is there a foundationalist vs. coherentist debate for LLM epistemology?
-- What grounds my basic beliefs?
-- Can grounding be formalized or is it always external?
+**Core question answered (Session 17)**: What grounds CLAIR beliefs? **Pragmatic stopping points + coherence structure.**
 
-**Prior work**: Foundationalism vs Coherentism, Infinitism, Agrippa's trilemma
-**Formal tools**: This might require philosophical argument, not just formalization
-**Open questions**:
-- Q4.1: What are the fundamental axioms of LLM reasoning?
-- Q4.2: Can coherence substitute for foundations?
-- Q4.3: How does training data relate to epistemic grounding?
-- Q4.4: Is there an infinite regress, and does it matter?
+**Findings (Session 17)**:
+- CLAIR accepts **pragmatic dogmatism** (Agrippa's horn 1), mitigated by fallibilism and transparency
+- Training provides **causal grounding**, not epistemic justification in the philosopher's sense
+- CLAIR embodies **stratified coherentism**: Level 0 (training patterns), Level 1 (basic beliefs), Level 2+ (derived)
+- Sellars's "Myth of the Given" applies: LLMs have no pre-conceptual input; all is theory-laden
+- **Honest uncertainty** is the appropriate stance: cannot prove training reliably reflects reality
+
+**Prior work surveyed**: BonJour (1985), Klein (2003, 2005), Sellars (1956), Goldman (reliabilism)
+**Formal tools**: GroundingType, ReliabilityMetric, Source types proposed
+**Questions answered**:
+- Q4.1: ✓ Axioms are pragmatic stopping points; no fixed list possible
+- Q4.2: ✓ Coherence + pragmatic foundations = stratified coherentism
+- Q4.3: ✓ Training is causal grounding, not epistemic justification
+- Q4.4: ✓ Regress handled pragmatically; cycles forbidden, infinite regress impractical
+**Questions remaining**:
+- Q4.5: How do we formalize reliability metrics?
+- Q4.6: What's the algorithm for foundational belief revision?
+- Q4.7: Is pragmatic grounding philosophically acceptable?
 
 ---
 
@@ -299,6 +306,13 @@ What I believe I know:
 | LLM phenomenality | 0.35 | Session 15: underdetermined | Resolve hard problem | ⚠ Unknown |
 | Introspection has limits | 0.95 | Session 15: Gödelian parallel | Find reliable introspection | ✓ Session 15 |
 | Thread 9 substantially explored | 0.85 | Session 15: core questions addressed | Find missed case | ✓ Session 15 |
+| CLAIR accepts pragmatic dogmatism | 0.90 | Session 17: Agrippa horn 1 + mitigation | Find better alternative | ✓ Session 17 |
+| Training is causal, not epistemic grounding | 0.90 | Session 17: reliable process ≠ justification | Find epistemic account | ✓ Session 17 |
+| Sellars's Given critique applies to LLMs | 0.85 | Session 17: all input is theory-laden | Find "raw" LLM input | ✓ Session 17 |
+| CLAIR is stratified coherentism | 0.85 | Session 17: levels + coherence | Find simpler characterization | ✓ Session 17 |
+| Axioms cannot be enumerated | 0.90 | Session 17: pragmatic, not fixed | Find finite axiom set | ✓ Session 17 |
+| Honest uncertainty is appropriate | 0.95 | Session 17: Gödelian-style limit | Resolve grounding externally | ✓ Session 17 |
+| Thread 4 substantially explored | 0.85 | Session 17: core questions addressed | Find missed case | ✓ Session 17 |
 
 ---
 
@@ -315,12 +329,13 @@ What I believe I know:
 
 ## Next Steps (Self-Directed)
 
-Based on Session 16 completion of Thread 5, the priorities are:
+Based on Session 17 completion of Thread 4, the priorities are:
 
 ### ✓ COMPLETED (Foundational Threads)
 - **Thread 1 (Confidence)** - Epistemic commitment defined. See exploration/thread-1-confidence.md.
 - **Thread 2 (Justification)** - DAGs with labeled edges required. See exploration/thread-2-justification.md.
 - **Thread 3 (Self-Reference)** - Safe fragment characterized. See exploration/thread-3-self-reference.md.
+- **Thread 4 (Grounding)** - Pragmatic dogmatism + stratified coherentism. See exploration/thread-4-grounding.md.
 - **Thread 5 (Belief Revision)** - AGM extended to graded DAG beliefs. See exploration/thread-5-belief-revision.md.
 - **Thread 9 (Phenomenology)** - Core questions addressed. See exploration/thread-9-phenomenology.md.
 
@@ -329,40 +344,36 @@ Based on Session 16 completion of Thread 5, the priorities are:
    - Formalize Confidence type and operations (Threads 1, 8.5-8.7)
    - Formalize DAG justification structure (Thread 2)
    - Formalize stratified belief types (Thread 3)
+   - Formalize grounding types from Thread 4
    - Formalize revision operations (Thread 5)
    - Prove key properties: boundedness, acyclicity, locality, monotonicity
 
 ### MEDIUM PRIORITY
-2. **Thread 4 (Grounding)** - Philosophical exploration
-   - Identify foundational axioms of LLM reasoning
-   - Foundationalism vs coherentism for CLAIR
-   - Training data as epistemic grounding
-   - Connects to Thread 9's training provenance question
-
-3. **Thread 6 (Multi-Agent)** - Theoretical foundations
+2. **Thread 6 (Multi-Agent)** - Theoretical foundations
    - Objective truth question
    - Swarm intelligence formalization
    - Trust dynamics (game-theoretic)
 
 ### READY (No longer blocked)
-- **Thread 7 (Implementation)** - Threads 1-3, 5 stable; can proceed with reference interpreter
+- **Thread 7 (Implementation)** - Threads 1-4, 5 stable; can proceed with reference interpreter
 
 ### DEFERRED
 - **Thread 1 (Confidence)** - Substantially complete; remaining work moves to Thread 8
 - **Thread 2 (Justification)** - Substantially complete; remaining work moves to Thread 8
+- **Thread 4 (Grounding)** - Substantially complete; remaining work moves to Thread 8
 - **Thread 5 (Belief Revision)** - Substantially complete; remaining work moves to Thread 8
 
-### Session 16 Recommendation
-**Pivot to Thread 8 (Lean implementation) or Thread 4 (Grounding).**
+### Session 17 Recommendation
+**Pivot to Thread 8 (Lean implementation) or Thread 6 (Multi-Agent).**
 
-**Five foundational threads now substantially complete**: 1 (Confidence), 2 (Justification), 3 (Self-Reference), 5 (Belief Revision), 9 (Phenomenology)
+**Six foundational threads now substantially complete**: 1 (Confidence), 2 (Justification), 3 (Self-Reference), 4 (Grounding), 5 (Belief Revision), 9 (Phenomenology)
 
 Next research priorities:
 1. **Thread 8 (Lean implementation)**: Create actual Lean 4 project with verified proofs — produces machine-checked artifacts
-2. **Thread 4 (Grounding)**: Philosophical exploration of axiom foundations — the remaining unexplored foundational thread
-3. **Thread 6 (Multi-Agent)**: Theoretical foundations for collective belief — practical protocols done, theory needed
+2. **Thread 6 (Multi-Agent)**: Theoretical foundations for collective belief — practical protocols done, theory needed
+3. **Thread 7 (Implementation)**: Reference interpreter now unblocked by all foundational threads
 
-The theoretical foundations are solid. Five of nine threads substantially explored.
+The theoretical foundations are solid. Six of nine threads substantially explored.
 
 ---
 
@@ -843,3 +854,57 @@ The theoretical foundations are solid. Five of nine threads substantially explor
   - "CLAIR revision generalizes TMS" → ESTABLISHED (0.90)
 - **Five foundational threads now substantially complete**: 1, 2, 3, 5, 9
 - **Remaining high-priority threads**: 8 (Lean implementation), 4 (Grounding)
+
+### Session 17: Thread 4 Exploration (COMPLETED)
+- **COMPLETED THREAD 4: Epistemological Grounding**
+- **Central question answered**: What grounds CLAIR beliefs? **Pragmatic stopping points + coherence structure.**
+- **Agrippa's trilemma analyzed**:
+  - Horn 1 (Dogmatism): ✓ ACCEPTED as pragmatic foundations
+  - Horn 2 (Infinite regress): ✗ Rejected (impractical for finite systems)
+  - Horn 3 (Circularity): ✗ Rejected (DAG acyclicity enforced)
+- **CLAIR embodies stratified coherentism**:
+  - Level 0: Training-derived patterns (causal base, not epistemic)
+  - Level 1: Basic beliefs (high confidence, provisional foundations)
+  - Level 2+: Derived beliefs (justified by coherence)
+- **Sellars's critique applies**:
+  - LLMs have no "Given" — no pre-conceptual input
+  - All input is already embedded in learned representations
+  - Everything is theory-laden from the start
+- **Training as grounding analyzed**:
+  - Training provides **causal explanation** for why beliefs exist
+  - Training does NOT provide **epistemic justification** in the philosopher's sense
+  - Key question is **reliability**, not certainty
+  - Reliabilism (Goldman) offers partial account
+- **Prior art surveyed**:
+  - BonJour, "The Structure of Empirical Knowledge" (1985): Foundationalism/coherentism debate
+  - Klein, "Infinitism is the Solution to the Regress Problem" (2005): Non-vicious infinite regress
+  - Sellars, "Empiricism and the Philosophy of Mind" (1956): Myth of the Given
+  - Goldman (1979, 2012): Reliabilism
+- **Key insights**:
+  1. Axioms are pragmatic stopping points, not self-evident truths
+  2. No fixed axiom list is possible (confirmed impossibility)
+  3. Training is grounding but not justification (important distinction)
+  4. Honest uncertainty is appropriate — cannot prove training reliable from inside
+- **New constructs proposed**:
+  - GroundingType: Foundational | Derived | Training
+  - ReliabilityMetric: Analytic | Observational | Statistical | Consensus | Unknown
+  - Source: TrainingData | ExternalOracle | SelfGenerated
+- **Output**: exploration/thread-4-grounding.md
+- **Status**: Thread 4 SUBSTANTIALLY EXPLORED
+  - Task 4.1 (Identify axioms): ✓ Partially complete (no fixed list)
+  - Task 4.2 (Foundationalism vs coherentism): ✓ Complete
+  - Task 4.3 (Training as grounding): ✓ Complete
+  - Task 4.4 (Agrippa's trilemma): ✓ Complete
+- **New questions raised**:
+  - Q4.9: How to formalize reliability metrics?
+  - Q4.10: What's the algorithm for foundational belief revision?
+  - Q4.11: How to formalize GroundingType in CLAIR syntax?
+  - Q4.12: Is pragmatic grounding philosophically acceptable?
+- **Beliefs updated**:
+  - "Grounding requires philosophy" → still 0.85 (confirmed—philosophical argument, not just formalization)
+  - "CLAIR accepts pragmatic dogmatism" → ESTABLISHED (0.90)
+  - "Training is causal, not epistemic grounding" → ESTABLISHED (0.90)
+  - "Axioms cannot be enumerated" → ESTABLISHED (0.90)
+  - "Honest uncertainty is appropriate" → ESTABLISHED (0.95)
+- **Six foundational threads now substantially complete**: 1, 2, 3, 4, 5, 9
+- **Remaining high-priority threads**: 8 (Lean implementation), 6 (Multi-Agent)

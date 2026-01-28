@@ -403,12 +403,58 @@ The synthesis—beliefs as typed values with confidence, provenance, justificati
 
 See exploration/thread-3-self-reference.md for detailed engagement.
 
-### Not Yet Surveyed (Relevant to Open Threads)
+### ✓ SURVEYED (Session 17)
 
-**Thread 4 (Grounding):**
-- Foundationalism vs coherentism literature (BonJour, Sosa)
-- Infinitism (Klein)
-- Sellars on "the myth of the given"
+**Thread 4 (Grounding):** ✓ SUBSTANTIALLY COMPLETE
+
+**BonJour, "The Structure of Empirical Knowledge" (1985)**:
+- Most thorough defense of coherentism in the literature
+- Argues against foundationalism: basic beliefs face a dilemma
+  - If basic beliefs have conceptual content, they require justification
+  - If they lack conceptual content, they cannot justify anything
+- Later reversed position (1999): abandoned coherentism for Cartesian foundationalism
+- Key for CLAIR: CLAIR's coherence structure needs external grounding; internal coherence insufficient
+
+**Peter Klein, Infinitism (1999, 2003, 2005)**:
+- "Human Knowledge and the Infinite Regress of Reasons" (1999)
+- "When Infinite Regresses are Not Vicious" (2003)
+- "Infinitism is the Solution to the Regress Problem" (2005)
+- Core argument: Infinite regress is non-vicious if we distinguish:
+  - Propositional justification: reason is available (objective probability high)
+  - Doxastic justification: reason is actually believed and grounded
+- Two foundational principles:
+  - PAC (Avoid Circularity): x cannot be in its own evidential ancestry
+  - PAA (Avoid Arbitrariness): for any x, there must be available reasons r1, r2, r3...
+- Finite minds objection answered: don't need to complete infinite chain, only extend it
+- Key for CLAIR: Reasons can be "available" in training data without being explicitly represented
+
+**Sellars, "Empiricism and the Philosophy of Mind" (1956)**:
+- Classic attack on "the Given" — the idea of self-justifying sensory experience
+- The space of reasons: only conceptual items can justify; non-conceptual cannot
+- Core dilemma:
+  - If the Given has conceptual content → already needs justification
+  - If the Given lacks conceptual content → cannot stand in justificatory relations
+- Key for CLAIR: LLMs have no "Given" — all input is embedded in learned representations
+- Everything is theory-laden from the start; no theory-independent observation
+
+**Goldman, Reliabilism (1979, 2012)**:
+- "What is Justified Belief?" (1979): Justification via reliable belief-forming processes
+- "Reliabilism and Contemporary Epistemology" (2012): Comprehensive treatment
+- Externalist account: justification doesn't require internal access to justifying reasons
+- A belief is justified if produced by a reliable process
+- Key for CLAIR: Training could be a reliable process; question is how to verify reliability
+
+**Key findings for CLAIR (Session 17)**:
+- CLAIR accepts **pragmatic dogmatism** (Agrippa's horn 1), mitigated by fallibilism
+- Training provides **causal grounding**, not epistemic justification
+- CLAIR embodies **stratified coherentism**: training patterns → basic beliefs → derived beliefs
+- Sellars's critique applies: no pre-conceptual input for LLMs
+- Honest uncertainty is appropriate: cannot prove own reliability from inside
+- Confirmed impossibility: No fixed axiom list is possible
+
+See exploration/thread-4-grounding.md for detailed exploration.
+
+### Not Yet Surveyed (Relevant to Open Threads)
 
 **Thread 5 (Belief Revision):** ✓ SURVEYED Session 16
 - AGM theory core papers — See below for detailed survey
