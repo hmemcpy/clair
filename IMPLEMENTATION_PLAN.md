@@ -60,7 +60,12 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **2.19 Cut elimination proof** - SUBSTANTIALLY COMPLETE Session 52: Cut elimination theorem proven for CLAIR's graded sequent calculus. Key findings: (1) Standard Gentzen double-induction strategy applies with modifications for graded judgments, (2) Confidence may decrease during cut elimination (c' ≤ c) - this is semantically correct, (3) Defeat rules (undercut, rebut) are NOT cuts - they permute with cut but are not eliminated, (4) Aggregative contraction (⊕) requires premise duplication but doesn't break termination, (5) Subformula property, consistency, and type safety connection established. See exploration/thread-2.19-cut-elimination.md
 - [ ] **2.20 CLAIR completeness** - Prove completeness of sequent calculus for graded Kripke semantics
 - [ ] **2.21 Decidable fragments** - Characterize decidable fragments of CLAIR (rational confidence, finite lattice)
-- [ ] **2.22 Proof terms (Curry-Howard)** - What's the term assignment for CLAIR sequents?
+- [x] **2.22 Proof terms (Curry-Howard)** - SUBSTANTIALLY COMPLETE Session 53: Full term assignment designed for CLAIR sequents. Key findings: (1) Terms carry explicit confidence bounds in types: Belief<A>[c], (2) Cut corresponds to let-binding with multiplicative confidence composition, (3) Defeat operations (undercut, rebut) are novel term formers with defined reduction semantics, (4) Aggregation uses ⊕ for confidence combination, fundamentally different from JL's sum (+), (5) Strong normalization follows from cut elimination, (6) CLAIR requires dual-monoid grading (×, ⊕ don't distribute - not a semiring). See exploration/thread-2.22-curry-howard-terms.md
+
+**New tasks discovered (Session 53)**:
+- [ ] **2.23 Subtyping for confidence** - Should Belief<A>[c] be subtype of Belief<A>[c'] when c ≥ c'?
+- [ ] **2.24 Type inference for confidence** - Can confidence bounds be inferred automatically?
+- [ ] **2.25 Dual-monoid grading formalization** - Formalize the two-sorted grading structure for × and ⊕
 
 ### Thread 3: Self-Reference
 **Status**: ✓ SUBSTANTIALLY EXPLORED. Safe fragment characterized. Design proposal ready. See exploration/thread-3-self-reference.md
@@ -234,7 +239,7 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 
 **New tasks discovered (Session 14)**:
 - [x] **8.8** Verify Mathlib's `unitInterval` API matches our needs exactly - COMPLETED Session 21. Mathlib's unitInterval is an EXACT MATCH for CLAIR's Confidence type. Key findings: (1) Full multiplication monoid structure via `LinearOrderedCommMonoidWithZero`, (2) `symm` operation provides 1-x for undercut, (3) `unit_interval` tactic automates bound proofs, (4) CLAIR only needs ~30 lines of custom definitions (oplus, undercut, rebut, min). See exploration/thread-8-verification.md §14.
-- [ ] **8.9** Complete `min_assoc` proof with full case analysis (has `sorry` in sketch)
+- [x] **8.9** Complete `min_assoc` proof with full case analysis - COMPLETED Session 31. Proof in formal/lean/CLAIR/Confidence/Min.lean uses split_ifs with case analysis and linarith. No `sorry` remains.
 - [x] **8.10** Formalize Belief type with confidence component - SUBSTANTIALLY COMPLETE Session 48. Core Belief<α> type defined as value + confidence. Created `formal/lean/CLAIR/Belief/Basic.lean` with: Functor structure (map), derivation (derive₂ with × composition), aggregation (⊕ combination), defeat operations (undercut, rebut), conservative combination (min), and graded monad structure (bind, pure). Key theorems proven: derivation decreases confidence, aggregation increases confidence, undercut composition law, monad laws for confidence. Incremental approach: Phase 1 (core) complete, Phases 2-4 (justification graph, stratification, full metadata) deferred. See exploration/thread-8.10-belief-type-formalization.md.
 - [x] **8.11** Formalize stratified belief levels from Thread 3 - SUBSTANTIALLY COMPLETE Session 49. Created `formal/lean/CLAIR/Belief/Stratified.lean` with: StratifiedBelief<n, α> type, Meta<α> wrapper, introspect operation with level constraint (h : m < n), level-preserving operations (map, derive₂, aggregate, applyUndercut), coercion to basic Belief, safety theorems (no same-level introspection, no circular introspection). See exploration/thread-8.11-stratified-belief-lean.md
 

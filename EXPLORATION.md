@@ -44,8 +44,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 2: The Structure of Justification
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52)
-**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53)
+**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md)
 
 **Core question answered**: Are trees adequate for justification? **NO.**
 
@@ -79,6 +79,16 @@ What IS confidence for an LLM?
 - Aggregative contraction (⊕) requires premise duplication but doesn't break termination
 - Consequences: subformula property, consistency, type safety connection
 
+**Findings (Session 53) - Curry-Howard Proof Terms**:
+- Full term assignment designed for CLAIR sequent calculus
+- Graded types: `Belief<A>[c]` carries confidence bounds
+- Cut corresponds to let-binding with multiplicative confidence composition (c₁ × c₂)
+- Defeat operations (undercut, rebut) are novel term formers with reduction semantics
+- Aggregation uses ⊕, fundamentally different from JL's sum (+): evidence combination vs choice
+- Strong normalization follows from cut elimination
+- **Key finding**: CLAIR requires **dual-monoid grading** — × and ⊕ don't distribute (not a semiring)
+- New term constructors: derive, aggregate, undercut, rebut, introspect
+
 **Prior work surveyed**: Pollock (1987), Doyle (1979), de Kleer (1986), Artemov (2001, 2019), Jøsang (2016), Toulmin (1958), Fitting (2005), Gentzen (1935), Girard (1987), Metcalfe et al. (2008)
 **Formal tools**: DAG structure with EdgeType labels; new constructors for abduction, analogy, induction, aggregate; sequent calculus with cut elimination
 **Questions answered**:
@@ -93,7 +103,7 @@ What IS confidence for an LLM?
 - Q2.17: Justification equivalence via normal forms
 - Q2.20: CLAIR completeness
 - Q2.21: Decidable fragments
-- Q2.22: Proof terms (Curry-Howard)
+- Q2.22: ✓ Proof terms (Curry-Howard) — Session 53
 
 ---
 
