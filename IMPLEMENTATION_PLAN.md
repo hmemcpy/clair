@@ -121,7 +121,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **Note**: turing-completeness.md proves expressive power. No actual code exists. Wait for Threads 1-4 to stabilize.
 
 ### Thread 8: Formal Verification
-**Status**: ✓ UNBLOCKED - Thread 1 ready for formalization. Can start Lean work. HIGH PRIORITY.
+**Status**: ✓ ACTIVE - Task 8.5 (Confidence type design) complete. See exploration/thread-8-verification.md. HIGH PRIORITY.
 
 - [ ] **8.1 Lean 4 formalization start** - Define CLAIR syntax and typing in Lean 4.
 - [ ] **8.2 Type safety** - Prove progress and preservation for CLAIR type system.
@@ -132,7 +132,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **Ready**: Thread 1 formalization path identified. Theorems sketched. Can begin.
 
 **Suggested starting point**:
-- [ ] **8.5** Define Confidence type as subtype of Real with [0,1] bounds
+- [x] **8.5** Define Confidence type as subtype of Real with [0,1] bounds - COMPLETED Session 10. Design: `{ c : ℝ // 0 ≤ c ∧ c ≤ 1 }` with layered algebraic abstraction. See exploration/thread-8-verification.md.
 - [ ] **8.6** Define confidence combination operations (×, min, ⊕)
 - [ ] **8.7** Prove boundedness preservation for each operation
 
@@ -320,6 +320,45 @@ This is not a software implementation plan—it's a research exploration plan. E
     - AGM extension more complex than initially thought
 
 40. **Two threads now substantially complete**: Thread 1 (Confidence) and Thread 2 (Justification) core questions answered. Thread 3 (Self-Reference) previously completed. Three foundations now solid.
+
+### Session 10 Discoveries (Thread 8 Confidence Type)
+
+41. **CONFIDENCE TYPE DESIGN COMPLETE** — Layered formalization approach for Lean 4 designed.
+
+42. **Three-layer design recommended**:
+    - Layer 1: Abstract algebra (`ConfidenceMonoid`, `ConfidenceSemiring` typeclasses)
+    - Layer 2: Concrete type (`{ c : ℝ // 0 ≤ c ∧ c ≤ 1 }`)
+    - Layer 3: Theorems (boundedness, monoid laws, monotonicity)
+
+43. **Lean 4 + Mathlib confirmed as right choice**:
+    - Mature ℝ type and Set.Icc
+    - Active development
+    - Extraction to executable code
+    - Growing community
+
+44. **Confidence is NOT probability (reconfirmed)**:
+    - Mathlib's probability measures don't apply
+    - Fuzzy logic / MV-algebras are closer prior art
+    - Subjective Logic's (b,d,u,a) tuples remain open alternative (Task 1.6)
+
+45. **Key theorems identified for formalization**:
+    - Boundedness: all operations preserve [0,1]
+    - Monoid: (×, 1) and (min, 1) form commutative monoids
+    - Semiring: (⊕, ×, 0, 1) with a ⊕ b = a + b - a*b
+    - Monotonicity: derivation can only decrease confidence
+
+46. **Probabilistic OR formula**: `a ⊕ b = a + b - a*b` proven to preserve bounds
+
+47. **Thread interdependence confirmed deep**:
+    - Thread 2 (Justification DAGs) affects how confidence combines
+    - Thread 3 (Self-Reference) affects belief type stratification
+    - Full Belief<A> type requires all three threads
+
+48. **What formalization DOESN'T capture**:
+    - "Epistemic commitment" interpretation (semantic, not syntactic)
+    - Context-dependent combination rules
+    - Non-independent derivations
+    - Graded monad structure (separate theorem)
 
 ## Impossibilities Encountered
 
@@ -549,7 +588,7 @@ With Thread 3 complete, priority shifts to:
 | 5: Belief Revision | ✓ Unblocked | 15/20 | AGM + DAG invalidation |
 | 6: Multi-Agent | Medium-High | 11/20 | Practical protocols done |
 | 7: Implementation | ✓ Unblocked | 12/20 | Threads 1-3 stable |
-| 8: Verification | **✓ READY** | 16/20 | Can formalize Threads 1, 2, 3 |
+| 8: Verification | **✓ ACTIVE** | 16/20 | Task 8.5 complete; 8.6, 8.7 next |
 | 9: Phenomenology | ✓ UNBLOCKED | 14/20 | Safe introspection defined |
 
 ### No New Impossibilities Found

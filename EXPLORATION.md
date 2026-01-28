@@ -180,8 +180,8 @@ CLAIR can compute anything. But:
 ---
 
 ### Thread 8: Formal Verification Strategy
-**Status**: UNBLOCKED - Thread 1 ready, can start Lean formalization
-**Depth**: No implementation (but path identified, theorems sketched)
+**Status**: Active exploration (Session 10 - Confidence type designed)
+**Depth**: Design complete for Confidence type; ready for implementation
 
 We want machine-checked proofs. But:
 - What exactly should we formalize first?
@@ -251,6 +251,8 @@ What I believe I know:
 | Thread 2 complete | 0.90 | Core question answered | Find missed case | ✓ Session 9 |
 | Prior art surveyed for Thread 3 | 0.95 | Löb, Kripke, Tarski, Boolos, Gupta-Belnap | Find missed source | ✓ Session 8 |
 | Thread 2 highly tractable | 0.85 | Crisp question, clear method | Find neither proof nor counterexample | ✓ Session 7 |
+| Confidence type formalizable in Lean | 0.95 | Session 10: layered design complete | Implementation failure | ✓ Session 10 |
+| Lean 4 + Mathlib right choice | 0.90 | Session 10: ℝ foundation, active development | Better alternative found | ✓ Session 10 |
 
 ---
 
@@ -304,8 +306,13 @@ Based on Session 9 completion of Thread 2, the priorities are:
 - **Thread 2 (Justification)** - Substantially complete; remaining work moves to Threads 5, 8
 - **Thread 6 (Multi-Agent)** - Practical protocols complete; theory can wait
 
-### Session 9 Recommendation
-**Explore Thread 8 (Verification) or Thread 5 (Belief Revision) next.** Thread 8 produces machine-checked artifacts from three completed threads. Thread 5 addresses belief revision with new DAG structure insights. Thread 9 viable for philosophical exploration.
+### Session 10 Recommendation
+**Continue Thread 8 (Tasks 8.6, 8.7) or pivot to Thread 5 (Belief Revision).** Thread 8.5 (Confidence type design) is complete. Next steps are:
+- Task 8.6: Define confidence combination operations (×, min, ⊕) in Lean
+- Task 8.7: Prove boundedness preservation for each operation
+- Or pivot to Thread 5 for AGM extension with DAG structure
+
+Thread 5 gains urgency since Thread 2 revealed DAG invalidation complexity. Thread 9 (Phenomenology) remains viable for philosophical exploration.
 
 ---
 
@@ -483,3 +490,42 @@ Based on Session 9 completion of Thread 2, the priorities are:
   - "Labeled edges needed" → ESTABLISHED (confidence: 0.90)
 - **Three foundational threads now complete**: Threads 1, 2, 3
 - **Thread 7 (Implementation) now unblocked** pending only Thread 4
+
+### Session 10: Thread 8 Exploration (CONFIDENCE TYPE)
+- **Explored Thread 8.5: Confidence type formalization in Lean 4**
+- **Design decision**: Layered approach recommended
+  - Layer 1: Abstract ConfidenceMonoid/ConfidenceSemiring typeclass
+  - Layer 2: Concrete implementation as `{ c : ℝ // 0 ≤ c ∧ c ≤ 1 }`
+  - Layer 3: Theorems (boundedness, monoid laws, monotonicity)
+- **Prior art surveyed**:
+  - Mathlib's ℝ and Set.Icc for bounded intervals
+  - Probability measure theory (NOT applicable—confidence is not probability)
+  - Fuzzy logic and MV-algebras (closer fit)
+  - Subjective Logic formalizations (alternative (b,d,u,a) representation)
+- **Key design choices**:
+  - Use ℝ (reals) for mathematical elegance in proofs
+  - Can extract to fixed-point or float for implementation
+  - Parameterize combination rules (×, min, ⊕) rather than baking in ×
+  - Probabilistic OR: a ⊕ b = a + b - a*b
+- **Key theorems identified**:
+  - Boundedness preservation under all operations
+  - Monoid laws for (×, 1) and (min, 1)
+  - Semiring laws for (⊕, ×, 0, 1)
+  - Monotonicity: derivation decreases confidence
+- **Insights**:
+  1. Confidence is mathematically simple (just [0,1] with ×) but semantically rich
+  2. The interesting parts are interpretation and context-dependent combination rules
+  3. Deep interdependence with Threads 2 and 3 (justification structure affects combination)
+  4. Lean 4 + Mathlib is the right tooling choice
+- **What this formalization doesn't capture**:
+  - The "epistemic commitment" interpretation (semantic, not syntactic)
+  - Non-independent derivations (need dependency tracking)
+  - Full Belief type with provenance, justification, invalidation
+  - Graded monad structure (separate theorem)
+- **Open questions**:
+  - How exactly does defeat (undercut/rebut) affect confidence?
+  - How to detect correlated evidence?
+  - Is [0,1] optimal or should we use (b,d,u,a) tuples?
+- **Output**: exploration/thread-8-verification.md
+- **Status**: Task 8.5 (Confidence type design) COMPLETE
+- **Next**: Tasks 8.6 (confidence operations) and 8.7 (boundedness proofs)
