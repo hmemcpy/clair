@@ -161,22 +161,39 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 6: Multi-Agent Epistemology
-**Status**: Explored (swarm coordination)
-**Depth**: Medium
+**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 23)
+**Depth**: Deep (see exploration/thread-6.1-objective-truth.md)
 
-Multiple agents disagree. But:
-- Is there objective truth they're all trying to approximate?
-- Or are there just different perspectives?
-- What's the epistemology of collective belief?
-- How does trust emerge and evolve?
+**Core question answered (Session 23)**: Is there objective truth? **Yes, but framework-relative.**
 
-**Prior work**: Social epistemology, Wisdom of crowds, Distributed cognition
-**Formal tools**: Game theory, Epistemic logic, Probabilistic consensus
-**Open questions**:
-- Q6.1: Is consensus truth-tracking or just coordination?
-- Q6.2: Can swarms be "smarter" than individuals? When?
-- Q6.3: What's the epistemology of AI-human collaboration?
-- Q6.4: How do you aggregate beliefs without losing information?
+**CLAIR adopts pragmatic internal realism**:
+- Truth is objective within shared frameworks, but framework-relative (no view from nowhere)
+- Truth is what would be agreed upon at the limit of inquiry within a shared framework
+- Aggregation is truth-tracking when agents share frameworks and evidence is independent
+- Disagreement is informative: indicates insufficient evidence, framework mismatch, or genuine underdetermination
+- Fallibilism is essential: no belief guaranteed true, but some better supported
+
+**Prior work surveyed (Session 23)**:
+- Putnam, "Reason, Truth and History" (1981): Internal realism
+- Massimi, "Perspectival Realism" (2022): Perspectivism compatible with realism
+- Peirce: Truth as limit of inquiry (convergence theory)
+- Condorcet Jury Theorem: Wisdom of crowds under independence
+- Arrow's Impossibility Theorem: No perfect aggregation
+
+**Key findings**:
+- Pure metaphysical realism fails (access problem, Putnam's critique)
+- Pure perspectivism collapses into incoherence (self-refutation)
+- Internal realism fits CLAIR: shared type system = common conceptual scheme
+- CLAIR sacrifices Arrow's "universal domain"—framework compatibility required before aggregation
+- Minority views should be preserved, not averaged away
+
+**Formal tools**: DisagreementType, AgentPerspective, MultiAgentBelief types proposed
+**Questions answered**:
+- Q6.1: ✓ Consensus IS truth-tracking when agents share frameworks
+- Q6.4: ✓ Partially—sacrifice universal domain, preserve minority views
+**Questions remaining**:
+- Q6.2: When are swarms smarter? Formalize conditions
+- Q6.3: AI-human collaboration epistemology
 
 ---
 
@@ -337,6 +354,12 @@ What I believe I know:
 | Anti-bootstrapping theorem holds | 0.90 | Session 22: self-soundness caps confidence | Find counterexample | ✓ Session 22 |
 | Graded Löb axiom: g(c) ≤ c required | 0.85 | Session 22: discount function analysis | Find g(c) > c that works | ✓ Session 22 |
 | CPL complements stratification | 0.90 | Session 22: what vs how-strongly | Find incompatibility | ✓ Session 22 |
+| Objective truth exists (framework-relative) | 0.90 | Session 23: pragmatic internal realism | Find alternative stance | ✓ Session 23 |
+| Pure perspectivism incoherent | 0.95 | Session 23: self-refutation | Find consistent perspectivism | ✓ Session 23 |
+| Aggregation is truth-tracking (conditions) | 0.85 | Session 23: shared framework + independence | Find counterexample | ✓ Session 23 |
+| Arrow applies to belief aggregation | 0.90 | Session 23: discursive dilemma | Find escape | ✓ Session 23 |
+| CLAIR should sacrifice universal domain | 0.85 | Session 23: framework compatibility | Find alternative sacrifice | ✓ Session 23 |
+| Disagreement is informative | 0.90 | Session 23: multiple interpretations | Find noise interpretation | ✓ Session 23 |
 
 ---
 
@@ -1210,3 +1233,58 @@ The theoretical foundations are solid. Six of nine threads substantially explore
 - **Thread 3 extensions**:
   - Task 3.13 complete
   - New tasks added: 3.16 (CPL decidability), 3.17 (CPL soundness/completeness), 3.18 (g function choice), 3.19 (type-level anti-bootstrapping)
+
+### Session 23: Task 6.1 Exploration (OBJECTIVE TRUTH)
+- **COMPLETED TASK 6.1: Objective truth question — Is there truth agents approximate, or just perspectives?**
+- **Core question answered**: CLAIR adopts **pragmatic internal realism**
+  - Truth is objective within shared frameworks, but framework-relative (no view from nowhere)
+  - What agents converge on at the limit of inquiry = practical truth
+  - Multiple perspectives can be valid for different purposes without relativism
+- **Four positions analyzed**:
+  1. Metaphysical realism: Rejected (Putnam's access problem)
+  2. Pure perspectivism: Rejected (self-refutation, practical collapse)
+  3. Internal realism (Putnam): ✓ ADOPTED as basis
+  4. Pragmatist convergence (Peirce): ✓ INTEGRATED
+  5. Perspectival realism (Massimi): ✓ Compatible extension
+- **Why internal realism fits CLAIR**:
+  - Agents share a framework (CLAIR's type system) = common conceptual scheme
+  - Within framework, questions have objective answers (type-check, tests pass)
+  - Framework itself is revisable based on collective inquiry
+  - Pluralism without relativism
+- **Implications for multi-agent aggregation**:
+  - Consensus mechanisms become truth-approximation mechanisms
+  - But only when agents share compatible frameworks
+  - Aggregation via ⊕ requires: shared framework + independence + competence + good faith
+- **Arrow's theorem implications addressed**:
+  - No perfect belief aggregation exists (impossibility)
+  - CLAIR sacrifices **universal domain**: framework compatibility required before aggregation
+  - Also sacrifices **systematicity**: different propositions may need different rules
+  - This is principled: aggregating incompatible perspectives isn't truth-tracking anyway
+- **Design elements proposed**:
+  ```clair
+  type DisagreementType = Factual | Evaluative | Perspectival | Underdetermined
+  type AgentPerspective = { framework, purpose, constraints, assumptions }
+  type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dissent, convergence }
+  ```
+- **Framework compatibility check designed**:
+  - Check: framework match, purpose overlap, constraint compatibility
+  - Results: FullyCompatible, DifferentQuestions, FrameworkMismatch, ConflictingConstraints
+- **Prior art surveyed**:
+  - Putnam (1981): Internal realism, framework-relative truth
+  - Massimi (2022): Perspectival realism
+  - Peirce: Convergence theory of truth
+  - James, Dewey: Pragmatist traditions
+  - Condorcet (1785): Jury theorem (independence critical)
+  - Arrow (1951): Impossibility theorem
+  - List & Pettit (2002): Judgment aggregation
+- **Output**: exploration/thread-6.1-objective-truth.md
+- **Status**: Task 6.1 SUBSTANTIALLY COMPLETE
+- **Beliefs updated**:
+  - "Objective truth exists (framework-relative)" → ESTABLISHED (0.90)
+  - "Pure perspectivism incoherent" → ESTABLISHED (0.95)
+  - "Aggregation is truth-tracking (with conditions)" → ESTABLISHED (0.85)
+  - "Arrow applies to belief aggregation" → ESTABLISHED (0.90)
+  - "CLAIR should sacrifice universal domain" → ESTABLISHED (0.85)
+  - "Disagreement is informative" → ESTABLISHED (0.90)
+- **Thread 6 unblocked**: Task 6.1 provides theoretical foundation for Tasks 6.2, 6.3, 6.4
+- **Seven foundational threads now substantially complete**: 1, 2, 3, 4, 5, 6, 9

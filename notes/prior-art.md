@@ -789,3 +789,55 @@ See exploration/thread-2.13-correlated-evidence.md for detailed exploration.
 - Type-level anti-bootstrapping possible for CLAIR's type checker
 
 See exploration/thread-3.13-graded-provability-logic.md for detailed exploration.
+
+### ✓ SURVEYED (Session 23)
+
+**Thread 6.1 (Objective Truth Question):** ✓ SUBSTANTIALLY COMPLETE
+
+**Hilary Putnam, "Reason, Truth and History" (1981) / Internal Realism**:
+- Critique of metaphysical realism: our concepts cannot "hook onto" reality without a God's eye view
+- Internal realism: truth is objective but framework-relative
+- Objects and kinds are constituted by conceptual schemes, but once adopted, truth is not merely intersubjective
+- Truth as "idealized rational acceptability"—what would be accepted at the limit of inquiry
+- **For CLAIR**: Agents share CLAIR's type system as a common conceptual scheme; within it, truth is objective
+
+**Michela Massimi, "Perspectival Realism" (2022)**:
+- Scientific knowledge is always perspectival (historically and culturally situated)
+- But perspectivism is compatible with realism
+- Different perspectives can be approximately true in different respects
+- Truth is "concerning specific aims or intentions within contexts"
+- **For CLAIR**: Different analyses can be valid for different purposes without relativism
+
+**Charles Sanders Peirce, Pragmatist Convergence Theory**:
+- Truth is "the opinion which is fated to be agreed to by all who investigate"
+- Reality is what would be discovered by an unbounded community at the limit of inquiry
+- Truth is social and processual, not static and pre-given
+- **For CLAIR**: Multiple agents engaging in inquiry approximate this convergence point
+- **Problem**: "Buried secrets"—truths that would never be discovered no matter how long we inquire
+
+**Condorcet, Jury Theorem (1785)**:
+- If each juror independently has probability p > 0.5 of being correct, majority voting converges to truth
+- KEY ASSUMPTION: Independence is explicitly required
+- Violation of independence undermines the theorem's conclusions
+- **For CLAIR**: Aggregation via ⊕ requires genuine independence; framework compatibility also required
+
+**Kenneth Arrow, "Social Choice and Individual Values" (1951)**:
+- Impossibility theorem: No preference aggregation satisfies all of: universal domain, weak Pareto, IIA, non-dictatorship
+- Extends to judgment aggregation (discursive dilemma): no JAF satisfies universal domain, anonymity, systematicity, collective consistency
+- **For CLAIR**: No perfect belief aggregation exists; must sacrifice something
+
+**List & Pettit, "Aggregating Sets of Judgments" (2002)**:
+- Extended Arrow to judgment aggregation
+- Showed the discursive dilemma applies to beliefs/propositions, not just preferences
+- **For CLAIR**: Sacrifice universal domain (framework compatibility required) and systematicity (different rules for different propositions)
+
+**Key design decisions for CLAIR (Session 23)**:
+- Adopts **pragmatic internal realism**: truth is objective within shared frameworks but framework-relative
+- CLAIR's type system is the shared conceptual scheme enabling objective truth within it
+- Sacrifices Arrow's universal domain: framework compatibility required before aggregation
+- Sacrifices systematicity: different propositions may need different aggregation rules
+- Disagreement has multiple interpretations (Factual, Evaluative, Perspectival, Underdetermined)
+- Minority views should be preserved as epistemic signal, not averaged away
+- Aggregation is truth-tracking when: shared framework + independence + competence + good faith
+
+See exploration/thread-6.1-objective-truth.md for detailed exploration.

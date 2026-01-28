@@ -140,14 +140,35 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [ ] **5.13 Contract by proposition** - Is there meaningful "contract by proposition" for CLAIR, or only "contract by edge"?
 
 ### Thread 6: Multi-Agent
-**Status**: Medium depth. Practical protocols designed, theory incomplete.
+**Status**: ✓ Foundation established. Task 6.1 answered. Theoretical work proceeding.
 
-- [ ] **6.1 Objective truth question** - Is there truth that agents approximate, or just perspectives? Take a stance.
-- [ ] **6.2 Swarm intelligence** - When are collectives smarter than individuals? Formalize conditions.
+- [x] **6.1 Objective truth question** - ANSWERED Session 23: CLAIR adopts **pragmatic internal realism**. Truth is objective within shared frameworks but framework-relative. Aggregation is truth-tracking when agents share frameworks and evidence is independent. Disagreement is informative, not noise. See exploration/thread-6.1-objective-truth.md
+- [ ] **6.2 Swarm intelligence** - When are collectives smarter than individuals? Formalize conditions. Blocked by: requires 6.1's stance on truth.
 - [ ] **6.3 Trust dynamics** - Model how trust evolves through interaction. Game-theoretic treatment.
-- [ ] **6.4 Information preservation** - How to aggregate without losing information? Arrow's theorem implications?
+- [ ] **6.4 Information preservation** - How to aggregate without losing information? Arrow's theorem implications? PARTIALLY ANSWERED in 6.1: We sacrifice universal domain (framework compatibility required) and systematicity.
 
-**Note**: multi-agent-beliefs.md covers practical protocols extensively. Theoretical foundations need work.
+**Prior art surveyed (Session 23)**:
+- [x] Putnam's internal realism (1981) - Framework-relative objectivity
+- [x] Massimi's perspectival realism (2022) - Perspectivism compatible with realism
+- [x] Peirce's convergence theory - Truth as limit of inquiry
+- [x] Condorcet Jury Theorem - Wisdom of crowds under independence
+- [x] Arrow's Impossibility Theorem - No perfect aggregation
+
+**Key findings (Session 23)**:
+- Truth exists but is framework-relative (no view from nowhere)
+- Within shared frameworks, truth is what inquiry would converge on
+- Aggregation requires framework compatibility check before application
+- CLAIR sacrifices universal domain to avoid Arrow's impossibility
+- Minority views should be preserved as epistemic signal
+
+**New design elements**:
+```clair
+type DisagreementType = Factual | Evaluative | Perspectival | Underdetermined
+type AgentPerspective = { framework, purpose, constraints, assumptions }
+type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dissent, convergence }
+```
+
+**Note**: multi-agent-beliefs.md covers practical protocols extensively. Task 6.1 now provides theoretical foundation.
 
 ### Thread 7: Implementation
 **Status**: BLOCKED - Needs stable theoretical foundation first.
