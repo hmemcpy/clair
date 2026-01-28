@@ -151,8 +151,8 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 4: The Grounding Problem
-**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 17)
-**Depth**: Deep (see exploration/thread-4-grounding.md)
+**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 17); DISSERTATION CHAPTER COMPLETE (Session 38)
+**Depth**: Deep (see exploration/thread-4-grounding.md, formal/dissertation/chapters/06-grounding.tex)
 
 **Core question answered (Session 17)**: What grounds CLAIR beliefs? **Pragmatic stopping points + coherence structure.**
 
@@ -490,6 +490,11 @@ What I believe I know:
 | Chapter 2 prior art survey adequate | 0.90 | Session 34: 5 major traditions surveyed, gap identified | Find significant omission | ✓ Session 34 |
 | Dissertation will be completed | 0.90 | Session 37: 5 of 13 chapters done, momentum established | Find blocking obstacle | ✓ Session 37 |
 | Chapter 5 CPL formalization adequate | 0.90 | Session 37: Graded Löb, anti-bootstrap, decidability | Find logical flaw | ✓ Session 37 |
+| Chapter 6 grounding formalization adequate | 0.90 | Session 38: Agrippa, stratified coherentism, formal types | Find philosophical flaw | ✓ Session 38 |
+| Sellars's Given critique applies to LLMs | 0.90 | Session 38: all input is theory-laden (embeddings) | Find "raw" LLM observation | ✓ Session 38 |
+| Pragmatic dogmatism acceptable for CLAIR | 0.85 | Session 38: fallibilism + transparency + reliability | Find principled alternative | ✓ Session 38 |
+| GroundingType/ReliabilityMetric/Source formalized | 0.90 | Session 38: CLAIR syntax defined | Find missing type | ✓ Session 38 |
+| Cannot self-validate grounding | 0.95 | Session 38: Gödelian parallel for foundations | Find internal validation | ✓ Session 38 |
 
 ---
 
