@@ -154,7 +154,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **Note**: turing-completeness.md proves expressive power. No actual code exists. Wait for Threads 1-4 to stabilize.
 
 ### Thread 8: Formal Verification
-**Status**: ✓ ACTIVE - Task 8.5 (Confidence type design) complete. See exploration/thread-8-verification.md. HIGH PRIORITY.
+**Status**: ✓ ACTIVE - Tasks 8.5, 8.6, 8.7, 8.8 complete. See exploration/thread-8-verification.md. HIGH PRIORITY.
 
 - [ ] **8.1 Lean 4 formalization start** - Define CLAIR syntax and typing in Lean 4.
 - [ ] **8.2 Type safety** - Prove progress and preservation for CLAIR type system.
@@ -174,7 +174,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [ ] **8.1-impl** Create actual Lean 4 project files and compile proofs - READY FOR IMPLEMENTATION. Mechanical work once environment setup is feasible.
 
 **New tasks discovered (Session 14)**:
-- [ ] **8.8** Verify Mathlib's `unitInterval` API matches our needs exactly
+- [x] **8.8** Verify Mathlib's `unitInterval` API matches our needs exactly - COMPLETED Session 21. Mathlib's unitInterval is an EXACT MATCH for CLAIR's Confidence type. Key findings: (1) Full multiplication monoid structure via `LinearOrderedCommMonoidWithZero`, (2) `symm` operation provides 1-x for undercut, (3) `unit_interval` tactic automates bound proofs, (4) CLAIR only needs ~30 lines of custom definitions (oplus, undercut, rebut, min). See exploration/thread-8-verification.md §14.
 - [ ] **8.9** Complete `min_assoc` proof with full case analysis (has `sorry` in sketch)
 - [ ] **8.10** Formalize Belief type with confidence component (depends on Threads 2, 3)
 - [ ] **8.11** Formalize stratified belief levels from Thread 3
@@ -789,6 +789,37 @@ This is not a software implementation plan—it's a research exploration plan. E
     - 2.12: Reinstatement (compositional, fixed-point) ✓
     - 2.13: Correlated aggregation (dependency-adjusted interpolation) ✓
     - 2.14: Update derivation-calculus.md (remaining)
+
+### Session 21 Discoveries (Task 8.8 Mathlib unitInterval Verification)
+
+114. **TASK 8.8 COMPLETE** — Mathlib's unitInterval verified as exact match for CLAIR.
+
+115. **Mathlib provides complete foundation**:
+    - Type: `Set.Icc 0 1` is exactly CLAIR's Confidence
+    - Structure: `LinearOrderedCommMonoidWithZero` gives full multiplication monoid
+    - Closure: `mul_mem` already proven
+    - Symm: `symm t = 1 - t` with rich properties (involutive, bijective, continuous)
+    - Automation: `unit_interval` tactic handles bound proofs
+
+116. **CLAIR extensions are minimal (~30 lines)**:
+    - `oplus a b = a + b - ab` (probabilistic OR)
+    - `undercut c d = c * symm d` (uses Mathlib's symm directly)
+    - `rebut c_for c_against = c_for / (c_for + c_against)`
+    - `min a b = if a ≤ b then a else b`
+
+117. **Key insight: undercut uses symm**:
+    ```
+    undercut(c, d) = c × (1 - d) = c × symm(d)
+    ```
+    Mathlib's `symm` operation is exactly what undercut needs.
+
+118. **No API conflicts**: CLAIR's operations don't clash with Mathlib's names or semantics.
+
+119. **Thread 8 formalization path confirmed**:
+    - Use `abbrev Confidence := unitInterval`
+    - Leverage `LinearOrderedCommMonoidWithZero` instance
+    - Define oplus, undercut, rebut, min
+    - Proofs use `ring`, `linarith`, `unit_interval` tactics
 
 ## Impossibilities Encountered
 

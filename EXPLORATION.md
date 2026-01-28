@@ -201,8 +201,8 @@ CLAIR can compute anything. But:
 ---
 
 ### Thread 8: Formal Verification Strategy
-**Status**: Active exploration (Session 11 - Confidence operations characterized)
-**Depth**: Design complete for Confidence type AND operations; ready for Lean implementation
+**Status**: Active exploration (Session 21 - Mathlib API verified)
+**Depth**: Foundation complete (Tasks 8.5, 8.6, 8.7, 8.8); ready for Lean 4 project creation
 
 We want machine-checked proofs. But:
 - What exactly should we formalize first?
@@ -327,6 +327,11 @@ What I believe I know:
 | More dependency → less aggregate confidence | 0.99 | Session 20: monotonicity proof | None (mathematical) | ✓ Proven |
 | Provenance overlap indicates dependency | 0.80 | Session 20: Jaccard-like heuristic | Find better inference | ✓ Session 20 |
 | Conservative default δ=0.3 when unknown | 0.75 | Session 20: practical recommendation | Find principled derivation | ⚠ Heuristic |
+| Mathlib unitInterval exact match | 0.99 | Session 21: comprehensive API analysis | Better alternative found | ✓ Session 21 |
+| CLAIR extensions minimal (~30 lines) | 0.95 | Session 21: oplus, undercut, rebut, min only | Discover missing operation | ✓ Session 21 |
+| Undercut uses Mathlib symm directly | 0.99 | Session 21: undercut(c,d) = c * symm(d) | None (mathematical) | ✓ Discovered |
+| No Mathlib API conflicts | 0.95 | Session 21: namespace analysis | Find naming conflict | ✓ Session 21 |
+| Thread 8 foundation complete | 0.95 | Session 21: Tasks 8.5-8.8 all done | Lean compilation failure | ✓ Session 21 |
 
 ---
 
@@ -1100,3 +1105,54 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - 2.12: Reinstatement ✓
   - 2.13: Correlated aggregation ✓
   - 2.14: Update derivation-calculus.md (remaining)
+
+### Session 21: Task 8.8 Exploration (MATHLIB UNITINTERVAL VERIFICATION)
+- **COMPLETED TASK 8.8: Verify Mathlib's unitInterval API matches CLAIR's needs exactly**
+- **Comprehensive API analysis conducted** by reading Mathlib source code
+- **Mathlib's unitInterval provides EXACT MATCH for CLAIR**:
+  - Type: `Set.Icc 0 1` — the closed interval [0,1] in ℝ
+  - Key instances: `LinearOrderedCommMonoidWithZero` (full multiplication monoid structure)
+  - Submonoid structure: `unitInterval.submonoid` with proven `mul_mem`
+  - `symm` operation: `symm t = 1 - t` with rich properties (involutive, bijective, continuous)
+  - Bound lemmas: `nonneg`, `le_one`, `one_minus_nonneg`, `one_minus_le_one`
+  - Automation: `unit_interval` tactic for common proof obligations
+- **What Mathlib provides (no CLAIR work needed)**:
+  - Type definition (exact match)
+  - Multiplication monoid (associative, commutative, identity 1)
+  - Multiplication closure (already proven)
+  - All bound lemmas
+  - `symm` operation for undercut
+  - Ordering (`LinearOrderedCommMonoidWithZero`)
+  - Proof automation
+- **What CLAIR must define (~30 lines)**:
+  - `oplus a b = a + b - a*b` (probabilistic OR)
+  - `undercut c d = c * symm d` (uses Mathlib's symm directly!)
+  - `rebut c_for c_against = c_for / (c_for + c_against)` with zero-case handling
+  - `min a b = if a ≤ b then a else b` (trivial—result is operand)
+- **Key insight: undercut uses Mathlib's symm directly**:
+  ```lean4
+  def undercut (c d : Confidence) : Confidence := c * symm d
+  ```
+  - No need to prove (1-d) is in [0,1] — Mathlib's `symm` already handles this
+  - Composition theorem `undercut(undercut(c,d₁),d₂) = undercut(c, d₁⊕d₂)` follows from algebra
+- **Proof complexity assessment**:
+  - Boundedness proofs: Use `linarith`, `ring`, `mul_nonneg`, `unit_interval` tactic
+  - Algebraic properties: Use `ring` tactic
+  - No foundational lemmas needed — Mathlib provides them
+- **No API conflicts identified**:
+  - CLAIR's operations don't clash with Mathlib names
+  - Clean extension possible
+- **Version considerations**:
+  - Mathlib is actively developed; pin specific version in lakefile.lean
+  - Use `lake exe cache get` for faster builds
+- **Output**: exploration/thread-8-verification.md §14
+- **Status**: Task 8.8 COMPLETE
+- **Beliefs updated**:
+  - "Mathlib unitInterval = Confidence" → CONFIRMED (0.95 → 0.99)
+  - "CLAIR extensions minimal" → ESTABLISHED (0.95)
+  - "Undercut uses Mathlib symm directly" → DISCOVERED (0.99)
+  - "No API conflicts" → ESTABLISHED (0.95)
+- **Thread 8 status**: Tasks 8.5, 8.6, 8.7, 8.8 all complete
+  - Theoretical foundation fully verified
+  - Ready for 8.1-impl (create actual Lean 4 project)
+  - Remaining: 8.9 (min_assoc proof), 8.10 (Belief type), 8.11 (stratified beliefs)
