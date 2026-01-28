@@ -437,3 +437,51 @@ See exploration/thread-3-self-reference.md for detailed engagement.
 **Key finding**: (⊕, ×) do NOT form a semiring—distributivity fails. This is a known result in fuzzy logic.
 
 See exploration/thread-8-verification.md §12 for detailed formalization.
+
+### ✓ SURVEYED (Session 12)
+
+**Thread 2.10 (Defeat Confidence Propagation):** ✓ SUBSTANTIALLY COMPLETE
+
+**Pollock's Defeaters (1987, 2001)**:
+- Rebutting defeaters: Attack the conclusion directly
+- Undercutting defeaters: Attack the inference without attacking conclusion
+- Weakest link principle: Argument strength = min of all steps
+- Variable degrees of justification (2001): Graded rather than binary defeat
+
+**Dung's Abstract Argumentation (1995)**:
+- Argumentation frameworks: Nodes are arguments, edges are attacks
+- Grounded extension: Unique, accepts unattacked arguments iteratively
+- Preferred extension: Maximal admissible sets
+- Qualitative (in/out), not graded—too coarse for CLAIR
+
+**Gradual/Weighted Argumentation Semantics**:
+- Amgoud & Ben-Naim (2023): Weighted bipolar argumentation graphs
+- h-categorizer: strength(a) = w(a) / (1 + Σ strength(attackers))
+- Max-based: Only strongest attacker matters
+- Card-based: Number of attackers matters
+- Key principles: Maximality, Void Precedence, Quality/Cardinality Precedence, Compensation
+
+**Subjective Logic Discounting (Jøsang)**:
+- Discounting operator: ω' = ω_trust ⊗ ω_source
+- Formula: (b_t·b_x, b_t·d_x + d_t, u_t + b_t·u_x, a_x)
+- Trust dilution in transitive chains
+- **Key for CLAIR undercut**: c' = c × (1 - undercut_strength)
+
+**Spohn's Ranking Theory (2012)**:
+- Ordinal rather than numerical belief measures
+- Ranking functions: κ : W → ℕ ∪ {∞}
+- Handles iterated belief revision where AGM fails
+- Potential ordinal alternative if calibration issues arise
+
+**Jeffrey Conditioning (Probability Kinematics)**:
+- Extends Bayesian conditioning to uncertain evidence
+- P_new(A) = P_old(A|B)·P_new(B) + P_old(A|¬B)·P_new(¬B)
+- Preserves conditional probabilities through update
+- Potential for uncertain defeat propagation
+
+**Key design decisions for CLAIR**:
+- Undercut uses multiplicative discounting: c' = c × (1 - d)
+- Rebut uses probabilistic comparison: c' = c_for / (c_for + c_against)
+- Different operations for different semantic roles
+
+See exploration/thread-2.10-defeat-confidence.md for detailed analysis.

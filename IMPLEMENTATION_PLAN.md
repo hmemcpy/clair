@@ -37,7 +37,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **2.9** Proposed DAG structure with labeled edges (support, undercut, rebut)
 
 **New tasks discovered (Session 9)**:
-- [ ] **2.10 Defeat confidence propagation** - How does confidence decrease when undercut? Multiplicative? Subtractive? Discounting?
+- [x] **2.10 Defeat confidence propagation** - ANSWERED Session 12: Undercut = multiplicative discounting c×(1-d); Rebut = probabilistic comparison c/(c+d). See exploration/thread-2.10-defeat-confidence.md
 - [ ] **2.11 Aggregation confidence** - How do independent lines of evidence combine? (Subjective Logic fusion?)
 - [ ] **2.12 Reinstatement** - What happens when a defeater is itself defeated?
 - [ ] **2.13 Correlated evidence** - How does aggregation handle correlated (not independent) evidence?
@@ -392,10 +392,59 @@ This is not a software implementation plan—it's a research exploration plan. E
     - ⊕ for aggregation of independent evidence (multiple supports)
     - Choice depends on justification structure (Thread 2)
 
-55. **Defeat operations remain the key open question**:
-    - How undercut/rebut edges affect confidence is NOT formalized
-    - Task 2.10 is now high priority
-    - Options: subtractive, multiplicative discounting, ranking theory
+55. **Defeat operations ANSWERED (Session 12)**:
+    - Undercut: multiplicative discounting c' = c × (1 - d)
+    - Rebut: probabilistic comparison c' = c_for / (c_for + c_against)
+    - See exploration/thread-2.10-defeat-confidence.md for full analysis
+
+### Session 12 Discoveries (Thread 2.10 Defeat Confidence)
+
+56. **DEFEAT CONFIDENCE PROPAGATION ANSWERED** — Two distinct operations for two types of defeat.
+
+57. **Undercutting defeat uses multiplicative discounting**:
+    - Formula: c' = c × (1 - defeat_strength)
+    - Always preserves [0,1] bounds without clamping
+    - Compositional: multiple undercuts compose via d_combined = d₁ ⊕ d₂ ⊕ ... ⊕ dₙ
+    - Aligns with Subjective Logic discounting operator
+    - Probabilistic interpretation: (1-d) is "survival probability" of inference
+
+58. **Rebutting defeat uses probabilistic comparison**:
+    - Formula: c' = c_for / (c_for + c_against)
+    - Treats for/against symmetrically
+    - Equal arguments → 0.5 (maximal uncertainty)
+    - Overwhelming argument → approaches 1 or 0
+    - "Market share" interpretation
+
+59. **Undercut ≠ Rebut (semantic difference)**:
+    - Undercut attacks the *inference link*, not the conclusion
+    - Rebut attacks the *conclusion* directly with counter-evidence
+    - Different mathematical treatment is principled, not arbitrary
+
+60. **Key mathematical properties verified**:
+    - P1 Boundedness: Both operations preserve [0,1]
+    - P2 Monotonicity in confidence: Stronger beliefs remain stronger after same defeat
+    - P3 Monotonicity in defeat: Stronger defeat reduces confidence more
+    - P4 Identity: defeat(c, 0) = c
+    - P5 Annihilation: undercut(c, 1) → 0
+    - P6 Compositionality: undercut(undercut(c, d₁), d₂) = undercut(c, d₁ ⊕ d₂)
+
+61. **Prior art surveyed for defeat**:
+    - Pollock (1987, 2001): Defeater taxonomy, weakest link principle
+    - Dung (1995): Abstract argumentation frameworks (qualitative)
+    - Gradual semantics (Amgoud, Ben-Naim): Weighted argumentation
+    - Subjective Logic discounting (Jøsang): Trust propagation
+    - Spohn's ranking theory: Ordinal alternative
+    - Jeffrey conditioning: Probability kinematics
+
+62. **Order matters for mixed defeat**:
+    - Apply undercuts first (weaken inference)
+    - Then compare against rebuts (weighted pool)
+    - Evaluation order: supports → undercuts → rebuts
+
+63. **Remaining questions for defeat**:
+    - Reinstatement when defeater is defeated (Task 2.12)
+    - Correlated evidence in defeat contexts (Task 2.13)
+    - Fixed-point semantics for cyclic defeat (A defeats B defeats C defeats A)
 
 ## Impossibilities Encountered
 

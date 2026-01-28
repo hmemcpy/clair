@@ -256,7 +256,10 @@ What I believe I know:
 | (⊕, ×) form semiring | 0.05 | **REFUTED** Session 11: distributivity fails | Find alternative proof | ✗ False |
 | Three monoid structures work | 0.95 | Session 11: (×,1), (min,1), (⊕,0) | Implementation failure | ✓ Session 11 |
 | min(a,b) ≥ a×b | 0.99 | Session 11: algebraic proof | None (mathematical) | ✓ Proven |
-| Defeat propagation open | 1.0 | Session 11: not formalized | Formalization found | ⚠ Task 2.10 |
+| Defeat propagation open | 0.10 | **ANSWERED** Session 12 | Better model found | ✓ Session 12 |
+| Undercut uses multiplicative discounting | 0.90 | Session 12: c × (1-d), aligns with Subjective Logic | Better model found | ✓ Session 12 |
+| Rebut uses probabilistic comparison | 0.85 | Session 12: c/(c+d), symmetric treatment | Better model found | ✓ Session 12 |
+| Defeat ≠ rebut (different math) | 0.95 | Session 12: different semantic meanings | Find unifying model | ✓ Session 12 |
 
 ---
 
@@ -570,3 +573,58 @@ Task 2.10 (defeat confidence propagation) is now recognized as a key open questi
 - **Output**: exploration/thread-8-verification.md §12
 - **Status**: Task 8.6 (Confidence operations) COMPLETE
 - **Next**: Task 8.7 (prove boundedness preservation in Lean 4) or Task 2.10 (defeat propagation)
+
+### Session 12: Thread 2.10 Exploration (DEFEAT CONFIDENCE)
+- **Explored Task 2.10: How does defeat affect confidence?**
+- **CORE QUESTION ANSWERED**: Defeat requires two distinct mathematical treatments
+- **Undercutting defeat**: Multiplicative discounting
+  ```
+  c' = c × (1 - defeat_strength)
+  ```
+  - Always preserves [0,1] bounds
+  - Compositional: multiple undercuts combine naturally
+  - Aligns with Subjective Logic discounting
+  - Probabilistic interpretation: (1-d) is "survival probability"
+- **Rebutting defeat**: Probabilistic comparison
+  ```
+  c' = c_for / (c_for + c_against)
+  ```
+  - Treats for/against symmetrically
+  - Equal arguments → 0.5 (maximal uncertainty)
+  - Intuitive "market share" interpretation
+- **Prior art surveyed**:
+  - Pollock (1987, 2001): Defeater taxonomy, weakest link principle
+  - Dung (1995): Abstract argumentation frameworks
+  - Gradual/weighted argumentation semantics (Amgoud, Ben-Naim)
+  - Subjective Logic discounting (Jøsang)
+  - Spohn's ranking theory (ordinal alternative)
+  - Jeffrey conditioning (probability kinematics)
+- **Mathematical properties verified**:
+  - P1 Boundedness: Both operations preserve [0,1]
+  - P2 Monotonicity in confidence: Stronger beliefs remain stronger
+  - P3 Monotonicity in defeat: Stronger defeat reduces more
+  - P4 Identity: defeat(c, 0) = c
+  - P5 Annihilation: undercut(c, 1) → 0
+  - P6 Compositionality: Sequential undercuts compose via ⊕
+- **Multiple defeaters**:
+  - Multiple undercuts: d_combined = d₁ ⊕ d₂ ⊕ ... ⊕ dₙ, then c' = c × (1 - d_combined)
+  - Multiple rebuts: c' = Σ(pro_arguments) / Σ(all_arguments)
+  - Mixed: Apply undercuts first, then rebuts
+- **Connection to CLAIR design**:
+  - EdgeEffect type with support/undercut/rebut variants
+  - DAG evaluation order: supports → undercuts → rebuts
+- **Lean 4 formalization sketched**:
+  - `undercut : Confidence → Confidence → Confidence`
+  - `rebut : Confidence → Confidence → Confidence`
+  - Theorems for boundedness, monotonicity, identity
+- **Output**: exploration/thread-2.10-defeat-confidence.md
+- **Status**: Task 2.10 (Defeat confidence propagation) SUBSTANTIALLY COMPLETE
+- **Remaining questions**:
+  - Reinstatement when defeater is defeated (Task 2.12)
+  - Correlated evidence in defeat contexts (Task 2.13)
+  - Fixed-point semantics for cyclic defeat
+- **Beliefs updated**:
+  - "Defeat propagation open" → ANSWERED (confidence: 0.10 → task was open, now solved)
+  - "Undercut uses multiplicative discounting" → ESTABLISHED (confidence: 0.90)
+  - "Rebut uses probabilistic comparison" → ESTABLISHED (confidence: 0.85)
+  - "Defeat ≠ rebut (different math)" → ESTABLISHED (confidence: 0.95)
