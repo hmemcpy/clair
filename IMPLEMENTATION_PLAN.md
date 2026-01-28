@@ -221,12 +221,12 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 **Status**: ✓ ACTIVE - Tasks 8.5, 8.6, 8.7, 8.8 complete. See exploration/thread-8-verification.md. HIGH PRIORITY.
 
 - [x] **8.1 Lean 4 formalization start** - DESIGN COMPLETE Session 61. CLAIR syntax formalization designed: de Bruijn indices for variables, graded types `Belief<A>[c]`, typing relation `Γ ⊢ e : A @c`, operational semantics with `Step`. Key findings: (1) De Bruijn indices best for list contexts, (2) Rational confidence bounds for decidability, (3) Confidence may decrease during evaluation (preservation gives c' ≤ c), (4) Dual-monoid structure preserved in typing rules. Implementation phases identified: syntax → type safety → confidence soundness → extraction. See exploration/thread-8.12-clair-syntax-lean.md.
-- [ ] **8.1-impl** Implement CLAIR syntax in Lean 4 - Create `formal/lean/CLAIR/Syntax/` and `formal/lean/CLAIR/Typing/` modules per design.
+- [x] **8.1-impl** Implement CLAIR syntax in Lean 4 - COMPLETED Session 64. Created `formal/lean/CLAIR/Syntax/` with Types.lean (type grammar), Expr.lean (expression grammar with de Bruijn indices), Context.lean (typing contexts), Subst.lean (substitution). Created `formal/lean/CLAIR/Typing/` with Subtype.lean (subtyping relation), HasType.lean (typing judgment Γ ⊢ e : A @c). Created `formal/lean/CLAIR/Semantics/Step.lean` (small-step operational semantics). All CLAIR constructs from Thread 2.22 implemented: derivation, aggregation, undercut, rebut, stratified introspection. Proofs for progress/preservation are statements only (Tasks 8.2-8.3). See exploration/thread-8.1-impl-syntax-implementation.md.
 - [ ] **8.2 Type safety** - Prove progress and preservation for CLAIR type system.
 - [ ] **8.3 Confidence soundness** - Prove confidence propagation preserves [0,1] bounds.
 - [ ] **8.4 Extract interpreter** - Extract runnable interpreter from Lean formalization.
 
-**Note**: Semantic types (Confidence, Belief, StratifiedBelief) are complete in formal/lean/. Syntax formalization designed but not yet implemented.
+**Note**: Semantic types (Confidence, Belief, StratifiedBelief) are complete in formal/lean/. Syntax formalization (Types, Expr, Context, Subst, HasType, Subtype, Step) implemented Session 64. Type safety proofs (progress, preservation) remain as Tasks 8.2-8.3.
 **Ready**: Thread 1 formalization path identified. Theorems sketched. Can begin.
 
 **Suggested starting point**:
@@ -2048,6 +2048,56 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Lean4Lean (Lean typechecker verified in Lean)
     - Parametric Higher-Order Abstract Syntax considered but rejected
     - Locally nameless considered but de Bruijn chosen for simplicity
+
+### Session 64 Discoveries (Task 8.1-impl CLAIR Syntax Implementation)
+
+323. **CLAIR SYNTAX FORMALIZATION IMPLEMENTED** — Full implementation in Lean 4 following Thread 8.12 design.
+
+324. **Seven new Lean 4 modules created**:
+    - `CLAIR/Syntax/Types.lean` - Type grammar with BaseTy, Ty inductive, ConfBound, well-formedness
+    - `CLAIR/Syntax/Expr.lean` - Expression grammar with de Bruijn indices, IsValue predicate, Justification type
+    - `CLAIR/Syntax/Context.lean` - Typing contexts as `List CtxEntry`, lookup, extension, well-formedness
+    - `CLAIR/Syntax/Subst.lean` - Substitution with shift and subst functions, preservation lemmas
+    - `CLAIR/Typing/Subtype.lean` - Subtyping relation with transitivity, inversion lemmas
+    - `CLAIR/Typing/HasType.lean` - Full typing judgment `Γ ⊢ e : A @c` with all CLAIR rules
+    - `CLAIR/Semantics/Step.lean` - Small-step operational semantics with call-by-value
+
+325. **All CLAIR-specific typing rules implemented**:
+    - Derivation: `HasType Γ (derive e₁ e₂) (Belief<A×B>[c₁×c₂]) (c_e₁ × c_e₂)`
+    - Aggregation: `HasType Γ (aggregate e₁ e₂) (Belief<A>[c₁⊕c₂]) (c_e₁ ⊕ c_e₂)`
+    - Undercut: `HasType Γ (undercut e d) (Belief<A>[c×(1-d_c)]) (c_e × c_d)`
+    - Rebut: `HasType Γ (rebut e_for e_against) (Belief<A>[c_for/(c_for+c_against)]) ...`
+    - Introspect: Level constraint `m < n`, Löb discount `c²`
+    - Subsumption: Subtyping + confidence weakening
+
+326. **All CLAIR-specific reduction rules implemented**:
+    - `deriveBeta`: Creates pair with multiplied confidence
+    - `aggregateBeta`: Uses ⊕ for confidence combination
+    - `undercutBeta`: Applies `c × (1 - d)` formula
+    - `rebutBeta`: Applies `c_for / (c_for + c_against)` formula
+    - Justification tracking via Justification type
+
+327. **Key design decisions confirmed in implementation**:
+    - De Bruijn indices work correctly with list contexts
+    - Rational confidence bounds (ℚ) enable decidable operations
+    - Graded judgments carry confidence at judgment level and type level
+    - Confidence can decrease during evaluation (preservation gives c' ≤ c)
+    - Subtyping: higher confidence is subtype (opposite from resource grading)
+
+328. **Type safety theorem statements added** (proofs are Tasks 8.2-8.3):
+    - `progress_statement`: Closed well-typed term is value or can step
+    - `preservation_statement`: Stepping preserves type, confidence may decrease
+    - `type_safety_statement`: Well-typed terms don't get stuck
+
+329. **Implementation follows semantic/syntactic distinction**:
+    - `CLAIR/Confidence/` and `CLAIR/Belief/` are semantic (runtime values)
+    - `CLAIR/Syntax/`, `CLAIR/Typing/`, `CLAIR/Semantics/` are syntactic (term language)
+    - Connection via semantic interpretation function (Task 8.3)
+
+330. **Thread 8 status advanced**: Task 8.1-impl complete. Remaining:
+    - Task 8.2: Prove progress and preservation (requires weakening, substitution lemmas)
+    - Task 8.3: Prove confidence soundness (connect syntax to semantic types)
+    - Task 8.4: Extract runnable interpreter
 
 ## Impossibilities Encountered
 

@@ -430,8 +430,8 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 8: Formal Verification Strategy
-**Status**: ✓ SYNTAX FORMALIZATION DESIGNED (Session 61)
-**Depth**: Deep - Confidence operations + core Belief + stratified beliefs formalized in Lean 4; syntax design complete
+**Status**: ✓ SYNTAX FORMALIZATION IMPLEMENTED (Session 64)
+**Depth**: Deep - Confidence operations + core Belief + stratified beliefs + SYNTAX formalized in Lean 4
 
 **Lean 4 Project Created (Sessions 31, 48, 49)**:
 - `formal/lean/` - Complete Lean 4 project with Mathlib 4 dependency
@@ -503,9 +503,22 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - Module organization designed: Syntax/ (types, expr, subst, context), Typing/ (HasType, Subtype), Semantics/ (Step, Eval), Safety/ (Progress, Preservation)
 - Implementation phases: (1) syntax definitions → (2) type safety proofs → (3) confidence soundness → (4) interpreter extraction
 
+**CLAIR Syntax Implementation (Session 64)**:
+- **Task 8.1-impl complete** - see exploration/thread-8.1-impl-syntax-implementation.md
+- Created `CLAIR/Syntax/Types.lean` - Type grammar with BaseTy, Ty, ConfBound
+- Created `CLAIR/Syntax/Expr.lean` - Expression grammar with de Bruijn indices, IsValue predicate
+- Created `CLAIR/Syntax/Context.lean` - Typing contexts as `List CtxEntry`
+- Created `CLAIR/Syntax/Subst.lean` - Substitution with shift/subst, preservation lemmas
+- Created `CLAIR/Typing/Subtype.lean` - Subtyping relation with transitivity proof
+- Created `CLAIR/Typing/HasType.lean` - Full typing judgment `Γ ⊢ e : A @c`
+- Created `CLAIR/Semantics/Step.lean` - Small-step operational semantics, multi-step
+- All CLAIR-specific rules implemented: derive, aggregate, undercut, rebut, introspect
+- Type safety theorems stated (proofs are Tasks 8.2-8.3)
+
 **Questions remaining**:
-- Q8.2: Natural language intents remain outside formalization scope
-- Q8.3: Extraction to working interpreter (rebut is noncomputable due to division)
+- Q8.2: Type safety proofs (progress, preservation) - Task 8.2
+- Q8.3: Confidence soundness (connect syntax to semantics) - Task 8.3
+- Q8.4: Extraction to working interpreter - Task 8.4
 - Q8.10: Phases 2, 4 (justification graph, full metadata)
 - Q8.12: Polymorphic level operations
 - Q8.13: Level inference in Lean
