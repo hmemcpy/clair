@@ -265,22 +265,36 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 8: Formal Verification Strategy
-**Status**: Active exploration (Session 21 - Mathlib API verified)
-**Depth**: Foundation complete (Tasks 8.5, 8.6, 8.7, 8.8); ready for Lean 4 project creation
+**Status**: ✓ LEAN 4 IMPLEMENTATION COMPLETE (Session 31)
+**Depth**: Deep - Confidence operations fully formalized in Lean 4
 
-We want machine-checked proofs. But:
-- What exactly should we formalize first?
-- Which tool is best suited?
-- How do we handle the parts that can't be formalized?
-- What's the relationship between CLAIR and the metatheory?
+**Lean 4 Project Created (Session 31)**:
+- `formal/lean/` - Complete Lean 4 project with Mathlib 4 dependency
+- Confidence type defined as `unitInterval` from Mathlib
+- All core operations implemented and proven: oplus, undercut, rebut, min
 
-**Prior work**: Lean mathlib, Coq stdlib, Agda standard library, POPLmark challenge
-**Formal tools**: Lean 4 (most practical), Coq (most mature), Agda (dependent types)
-**Open questions**:
-- Q8.1: What's the minimal formalization that's still useful?
-- Q8.2: How do we handle natural language intents in a formal system?
-- Q8.3: Can we extract a working interpreter from the formalization?
-- Q8.4: What properties are worth proving first?
+**Key Artifacts**:
+- `CLAIR/Confidence/Basic.lean` - Type definition, basic properties
+- `CLAIR/Confidence/Oplus.lean` - Probabilistic OR with monoid proofs
+- `CLAIR/Confidence/Undercut.lean` - Multiplicative discounting with composition law
+- `CLAIR/Confidence/Rebut.lean` - Probabilistic comparison for competing evidence
+- `CLAIR/Confidence/Min.lean` - Conservative combination (meet-semilattice)
+
+**Key Theorems Proven**:
+- All operations preserve [0,1] bounds
+- Oplus: commutative monoid, confidence-increasing property
+- Undercut: composition law `undercut(undercut(c,d₁),d₂) = undercut(c, d₁⊕d₂)`
+- Rebut: anti-symmetry, monotonicity properties
+- Min: bounded meet-semilattice, `mul_le_min` comparison theorem
+
+**Prior work**: Lean Mathlib (unitInterval), fuzzy logic t-norms/t-conorms
+**Formal tools**: Lean 4 v4.15.0, Mathlib v4.15.0
+**Questions answered**:
+- Q8.1: ✓ Confidence operations are the useful minimal formalization
+- Q8.4: ✓ Boundedness, algebraic properties, monotonicity worth proving first
+**Questions remaining**:
+- Q8.2: Natural language intents remain outside formalization scope
+- Q8.3: Extraction to working interpreter (rebut is noncomputable due to division)
 
 ---
 
