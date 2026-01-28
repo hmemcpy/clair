@@ -44,8 +44,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 2: The Structure of Justification
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53, 54, 55)
-**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md, thread-2.20-completeness.md, thread-2.25-dual-monoid-grading.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53, 54, 55, 56)
+**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md, thread-2.20-completeness.md, thread-2.25-dual-monoid-grading.md, thread-2.18-conservative-extension.md)
 
 **Core question answered**: Are trees adequate for justification? **NO.**
 
@@ -113,10 +113,19 @@ What IS confidence for an LLM?
 - Standard graded type theory (semiring grades) doesn't apply; CLAIR needs weaker bimonoid structure
 - See exploration/thread-2.25-dual-monoid-grading.md
 
+**Findings (Session 56) - Conservative Extension**:
+- **CLAIR is conservative over JL for JL-fragment at confidence 1**: When restricted to JL-expressible formulas, CLAIR derivations at c=1 correspond exactly to JL derivations
+- **CLAIR is NOT conservative in general**: Graded confidence (c < 1), defeat (undercut, rebut), and aggregation (vs choice) are genuine extensions
+- The extension is orthogonal in three dimensions: Binary→Graded, Positive→Positive+Defeat, Choice→Choice+Aggregation
+- Adding JL-compatible Choice construct (confidence = max) would clarify relationship with JL's sum (+)
+- JL's decidability and meta-theory transfer to CLAIR's conservative fragment
+- See exploration/thread-2.18-conservative-extension.md
+
 **Questions remaining**:
 - Q2.2: How do I (Claude) actually form beliefs? → Thread 9
-- Q2.15: Should CLAIR add JL-style Choice construct?
+- Q2.15: Should CLAIR add JL-style Choice construct? (Confirmed needed by Session 56)
 - Q2.17: Justification equivalence via normal forms
+- Q2.18: ✓ Conservative extension over JL proven for JL-fragment — Session 56
 - Q2.20: ✓ Completeness proven for rational confidence — Session 54
 - Q2.21: Decidable fragments (informed by 2.20: finite model property yields decidability)
 - Q2.22: ✓ Proof terms (Curry-Howard) — Session 53

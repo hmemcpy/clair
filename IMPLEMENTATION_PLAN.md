@@ -54,7 +54,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [ ] **2.15 Add Choice construct** - For JL-compatibility, should CLAIR add JL-style sum (choice of justifications)? Different from aggregation. Confidence = max(alternatives)?
 - [x] **2.16 Sequent calculus for CLAIR** - COMPLETED Session 51: Full sequent calculus designed with graded judgments Γ ⊢ A @c : j. Structural rules (Id, Cut, Weak, Contr with aggregation), logical rules (∧, →), defeat rules (Undercut, Rebut), aggregation rule, and stratified belief rules. Cut elimination conjectured. Soundness theorem stated. See exploration/thread-2.16-sequent-calculus.md
 - [ ] **2.17 Justification equivalence** - When are two CLAIR justification DAGs "equivalent"? Normal forms? (Informed by 2.16: cut-free derivations define equivalence via normal forms)
-- [ ] **2.18 Conservative extension** - Is CLAIR a conservative extension of JL? Formalize relationship (Informed by 2.16: sequent calculus enables precise formulation)
+- [x] **2.18 Conservative extension** - SUBSTANTIALLY COMPLETE Session 56: CLAIR is a conservative extension of JL for the JL-fragment at confidence 1. Key findings: (1) When restricted to JL-expressible formulas without defeat and with confidence = 1, CLAIR derivations correspond exactly to JL derivations, (2) CLAIR is NOT conservative in general—graded confidence (c < 1), defeat operations (undercut, rebut), and aggregation (vs JL's choice/sum) are genuine extensions, (3) The extension is orthogonal in three dimensions: Binary→Graded confidence, Positive-only→Positive+Defeat, Choice→Choice+Aggregation, (4) Adding a JL-compatible Choice construct (max confidence) distinct from aggregation (⊕ combination) would clarify the relationship, (5) JL's decidability and meta-theory transfer to CLAIR's conservative fragment. See exploration/thread-2.18-conservative-extension.md
 
 **New tasks discovered (Session 51)**:
 - [x] **2.19 Cut elimination proof** - SUBSTANTIALLY COMPLETE Session 52: Cut elimination theorem proven for CLAIR's graded sequent calculus. Key findings: (1) Standard Gentzen double-induction strategy applies with modifications for graded judgments, (2) Confidence may decrease during cut elimination (c' ≤ c) - this is semantically correct, (3) Defeat rules (undercut, rebut) are NOT cuts - they permute with cut but are not eliminated, (4) Aggregative contraction (⊕) requires premise duplication but doesn't break termination, (5) Subformula property, consistency, and type safety connection established. See exploration/thread-2.19-cut-elimination.md
@@ -1846,6 +1846,46 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - De Morgan bimonoid characterizes CLAIR: 0.85 (captures all operations and duality)
     - Type system doesn't need distributivity: 0.90 (structural separation of operations)
     - This is novel for graded type theory: 0.70 (not found in standard literature)
+
+### Session 56 Discoveries (Task 2.18 Conservative Extension)
+
+285. **CLAIR IS CONSERVATIVE OVER JL FOR THE JL-FRAGMENT** — When restricted to JL-expressible formulas (no defeat, confidence = 1), CLAIR derivability corresponds exactly to JL derivability.
+
+286. **Three orthogonal dimensions of extension established**:
+    - **Confidence dimension**: Binary (JL: justified/not) → Graded (CLAIR: [0,1])
+    - **Polarity dimension**: Positive-only (JL) → Positive + Defeat (CLAIR: undercut, rebut)
+    - **Combination dimension**: Choice (JL: sum +) → Choice + Aggregation (CLAIR: also ⊕)
+
+287. **Translation functions defined**:
+    - JL → CLAIR: Full embedding at confidence 1 with justification term translation
+    - CLAIR → JL: Partial (lossy) — loses c < 1, defeat, and aggregation semantics
+
+288. **JL's sum (+) ≠ CLAIR's aggregation (⊕)**:
+    - JL sum: "t OR s suffices" — confidence = max(alternatives)
+    - CLAIR aggregate: "t AND s both contribute" — confidence = c₁ ⊕ c₂
+    - Confirms Task 2.15: CLAIR should add JL-compatible Choice construct
+
+289. **Conservative extension proof established**:
+    - Forward: JL ⊢ φ ⟹ CLAIR ⊢ ⟦φ⟧ @ 1 (by rule correspondence)
+    - Backward: CLAIR ⊢ ⟦φ⟧ @ 1 ⟹ JL ⊢ φ (by cut elimination preserving c = 1)
+    - Key insight: Confidence 1 is preserved through all rules without defeat
+
+290. **Non-conservative aspects characterized**:
+    - Graded confidence: JL cannot express "justified with c = 0.8"
+    - Defeat: JL has no undercut or rebut mechanisms
+    - Aggregation: Evidence combination ⊕ differs from choice semantics
+    - Each is a genuine extension, not redundant reformulation
+
+291. **Implications for formal verification**:
+    - JL meta-theory (decidability, realization) transfers to CLAIR's conservative fragment
+    - Lean proofs for JL-fragment can leverage established JL results
+    - Novel verification needed only for CLAIR-specific features (defeat, grading)
+
+292. **Confidence assessment**:
+    - Conservative for JL₁ fragment: 0.90 (proof sketch verified)
+    - Non-conservative for graded confidence: 0.95 (JL cannot express)
+    - Non-conservative for defeat: 0.95 (JL lacks mechanism)
+    - Aggregation ≠ Sum semantically: 0.90 (clear semantic difference)
 
 ## Impossibilities Encountered
 
