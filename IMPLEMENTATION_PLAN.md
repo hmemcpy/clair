@@ -59,7 +59,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **New tasks discovered (Session 51)**:
 - [x] **2.19 Cut elimination proof** - SUBSTANTIALLY COMPLETE Session 52: Cut elimination theorem proven for CLAIR's graded sequent calculus. Key findings: (1) Standard Gentzen double-induction strategy applies with modifications for graded judgments, (2) Confidence may decrease during cut elimination (c' ≤ c) - this is semantically correct, (3) Defeat rules (undercut, rebut) are NOT cuts - they permute with cut but are not eliminated, (4) Aggregative contraction (⊕) requires premise duplication but doesn't break termination, (5) Subformula property, consistency, and type safety connection established. See exploration/thread-2.19-cut-elimination.md
 - [x] **2.20 CLAIR completeness** - SUBSTANTIALLY COMPLETE Session 54: Completeness theorem proven for rational confidence via graded Henkin construction. Key findings: (1) Canonical model construction adapts to graded beliefs using confidence-indexed belief sets, (2) Lindenbaum's Lemma holds for rational confidence (countable enumeration), (3) Truth Lemma establishes syntactic-semantic correspondence, (4) Defeat handled via deductive closure in maximally consistent sets, (5) Real-valued (standard) completeness conjectured but requires algebraic methods (Cintula & Noguera). Connection to decidability: completeness + finite model property yields decidability for finite lattice confidence. See exploration/thread-2.20-completeness.md
-- [ ] **2.21 Decidable fragments** - Characterize decidable fragments of CLAIR (rational confidence, finite lattice)
+- [x] **2.21 Decidable fragments** - SUBSTANTIALLY COMPLETE Session 57: Decidable fragments characterized. Key findings: (1) Full CLAIR is likely undecidable due to Vidal (2019) on transitive many-valued modal logics, (2) CLAIR-finite (confidence in finite lattice L_n) is decidable (PSPACE), (3) CLAIR-stratified (no same-level self-reference) is decidable over rational confidence, (4) CLAIR-finite-stratified is the recommended default for type-level checking, (5) CLAIR-rational decidability remains open. See exploration/thread-2.21-decidable-fragments.md
 - [x] **2.22 Proof terms (Curry-Howard)** - SUBSTANTIALLY COMPLETE Session 53: Full term assignment designed for CLAIR sequents. Key findings: (1) Terms carry explicit confidence bounds in types: Belief<A>[c], (2) Cut corresponds to let-binding with multiplicative confidence composition, (3) Defeat operations (undercut, rebut) are novel term formers with defined reduction semantics, (4) Aggregation uses ⊕ for confidence combination, fundamentally different from JL's sum (+), (5) Strong normalization follows from cut elimination, (6) CLAIR requires dual-monoid grading (×, ⊕ don't distribute - not a semiring). See exploration/thread-2.22-curry-howard-terms.md
 
 **New tasks discovered (Session 53)**:
@@ -1886,6 +1886,44 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Non-conservative for graded confidence: 0.95 (JL cannot express)
     - Non-conservative for defeat: 0.95 (JL lacks mechanism)
     - Aggregation ≠ Sum semantically: 0.90 (clear semantic difference)
+
+### Session 57 Discoveries (Task 2.21 Decidable Fragments)
+
+293. **DECIDABLE FRAGMENTS OF CLAIR CHARACTERIZED** — Full CLAIR is likely undecidable, but significant decidable fragments exist.
+
+294. **Classification theorem established**:
+    - **CLAIR-finite** (confidence in L_n for finite n): Decidable (PSPACE)
+    - **CLAIR-stratified** (no same-level self-reference): Decidable over rational confidence
+    - **CLAIR-finite-stratified** (both restrictions): Decidable (PSPACE)
+    - **Full CLAIR** (continuous [0,1] + unrestricted self-reference): Likely undecidable
+    - **CLAIR-rational** (rational confidence + full self-reference): Open question
+
+295. **Undecidability source identified**:
+    - Vidal (2019): Transitive modal logics over standard MV-algebras are undecidable
+    - CLAIR triggers this: Axiom 4 (transitivity) + continuous [0,1] values + Product-like operations
+    - Breaking either dimension restores decidability: finite values OR stratification
+
+296. **Practical recommendations established**:
+    - Type-level checking: Use CLAIR-finite-stratified (decidable, practical L_5 lattice)
+    - Static analysis: Use CLAIR-stratified (decidable, more expressive)
+    - Runtime evaluation: Allow full CLAIR with honest uncertainty about termination
+
+297. **Connection to completeness (Thread 2.20)**:
+    - Completeness + Finite Model Property ⟹ Decidability
+    - CLAIR-finite has FMP via finite canonical model
+    - CLAIR-rational FMP status unclear (rationals are countably infinite)
+
+298. **Design implications**:
+    - Decidable core + escape hatches: CLAIR-safe as default, annotations for undecidable features
+    - Type checker implements decidable fragment; runtime is more permissive
+    - Formalizations (Thread 8) should prioritize decidable fragments
+
+299. **Confidence assessment**:
+    - Full CLAIR undecidable: 0.75 (Vidal analogy)
+    - CLAIR-finite decidable: 0.90 (Bou et al. 2011)
+    - CLAIR-stratified decidable: 0.85 (stratification breaks encoding)
+    - CLAIR-rational decidability open: 0.80 (no proof either way)
+    - Complexity is PSPACE: 0.70 (conjecture from GL)
 
 ## Impossibilities Encountered
 

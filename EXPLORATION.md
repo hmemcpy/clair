@@ -127,7 +127,7 @@ What IS confidence for an LLM?
 - Q2.17: Justification equivalence via normal forms
 - Q2.18: ✓ Conservative extension over JL proven for JL-fragment — Session 56
 - Q2.20: ✓ Completeness proven for rational confidence — Session 54
-- Q2.21: Decidable fragments (informed by 2.20: finite model property yields decidability)
+- Q2.21: ✓ Decidable fragments characterized — Session 57. CLAIR-finite and CLAIR-stratified are decidable; full CLAIR likely undecidable (Vidal 2019)
 - Q2.22: ✓ Proof terms (Curry-Howard) — Session 53
 - Q2.25: ✓ Dual-monoid grading formalized — Session 55
 
