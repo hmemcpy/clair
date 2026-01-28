@@ -44,8 +44,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 2: The Structure of Justification
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53)
-**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52, 53, 54)
+**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md, thread-2.22-curry-howard-terms.md, thread-2.20-completeness.md)
 
 **Core question answered**: Are trees adequate for justification? **NO.**
 
@@ -97,12 +97,20 @@ What IS confidence for an LLM?
 - Q2.4: ✓ CLAIR extends JL; formal mapping established (Session 50)
 - Q2.16: ✓ Sequent calculus designed (Session 51)
 - Q2.19: ✓ Cut elimination proven (Session 52)
+**Findings (Session 54) - Completeness**:
+- **Completeness proven for rational confidence** via graded Henkin construction
+- Canonical model: Worlds = maximally consistent belief sets, confidence-indexed membership
+- Truth Lemma: M_c, Σ ⊨ A @c : j iff (A, c, j) ∈ Σ (syntactic-semantic correspondence)
+- Defeat handled via deductive closure in maximally consistent sets
+- Real-valued (standard) completeness conjectured but requires algebraic methods
+- Connection to decidability: completeness + finite model property ⟹ decidability for finite lattices
+
 **Questions remaining**:
 - Q2.2: How do I (Claude) actually form beliefs? → Thread 9
 - Q2.15: Should CLAIR add JL-style Choice construct?
 - Q2.17: Justification equivalence via normal forms
-- Q2.20: CLAIR completeness
-- Q2.21: Decidable fragments
+- Q2.20: ✓ Completeness proven for rational confidence — Session 54
+- Q2.21: Decidable fragments (informed by 2.20: finite model property yields decidability)
 - Q2.22: ✓ Proof terms (Curry-Howard) — Session 53
 
 ---
