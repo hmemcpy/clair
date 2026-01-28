@@ -1383,6 +1383,43 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 
 211. **Dissertation progress**: Chapters 1-8 complete (Introduction, Background, Confidence, Justification, Self-Reference, Grounding, Belief Revision, Multi-Agent). Remaining: Chapters 9-13 and appendices (~185 pages complete, ~60 remaining).
 
+### Session 41 Discoveries (Task 10.1i Dissertation Chapter 9 Complete)
+
+212. **DISSERTATION CHAPTER 9 COMPLETE** — Formal Verification (~20 pages) written.
+
+213. **Chapter structure**:
+    - The case for machine-checked proofs
+    - What formalization proves vs. does not prove (type correctness vs. semantic adequacy)
+    - Choice of Lean 4 with Mathlib
+    - Confidence type definition via unitInterval
+    - Probabilistic OR (⊕): definition, boundedness, monoid structure, increases confidence
+    - Undercut defeat: definition, composition theorem (undercuts compose via ⊕)
+    - Rebut defeat: definition (noncomputable), antisymmetry
+    - Minimum: conservative combination, mul_le_min theorem
+    - Three-monoid structure (NOT a semiring) with counterexample
+    - T-norm/t-conorm connection to fuzzy logic
+    - Project structure and Mathlib dependencies
+    - Limitations and future work (justification, stratification, revision)
+
+214. **Key formalizations presented**:
+    - Definition: Unit Interval (Mathlib's Set.Icc 0 1)
+    - Lemma: Confidence Bounds (nonneg, le_one)
+    - Theorem: Oplus Algebraic Properties (commutative monoid)
+    - Theorem: Oplus Increases Confidence (a ⊕ b ≥ max(a, b))
+    - Theorem: Undercut Composition Law (undercut(undercut(c, d₁), d₂) = undercut(c, d₁ ⊕ d₂))
+    - Theorem: Rebut Anti-Symmetry (rebut(a, b) + rebut(b, a) = 1)
+    - Theorem: Multiplication-Minimum Comparison (a × b ≤ min(a, b))
+    - Theorem: Confidence Algebra Structure (three monoids, not semiring with counterexample)
+
+215. **Key insights**:
+    - Formalization proves type correctness but not semantic adequacy
+    - Mathlib's unitInterval is exact match for CLAIR confidence
+    - Undercut composition via ⊕ elegantly connects defeat to aggregation
+    - Rebut is noncomputable in Lean due to real division
+    - Three monoids serve different semantic purposes (sequential, conservative, parallel)
+
+216. **Dissertation progress**: Chapters 1-9 complete (Introduction, Background, Confidence, Justification, Self-Reference, Grounding, Belief Revision, Multi-Agent, Verification). Remaining: Chapters 10-13 and appendices (~205 pages complete, ~45 remaining).
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -1645,7 +1682,8 @@ With Threads 1, 2, 3 complete, priority shifts to:
 - [x] **10.1f Write Chapter 6: Epistemological Grounding** — COMPLETED Session 38. Full treatment of grounding: Agrippa's trilemma and the regress problem, classical responses (foundationalism, coherentism, infinitism), Sellars's Myth of the Given applied to LLMs, pragmatic dogmatism as CLAIR's stance, stratified coherentism architecture. Formalized GroundingType, ReliabilityMetric, Source types. Training as pragmatic grounding (not epistemic justification). Honest uncertainty as appropriate stance. Connection to self-reference and belief revision. ~20 pages. See `formal/dissertation/chapters/06-grounding.tex`.
 - [x] **10.1g Write Chapter 7: Belief Revision** — COMPLETED Session 39. Full treatment of CLAIR belief revision: extending AGM to graded DAG-structured beliefs, justification-based revision (not proposition-based), confidence recomputation algorithm with topological sort, locality/monotonicity/defeat-composition theorems, Recovery postulate correctly fails. Defeat dynamics: fixed-point existence via Brouwer, uniqueness via Banach contraction (condition b_max×d_max<1), special cases (mutual undercut, infinite chains, pure rebut). Reinstatement emerges compositionally. Implementation sketch with efficient SCC-based evaluation. Connection to TMS, ranking theory, DEL. ~25 pages. See `formal/dissertation/chapters/07-belief-revision.tex`.
 - [x] **10.1h Write Chapter 8: Multi-Agent Epistemology** — COMPLETED Session 40. Full treatment of multi-agent CLAIR: philosophical foundations (pragmatic internal realism), agent-attributed beliefs with explicit attribution, framework compatibility requirements, disagreement taxonomy (factual/evaluative/perspectival/underdetermined), belief aggregation via ⊕ with dependency adjustment for correlated agents, trust profiles with domain-specific trust and evolution, consensus protocols (majority, quorum, weighted), Arrow's theorem escape via domain restriction, multi-agent provenance, conflict resolution strategies, and collective anti-bootstrapping theorem. ~25 pages. See `formal/dissertation/chapters/08-multi-agent.tex`.
-- [ ] **10.1 Complete remaining dissertation chapters** — IN PROGRESS. Chapters 9-13 and appendices remain.
+- [x] **10.1i Write Chapter 9: Formal Verification** — COMPLETED Session 41. Full treatment of Lean 4 formalization: machine-checked proofs of confidence algebra, type definition via Mathlib's unitInterval, boundedness preservation proofs for all operations (×, min, ⊕, undercut, rebut), undercut composition theorem connecting defeat to aggregation, three-monoid structure (NOT semiring with counterexample), t-norm/t-conorm connection to fuzzy logic, project structure and dependencies, limitations (rebut noncomputable, no justification formalization yet), future work roadmap. ~20 pages. See `formal/dissertation/chapters/09-verification.tex`.
+- [ ] **10.1 Complete remaining dissertation chapters** — IN PROGRESS. Chapters 10-13 and appendices remain.
 
   **Objective**: Synthesize all exploration findings into a coherent, PhD-level academic document that formalizes CLAIR as a novel contribution to the intersection of programming language theory, epistemology, and AI reasoning.
 

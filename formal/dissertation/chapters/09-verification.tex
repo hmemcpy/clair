@@ -1,0 +1,539 @@
+% Chapter 9: Formal Verification
+% Machine-checked proofs of CLAIR's confidence algebra
+
+\chapter{Formal Verification}
+\label{ch:verification}
+
+\begin{quote}
+\textit{``The purpose of computing is insight, not numbers.''}
+\begin{flushright}
+--- Richard Hamming
+\end{flushright}
+\end{quote}
+
+\section{The Case for Machine-Checked Proofs}
+
+CLAIR makes precise mathematical claims about its confidence operations: that they preserve bounds, satisfy algebraic laws, and combine in specific ways. Hand-written proofs of these properties, however careful, can contain errors that propagate through the design. Machine-checked proofs provide certainty---not the epistemic certainty that CLAIR itself tracks, but the logical certainty that comes from formal verification.
+
+This chapter presents the Lean 4 formalization of CLAIR's confidence algebra, demonstrating that the mathematical foundations developed in preceding chapters are not merely plausible but \emph{proven correct}.
+
+\subsection{What Formalization Proves (and What It Does Not)}
+
+We must be clear about the scope of formal verification. The Lean formalization establishes:
+
+\begin{itemize}
+\item \textbf{Type correctness}: All operations are well-typed and preserve the $[0,1]$ bounds
+\item \textbf{Algebraic properties}: Associativity, commutativity, identity laws, and composition theorems
+\item \textbf{Boundedness preservation}: Every operation on valid confidence values produces valid confidence values
+\item \textbf{Monotonicity}: Key relationships between operations (e.g., $\min(a,b) \geq a \times b$)
+\end{itemize}
+
+The formalization does \emph{not} establish:
+
+\begin{itemize}
+\item \textbf{Semantic adequacy}: Whether multiplicative discounting \emph{correctly models} undercutting defeat
+\item \textbf{Phenomenological accuracy}: Whether CLAIR captures how LLMs actually reason
+\item \textbf{Completeness}: Whether the operation set covers all needed confidence manipulations
+\end{itemize}
+
+These latter questions are semantic and empirical, not mathematical. The formalization proves that CLAIR's mathematics is \emph{consistent}; whether it is \emph{appropriate} requires philosophical and empirical argument.
+
+\subsection{Choice of Proof Assistant}
+
+We chose Lean 4 with Mathlib for several reasons:
+
+\begin{enumerate}
+\item \textbf{Mature real number library}: Mathlib provides $\mathbb{R}$ with comprehensive algebraic structure
+\item \textbf{Unit interval support}: The \texttt{unitInterval} type is exactly CLAIR's confidence type
+\item \textbf{Active development}: Lean 4 and Mathlib 4 are under active development with growing community
+\item \textbf{Executable extraction}: Lean can extract verified code to executable programs
+\item \textbf{Dependent types}: Full dependent type theory for rich specifications
+\end{enumerate}
+
+Alternative systems (Coq, Agda, Isabelle) could work equally well. The mathematical content is system-independent.
+
+\section{The Confidence Type}
+
+\subsection{Type Definition}
+
+CLAIR's confidence values inhabit the closed interval $[0,1]$. In Lean 4, Mathlib provides exactly this type:
+
+\begin{lstlisting}[language=Lean, caption={Confidence type definition}]
+import Mathlib.Topology.UnitInterval
+
+namespace CLAIR.Confidence
+
+-- CLAIR's Confidence type is exactly Mathlib's unitInterval
+abbrev Confidence := unitInterval
+
+-- Basic properties inherited from Mathlib
+#check (inferInstance : Zero Confidence)      -- 0 is in [0,1]
+#check (inferInstance : One Confidence)       -- 1 is in [0,1]
+#check (inferInstance : LE Confidence)        -- [0,1] is ordered
+#check (inferInstance : LT Confidence)        -- strict ordering
+\end{lstlisting}
+
+The \texttt{unitInterval} type in Mathlib is defined as a subtype of $\mathbb{R}$:
+
+\begin{definition}[Unit Interval]
+\label{def:unit-interval}
+\[
+\texttt{unitInterval} = \{ x : \mathbb{R} \mid 0 \leq x \land x \leq 1 \}
+\]
+\end{definition}
+
+This definition immediately provides two crucial properties:
+
+\begin{lemma}[Confidence Bounds]
+\label{lem:conf-bounds}
+For all $c : \texttt{Confidence}$:
+\begin{enumerate}
+\item $0 \leq c$ (nonnegativity)
+\item $c \leq 1$ (upper bound)
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+These are definitional consequences of the subtype constraint. In Lean:
+
+\begin{lstlisting}[language=Lean]
+theorem nonneg (c : Confidence) : 0 ≤ c.val := c.property.1
+theorem le_one (c : Confidence) : c.val ≤ 1 := c.property.2
+\end{lstlisting}
+\end{proof}
+
+\subsection{Basic Infrastructure}
+
+Mathlib's \texttt{unitInterval} comes with substantial infrastructure that CLAIR inherits:
+
+\begin{lstlisting}[language=Lean, caption={Inherited structure from Mathlib}]
+-- Coercion to real numbers
+instance : Coe Confidence ℝ := ⟨Subtype.val⟩
+
+-- Multiplication is closed (key for derivation)
+instance : Mul Confidence :=
+  ⟨fun a b => ⟨a.val * b.val, unitInterval.mul_mem a.property b.property⟩⟩
+
+-- The symm operation: 1 - x
+-- Critical for undercut: undercut(c, d) = c * (1 - d) = c * symm(d)
+def symm (c : Confidence) : Confidence :=
+  ⟨1 - c.val, by simp [c.property.1, c.property.2]⟩
+\end{lstlisting}
+
+The \texttt{symm} operation, which computes $1 - c$, is central to CLAIR's defeat semantics. It represents the ``survival probability'' when facing defeat of strength $d$: the proportion of confidence that remains is $1 - d$.
+
+\section{Confidence Operations}
+
+CLAIR requires four operations beyond basic multiplication: probabilistic OR ($\oplus$), undercut, rebut, and minimum. We formalize each, proving boundedness preservation and key algebraic properties.
+
+\subsection{Probabilistic OR ($\oplus$)}
+
+\begin{definition}[Probabilistic OR]
+\label{def:oplus}
+For confidence values $a, b \in [0,1]$:
+\[
+a \oplus b = a + b - a \cdot b
+\]
+\end{definition}
+
+This operation aggregates independent evidence supporting the same conclusion. The interpretation is ``survival of doubt'': if each piece of evidence independently has some chance of being wrong, the combined confidence is the probability that at least one is right.
+
+\begin{lstlisting}[language=Lean, caption={Probabilistic OR definition and boundedness}]
+namespace CLAIR.Confidence.Oplus
+
+def oplus (a b : Confidence) : Confidence :=
+  ⟨a.val + b.val - a.val * b.val, oplus_mem a.property b.property⟩
+
+-- Notation
+infixl:65 " ⊕ " => oplus
+
+-- Boundedness preservation
+theorem oplus_mem {a b : ℝ} (ha : 0 ≤ a ∧ a ≤ 1) (hb : 0 ≤ b ∧ b ≤ 1) :
+    0 ≤ a + b - a * b ∧ a + b - a * b ≤ 1 := by
+  constructor
+  · -- Lower bound: a + b - ab ≥ 0 iff a(1-b) + b ≥ 0
+    have h1 : a * (1 - b) ≥ 0 := mul_nonneg ha.1 (by linarith)
+    linarith
+  · -- Upper bound: a + b - ab ≤ 1 iff a + b(1-a) ≤ 1
+    have h1 : b * (1 - a) ≤ 1 - a := by
+      have : b ≤ 1 := hb.2
+      have : 0 ≤ 1 - a := by linarith
+      nlinarith
+    linarith
+\end{lstlisting}
+
+\begin{theorem}[Oplus Algebraic Properties]
+\label{thm:oplus-algebra}
+$(\texttt{Confidence}, \oplus, 0)$ forms a commutative monoid:
+\begin{enumerate}
+\item Associativity: $(a \oplus b) \oplus c = a \oplus (b \oplus c)$
+\item Commutativity: $a \oplus b = b \oplus a$
+\item Identity: $a \oplus 0 = a$
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+All properties follow by algebraic expansion and the ring properties of $\mathbb{R}$.
+
+\textbf{Identity}: $a \oplus 0 = a + 0 - a \cdot 0 = a$.
+
+\textbf{Commutativity}: $a \oplus b = a + b - ab = b + a - ba = b \oplus a$.
+
+\textbf{Associativity}: By expansion:
+\begin{align*}
+(a \oplus b) \oplus c &= (a + b - ab) + c - (a + b - ab) \cdot c \\
+&= a + b + c - ab - ac - bc + abc
+\end{align*}
+Similarly, $a \oplus (b \oplus c) = a + b + c - ab - ac - bc + abc$.
+
+The Lean proof uses the \texttt{ring} tactic for algebraic simplification.
+\end{proof}
+
+\begin{theorem}[Oplus Increases Confidence]
+\label{thm:oplus-increases}
+For any $a, b \in [0,1]$:
+\[
+a \oplus b \geq \max(a, b)
+\]
+Aggregating evidence never decreases confidence.
+\end{theorem}
+
+\begin{proof}
+We show $a \oplus b \geq a$. By definition:
+\[
+a \oplus b - a = b - ab = b(1 - a) \geq 0
+\]
+since $b \geq 0$ and $1 - a \geq 0$ (as $a \leq 1$).
+By symmetry, $a \oplus b \geq b$, so $a \oplus b \geq \max(a, b)$.
+\end{proof}
+
+This property is essential: multiple pieces of evidence supporting a conclusion should compound, not diminish.
+
+\subsection{Undercut Defeat}
+
+\begin{definition}[Undercut]
+\label{def:undercut}
+For base confidence $c$ and defeat strength $d$:
+\[
+\undercut(c, d) = c \times (1 - d)
+\]
+\end{definition}
+
+Undercutting attacks the \emph{inference link} rather than the conclusion directly. A defeat of strength $d$ reduces confidence by factor $(1 - d)$.
+
+\begin{lstlisting}[language=Lean, caption={Undercut definition}]
+namespace CLAIR.Confidence.Undercut
+
+def undercut (c d : Confidence) : Confidence :=
+  ⟨c.val * (1 - d.val), undercut_mem c.property d.property⟩
+
+-- Boundedness: c * (1-d) ∈ [0,1] when c, d ∈ [0,1]
+theorem undercut_mem {c d : ℝ} (hc : 0 ≤ c ∧ c ≤ 1) (hd : 0 ≤ d ∧ d ≤ 1) :
+    0 ≤ c * (1 - d) ∧ c * (1 - d) ≤ 1 := by
+  constructor
+  · exact mul_nonneg hc.1 (by linarith)
+  · calc c * (1 - d) ≤ 1 * (1 - d) := by nlinarith
+                   _ = 1 - d := by ring
+                   _ ≤ 1 := by linarith
+\end{lstlisting}
+
+\begin{theorem}[Undercut Composition Law]
+\label{thm:undercut-composition}
+Sequential undercuts compose via $\oplus$:
+\[
+\undercut(\undercut(c, d_1), d_2) = \undercut(c, d_1 \oplus d_2)
+\]
+\end{theorem}
+
+\begin{proof}
+By algebraic expansion:
+\begin{align*}
+\undercut(\undercut(c, d_1), d_2) &= c(1 - d_1)(1 - d_2) \\
+&= c(1 - d_1 - d_2 + d_1 d_2) \\
+&= c(1 - (d_1 + d_2 - d_1 d_2)) \\
+&= c(1 - (d_1 \oplus d_2)) \\
+&= \undercut(c, d_1 \oplus d_2)
+\end{align*}
+
+\begin{lstlisting}[language=Lean]
+theorem undercut_composition (c d₁ d₂ : Confidence) :
+    undercut (undercut c d₁) d₂ = undercut c (d₁ ⊕ d₂) := by
+  ext
+  simp only [undercut, oplus]
+  ring
+\end{lstlisting}
+\end{proof}
+
+This theorem has profound implications: it connects defeat composition to evidence aggregation. The combined effect of multiple independent undercuts is an undercut by the $\oplus$-aggregate of the defeat strengths. This elegant algebraic relationship was discovered during the formalization process.
+
+\begin{corollary}[Undercut Monotonicity]
+\label{cor:undercut-mono}
+For fixed defeat strength $d$:
+\begin{enumerate}
+\item $\undercut(c_1, d) \leq \undercut(c_2, d)$ when $c_1 \leq c_2$ (monotone in confidence)
+\item $\undercut(c, d_1) \geq \undercut(c, d_2)$ when $d_1 \leq d_2$ (anti-monotone in defeat)
+\end{enumerate}
+\end{corollary}
+
+\subsection{Rebut Defeat}
+
+\begin{definition}[Rebut]
+\label{def:rebut}
+For supporting confidence $c_{for}$ and opposing confidence $c_{against}$:
+\[
+\rebut(c_{for}, c_{against}) = \frac{c_{for}}{c_{for} + c_{against}}
+\]
+with the convention that $\rebut(0, 0) = 0.5$ (maximal uncertainty when no evidence either way).
+\end{definition}
+
+Rebutting differs from undercutting: it attacks the \emph{conclusion} directly with counter-evidence. The result is a probabilistic comparison treating both sides symmetrically.
+
+\begin{lstlisting}[language=Lean, caption={Rebut definition (noncomputable due to division)}]
+namespace CLAIR.Confidence.Rebut
+
+-- Rebut is noncomputable in Lean due to real number division
+noncomputable def rebut (c_for c_against : Confidence) : Confidence :=
+  if h : c_for.val + c_against.val = 0 then
+    ⟨0.5, by norm_num⟩  -- Equal ignorance default
+  else
+    ⟨c_for.val / (c_for.val + c_against.val), rebut_mem c_for c_against h⟩
+
+-- Boundedness when denominator nonzero
+theorem rebut_mem (c_for c_against : Confidence)
+    (h : c_for.val + c_against.val ≠ 0) :
+    0 ≤ c_for.val / (c_for.val + c_against.val) ∧
+    c_for.val / (c_for.val + c_against.val) ≤ 1 := by
+  have sum_pos : 0 < c_for.val + c_against.val := by
+    have h1 := c_for.property.1
+    have h2 := c_against.property.1
+    linarith [h, h1, h2]
+  constructor
+  · exact div_nonneg c_for.property.1 (le_of_lt sum_pos)
+  · rw [div_le_one sum_pos]
+    linarith [c_against.property.1]
+\end{lstlisting}
+
+\begin{theorem}[Rebut Anti-Symmetry]
+\label{thm:rebut-antisym}
+\[
+\rebut(a, b) + \rebut(b, a) = 1
+\]
+when $a + b \neq 0$.
+\end{theorem}
+
+\begin{proof}
+\[
+\rebut(a, b) + \rebut(b, a) = \frac{a}{a + b} + \frac{b}{a + b} = \frac{a + b}{a + b} = 1
+\]
+\end{proof}
+
+This confirms that rebut treats evidence symmetrically: the confidence after considering both sides sums to 1 across the two directions.
+
+\subsection{Minimum (Conservative Combination)}
+
+\begin{definition}[Conservative Combination]
+\label{def:min}
+For confidence values $a, b$:
+\[
+\min(a, b) = \begin{cases} a & \text{if } a \leq b \\ b & \text{otherwise} \end{cases}
+\]
+\end{definition}
+
+The minimum operation provides conservative combination: when combining evidence in contexts where the weakest link determines overall confidence.
+
+\begin{lstlisting}[language=Lean, caption={Minimum operation}]
+namespace CLAIR.Confidence.Min
+
+def conf_min (a b : Confidence) : Confidence :=
+  if a.val ≤ b.val then a else b
+
+-- Minimum is at least as large as product
+theorem mul_le_min (a b : Confidence) :
+    (a.val * b.val) ≤ conf_min a b := by
+  simp only [conf_min]
+  split_ifs with h
+  · -- a ≤ b, show ab ≤ a
+    calc a.val * b.val ≤ a.val * 1 := by nlinarith [b.property.2]
+                     _ = a.val := by ring
+  · -- b < a, show ab ≤ b
+    calc a.val * b.val ≤ 1 * b.val := by nlinarith [a.property.2]
+                     _ = b.val := by ring
+\end{lstlisting}
+
+\begin{theorem}[Multiplication-Minimum Comparison]
+\label{thm:mul-min}
+For all $a, b \in [0,1]$:
+\[
+a \times b \leq \min(a, b)
+\]
+Multiplication is more ``pessimistic'' than minimum.
+\end{theorem}
+
+\begin{proof}
+If $a \leq b$: $ab \leq a \cdot 1 = a = \min(a, b)$.
+If $b < a$: $ab \leq 1 \cdot b = b = \min(a, b)$.
+\end{proof}
+
+This theorem clarifies when to use multiplication versus minimum: multiplication is appropriate when each premise independently contributes to derivation (and can fail independently), while minimum is appropriate when the weakest premise is the bottleneck.
+
+\section{Algebraic Structure}
+
+\subsection{Three Monoids, Not a Semiring}
+
+A key discovery during formalization was that CLAIR's confidence operations do \emph{not} form a semiring. We have three separate algebraic structures:
+
+\begin{theorem}[Confidence Algebra Structure]
+\label{thm:conf-algebra}
+$[0,1]$ admits three distinct commutative monoid structures:
+\begin{enumerate}
+\item $([0,1], \times, 1)$ --- multiplicative monoid for derivation
+\item $([0,1], \min, 1)$ --- meet-semilattice for conservative combination
+\item $([0,1], \oplus, 0)$ --- monoid for independent aggregation
+\end{enumerate}
+These do \textbf{not} combine into a semiring.
+\end{theorem}
+
+\begin{proof}[Proof of non-semiring structure]
+For $([0,1], \oplus, \times, 0, 1)$ to be a semiring, we would need distributivity:
+\[
+a \times (b \oplus c) = (a \times b) \oplus (a \times c)
+\]
+
+\textbf{Counterexample}: Let $a = b = c = 0.5$.
+
+Left side:
+\[
+a \times (b \oplus c) = 0.5 \times (0.5 + 0.5 - 0.25) = 0.5 \times 0.75 = 0.375
+\]
+
+Right side:
+\[
+(a \times b) \oplus (a \times c) = 0.25 \oplus 0.25 = 0.25 + 0.25 - 0.0625 = 0.4375
+\]
+
+Since $0.375 \neq 0.4375$, distributivity fails.
+
+\begin{lstlisting}[language=Lean]
+theorem distributivity_fails :
+    ∃ (a b c : Confidence), a * (b ⊕ c) ≠ (a * b) ⊕ (a * c) := by
+  use ⟨0.5, by norm_num⟩, ⟨0.5, by norm_num⟩, ⟨0.5, by norm_num⟩
+  simp only [oplus, Subtype.ext_iff]
+  norm_num
+\end{lstlisting}
+\end{proof}
+
+This is not a limitation but a feature. The operations have different semantic purposes:
+\begin{itemize}
+\item Multiplication for sequential derivation (``both needed'')
+\item $\oplus$ for parallel aggregation (``either sufficient'')
+\item Minimum for bottleneck reasoning (``weakest link'')
+\end{itemize}
+
+Forcing them into a semiring would conflate these distinct roles.
+
+\subsection{T-Norm and T-Conorm Connection}
+
+The confidence operations connect to fuzzy logic:
+
+\begin{itemize}
+\item Multiplication ($\times$) is the \emph{product t-norm}
+\item $\oplus$ is the \emph{algebraic sum t-conorm} (dual to product)
+\item Minimum is the \emph{G\"odel t-norm}
+\end{itemize}
+
+This connection to fuzzy logic literature provides additional theoretical grounding. The De Morgan duality holds:
+\[
+a \oplus b = 1 - ((1-a) \times (1-b))
+\]
+
+In CLAIR notation using \texttt{symm}:
+\[
+a \oplus b = \textrm{symm}(\textrm{symm}(a) \times \textrm{symm}(b))
+\]
+
+\section{Project Structure}
+
+The complete Lean 4 formalization is organized as:
+
+\begin{verbatim}
+formal/lean/
+├── lakefile.lean              # Build configuration
+├── lean-toolchain             # Lean version (v4.15.0)
+├── CLAIR/
+│   ├── Confidence/
+│   │   ├── Basic.lean         # Type definition, bounds
+│   │   ├── Oplus.lean         # Probabilistic OR
+│   │   ├── Undercut.lean      # Multiplicative discounting
+│   │   ├── Rebut.lean         # Probabilistic comparison
+│   │   └── Min.lean           # Conservative combination
+│   └── CLAIR.lean             # Top-level imports
+└── Main.lean                  # Entry point
+\end{verbatim}
+
+Dependencies:
+\begin{itemize}
+\item Lean 4 version 4.15.0
+\item Mathlib 4 version 4.15.0
+\item Specifically: \texttt{Mathlib.Topology.UnitInterval}
+\end{itemize}
+
+Build with: \texttt{lake build}
+
+\section{Limitations and Future Work}
+
+\subsection{Current Limitations}
+
+\begin{enumerate}
+\item \textbf{Rebut is noncomputable}: Division on reals in Lean is noncomputable. For executable code, a rational approximation would be needed.
+
+\item \textbf{No justification formalization}: The current formalization covers confidence algebra only. The justification DAG structure (Chapter~\ref{ch:justification}) awaits formalization.
+
+\item \textbf{No stratification formalization}: The stratified belief types from Chapter~\ref{ch:self-reference} are not yet in Lean.
+
+\item \textbf{No revision formalization}: The belief revision algorithm (Chapter~\ref{ch:revision}) is specified but not machine-verified.
+\end{enumerate}
+
+\subsection{Future Formalization Work}
+
+Priority extensions to the Lean formalization:
+
+\begin{enumerate}
+\item \textbf{Justification DAGs}: Define the labeled DAG structure with support/undercut/rebut edges; prove acyclicity invariants.
+
+\item \textbf{Confidence propagation}: Formalize and prove correctness of the bottom-up confidence recomputation algorithm.
+
+\item \textbf{Defeat fixed points}: Prove existence (Brouwer) and uniqueness conditions (Banach) for defeat chain fixed points.
+
+\item \textbf{Stratified beliefs}: Formalize \texttt{Belief<n, A>} types with level constraints; prove stratification safety.
+
+\item \textbf{CPL-finite}: Formalize the five-value confidence lattice and prove decidability of type checking.
+\end{enumerate}
+
+\subsection{Extraction and Execution}
+
+Lean 4 supports code extraction, but CLAIR faces challenges:
+
+\begin{itemize}
+\item Real numbers are Cauchy sequences (slow)
+\item Division is noncomputable
+\item Proofs are erased at runtime
+\end{itemize}
+
+For a practical interpreter, the reference implementation (Chapter~\ref{ch:implementation}) uses rational arithmetic in Haskell, which gives exact computation with reasonable performance.
+
+\section{Conclusion}
+
+The Lean 4 formalization demonstrates that CLAIR's confidence algebra is mathematically sound. All operations preserve bounds, satisfy their claimed algebraic properties, and combine according to the composition theorems.
+
+Key verified results:
+\begin{itemize}
+\item All four operations preserve $[0,1]$ bounds
+\item $\oplus$ forms a commutative monoid with identity 0
+\item Undercuts compose via $\oplus$ (Theorem~\ref{thm:undercut-composition})
+\item Multiplication is more pessimistic than minimum (Theorem~\ref{thm:mul-min})
+\item $(\oplus, \times)$ do not form a semiring (Theorem~\ref{thm:conf-algebra})
+\end{itemize}
+
+The formalization provides a foundation for extending verification to the full CLAIR system---justification structure, belief revision, and stratified self-reference---though these extensions require substantial additional work.
+
+Machine-checked proofs serve a dual purpose for CLAIR. They establish mathematical correctness with certainty unattainable through manual proof. And they embody CLAIR's own principles: explicit justification (proofs are justification terms), tracked confidence (proofs give confidence 1.0), and verifiable provenance (proof terms are inspectable). The formalization is CLAIR reasoning about CLAIR, with all the epistemic metadata that entails.
