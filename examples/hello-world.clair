@@ -1,0 +1,74 @@
+-- CLAIR Hello World
+-- A minimal program demonstrating belief-based computation
+
+module HelloWorld where
+
+-- Program-level metadata
+program:
+  intent: "Demonstrate system execution by emitting a greeting"
+  confidence: 0.99
+  assumes:
+    - stdout is writable
+    - UTF-8 encoding supported
+
+-- Entry point
+main : Effect<IO, Unit>
+main =
+  intent "emit greeting then exit successfully"
+  confidence 0.99
+
+  -- The message is a belief, not just a value
+  let message : Belief<String> =
+    belief
+      value: "Hello, world!"
+      confidence: 1.0
+      provenance: literal
+      justification: axiom
+      invalidation: {}
+      semantic: canonical_greeting
+
+  -- Decision: where to output (even trivial decisions are recorded)
+  let output : Belief<Stream> =
+    decide
+      question: "Where should output go?"
+      options:
+        - stdout: "Standard output stream"
+            satisfies: [user_visible]
+            scores: {convention: 1.0}
+        - stderr: "Standard error stream"
+            satisfies: [user_visible]
+            scores: {convention: 0.3}
+      constraints:
+        - user_visible: "Output must be visible to user"
+      criteria:
+        - convention: "Follow standard conventions" weight: 1.0
+      selected: stdout
+      rationale: "stdout is conventional for normal program output"
+      confidence: 0.99
+      revisit_if: []
+
+  -- Effect: print the message
+  -- The effect is annotated with intent
+  do
+    intent "display greeting to user"
+    print (val output) (val message)
+
+  -- Verify postcondition (optional but demonstrates intent checking)
+  verify
+    realizes: effect(stdout, write, greeting)
+    postcondition: "greeting emitted exactly once"
+
+  -- Exit with success
+  return ()
+    intent: "signal successful completion"
+
+
+-- Compact form (same semantics, less verbose)
+-- For trivial programs, this is more appropriate
+
+module HelloWorld.Compact where
+
+main : Effect<IO, Unit>
+main =
+  intent "greet via stdout"
+  print stdout "Hello, world!"

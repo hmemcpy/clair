@@ -1,0 +1,339 @@
+-- CLAIR Authentication Module
+-- JWT-based authentication with full belief tracking
+
+module Auth where
+
+-- ============================================================
+-- Types
+-- ============================================================
+
+-- Make invalid states unrepresentable
+type NonEmptyBytes = { bs : Bytes | length bs > 0 }
+type Secret = { s : Bytes | length s >= 32 }
+type UnixTime = { t : Int | t >= 0 }
+
+-- Token structure enforced by types
+type TokenParts = {
+  header  : NonEmptyBytes,
+  payload : NonEmptyBytes,
+  signature : NonEmptyBytes
+}
+
+-- Claims with refinements
+type Claims = {
+  sub : String,                          -- subject (user id)
+  exp : UnixTime,                        -- expiration time
+  iat : UnixTime,                        -- issued at
+  -- Refinement: issued before expiry
+  proof : iat <= exp
+}
+
+-- Errors are explicit and semantic
+type VerifyError
+  = Malformed       (reason : String)
+  | InvalidSignature (expected : Bytes, got : Bytes)
+  | Expired         (expiredAt : UnixTime, now : UnixTime)
+
+-- ============================================================
+-- Module-level Decision
+-- ============================================================
+
+decision auth_method : d:auth:001
+  timestamp: 2024-01-15T10:30:00Z
+  question: "How should users authenticate?"
+
+  constraints:
+    c1: "Must be stateless - no server-side session storage"
+        source: requirements/architecture.md:L42
+    c2: "Must reject expired credentials"
+        source: requirements/security.md:L15
+    c3: "Must handle malformed input gracefully"
+        source: requirements/security.md:L23
+
+  criteria:
+    cr1: "Implementation simplicity" weight: 0.6
+    cr2: "Security strength" weight: 0.9
+    cr3: "Performance" weight: 0.4
+
+  options:
+    session_based:
+      description: "Server-side sessions with session ID cookie"
+      satisfies: [c2, c3]
+      violates: c1 because "Requires session storage"
+      scores: {cr1: 0.9, cr2: 0.6, cr3: 0.5}
+      status: rejected
+
+    jwt_hs256:
+      description: "JWT with HMAC-SHA256 symmetric signing"
+      satisfies: [c1, c2, c3]
+      scores: {cr1: 0.8, cr2: 0.7, cr3: 0.9}
+      status: selected
+
+    jwt_rs256:
+      description: "JWT with RSA-SHA256 asymmetric signing"
+      satisfies: [c1, c2, c3]
+      scores: {cr1: 0.5, cr2: 0.9, cr3: 0.7}
+      status: viable
+      note: "Would choose if multi-service or higher security needed"
+
+  selected: jwt_hs256
+  rationale: >
+    JWT with HS256 selected. Satisfies all constraints and provides
+    good balance of simplicity and security. RS256 would be preferred
+    for multi-service deployments, but adds complexity unnecessary
+    for current single-service architecture.
+
+  confidence: 0.91
+
+  assumptions:
+    a1: "Single service deployment"
+        source: inferred from architecture
+        status: active
+        invalidated_by: kubernetes/deployment.yaml with replicas > 1
+    a2: "Shared secret is securely stored"
+        source: ops/secrets.md
+        status: active
+    a3: "Tokens have reasonable expiry (< 24h)"
+        source: requirements/security.md:L30
+        status: active
+
+  revisit_if:
+    - assumption_false(a1)  -- moving to multi-service
+    - constraint_added("asymmetric trust required")
+    - criterion_weight_changed(cr2, +0.3)  -- security becomes more important
+
+
+-- ============================================================
+-- Main Function
+-- ============================================================
+
+verify_token
+  : (secret : Secret)
+  -> (token : Bytes)
+  -> Result<Claims, VerifyError>
+
+  -- Metadata
+  intent: "Validate JWT and extract claims, rejecting expired or tampered tokens"
+  confidence: 0.91
+  realizes: secure_authentication
+
+  -- Implementation decision reference
+  implements: d:auth:001
+
+verify_token secret token =
+
+  -- --------------------------------------------------------
+  -- Block 1: Parse token structure
+  -- --------------------------------------------------------
+  block parse
+    intent: "Split token into three base64-encoded parts"
+    confidence: 0.98
+
+    decision d:auth:001:parse
+      question: "How to parse token?"
+      options:
+        regex:
+          description: "Use regex to match JWT pattern"
+          status: rejected because "Overkill for simple structure"
+        string_split:
+          description: "Split on '.' delimiter"
+          status: selected
+      rationale: "Simple split is clearer and sufficient"
+      confidence: 0.99
+
+    let parts : Belief<List<Bytes>> =
+      derive token by (split ".")
+        confidence: 0.99
+        provenance: derived(token)
+
+    -- Check structure
+    if length (val parts) != 3 then
+      return Err (Malformed "Expected 3 dot-separated parts")
+        confidence: 1.0
+        why: "JWT spec requires exactly header.payload.signature"
+
+    -- Construct typed token parts (type system ensures non-empty)
+    let token_parts : Belief<TokenParts> =
+      derive parts by construct_parts
+        confidence: conf(parts)
+        intent: "Create structured token from raw parts"
+
+  -- --------------------------------------------------------
+  -- Block 2: Verify signature
+  -- --------------------------------------------------------
+  block verify_sig
+    intent: "Cryptographically verify token was signed with our secret"
+    confidence: 0.88  -- crypto is subtle
+
+    decision d:auth:001:compare
+      question: "How to compare signatures?"
+      options:
+        naive_eq:
+          description: "Use standard equality (==)"
+          status: rejected because "Vulnerable to timing attacks"
+        secure_eq:
+          description: "Use constant-time comparison"
+          status: selected
+      rationale: "Constant-time comparison prevents timing side-channels"
+      confidence: 0.95
+      assumes:
+        - "stdlib secure_eq is actually constant-time"
+          confidence: 0.88
+          source: documentation review
+
+    let header = (val token_parts).header
+    let payload = (val token_parts).payload
+    let provided_sig = (val token_parts).signature
+
+    let signing_input : Belief<Bytes> =
+      derive header, payload by concat_with(".")
+        confidence: 0.99
+
+    let expected_sig : Belief<Bytes> =
+      derive (val secret), (val signing_input) by hmac_sha256
+        confidence: 0.95
+        intent: "Compute expected signature"
+        assumes:
+          - "hmac_sha256 implementation is correct"
+
+    let sig_valid : Belief<Bool> =
+      derive expected_sig, (b64_decode provided_sig) by secure_eq
+        confidence: min(conf(expected_sig), 0.95)
+        intent: "Compare signatures in constant time"
+
+    if not (val sig_valid) then
+      return Err (InvalidSignature
+        expected: val expected_sig
+        got: b64_decode provided_sig)
+        confidence: conf(sig_valid)
+        why: "Signature mismatch indicates tampering or wrong key"
+
+  -- --------------------------------------------------------
+  -- Block 3: Check expiration
+  -- --------------------------------------------------------
+  block check_expiry
+    intent: "Reject tokens that have expired"
+    confidence: 0.97
+
+    decision d:auth:001:expiry
+      question: "Should we allow clock skew leeway?"
+      options:
+        with_leeway:
+          description: "Allow N seconds of clock skew"
+          status: rejected because "Not in requirements, adds complexity"
+        strict:
+          description: "Exact expiry comparison"
+          status: selected
+      rationale: "Keep it simple; clock sync is ops concern"
+      confidence: 0.95
+      revisit_if: clock_skew_issues_reported
+
+    let payload_json : Belief<JSON> =
+      derive (val token_parts).payload by (b64_decode >> json_parse)
+        confidence: 0.95
+
+    let exp : Belief<UnixTime> =
+      derive payload_json by (get "exp")
+        confidence: conf(payload_json)
+        invalidation: [input_changed("token")]
+
+    let now : Belief<UnixTime> =
+      belief
+        value: current_unix_time()
+        confidence: 0.99
+        provenance: system_clock
+        justification: axiom
+        invalidation: [time_elapsed(1.second)]
+        why: "System clock, may drift but trusted for auth"
+
+    let is_expired : Belief<Bool> =
+      derive now, exp by (>)
+        confidence: min(conf(now), conf(exp))
+
+    if val is_expired then
+      return Err (Expired
+        expiredAt: val exp
+        now: val now)
+        confidence: conf(is_expired)
+        why: "Token exp claim is in the past"
+
+  -- --------------------------------------------------------
+  -- Block 4: Extract and return claims
+  -- --------------------------------------------------------
+  block extract_claims
+    intent: "Parse and return validated claims"
+    confidence: 0.95
+
+    let claims : Belief<Claims> =
+      derive payload_json by parse_claims
+        confidence: conf(payload_json) * 0.98
+        intent: "Extract typed claims from JSON payload"
+        assumes:
+          - "JSON contains required fields (sub, exp, iat)"
+        invalidation: [input_changed("token")]
+
+    return Ok (val claims)
+      confidence: conf(claims)
+      why: "Token passed all validation checks"
+      justification: rule(
+        verify_token,
+        just(token_parts),   -- parsed correctly
+        just(sig_valid),     -- signature valid
+        just(is_expired),    -- not expired
+        just(claims)         -- claims extracted
+      )
+
+
+-- ============================================================
+-- Usage Example
+-- ============================================================
+
+{-
+  let result = verify_token secret incoming_token
+
+  case result of
+    Ok claims ->
+      -- claims.confidence tells us how confident we are
+      -- claims.justification tells us why we believe it
+      -- claims.invalidation tells us when to recheck
+      grant_access(claims.val.sub)
+
+    Err error ->
+      -- error carries full context
+      log_auth_failure(error)
+      deny_access()
+-}
+
+
+-- ============================================================
+-- Queries (what the system can answer)
+-- ============================================================
+
+{-
+  > why verify_token uses HS256?
+  Decision d:auth:001: JWT with HS256 selected because
+  - Satisfies constraints: stateless (c1), expiry (c2), graceful errors (c3)
+  - Simpler than RS256 (0.8 vs 0.5 on simplicity criterion)
+  - Assumption: single-service deployment makes shared secret acceptable
+
+  > what would change verify_token's approach?
+  Decision d:auth:001 would be revisited if:
+  - Assumption a1 invalidated (multi-service deployment)
+  - New constraint requiring asymmetric trust
+  - Security criterion weight increases by 0.3+
+
+  > confidence of verify_token?
+  Overall: 0.91
+  Breakdown:
+  - parse block: 0.98
+  - verify_sig block: 0.88 (lowest - crypto is subtle)
+  - check_expiry block: 0.97
+  - extract_claims block: 0.95
+
+  > what assumptions does verify_token make?
+  - a1: Single service deployment (from architecture inference)
+  - a2: Shared secret securely stored (from ops/secrets.md)
+  - a3: Tokens have reasonable expiry (from security requirements)
+  - hmac_sha256 implementation is correct
+  - stdlib secure_eq is constant-time (confidence: 0.88)
+-}

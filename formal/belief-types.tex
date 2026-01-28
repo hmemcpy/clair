@@ -1,0 +1,396 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\newcommand{\Belief}{\mathsf{Belief}}
+\newcommand{\conf}{\mathsf{conf}}
+\newcommand{\prov}{\mathsf{prov}}
+\newcommand{\just}{\mathsf{just}}
+\newcommand{\inv}{\mathsf{inv}}
+\newcommand{\val}{\mathsf{val}}
+\newcommand{\Der}{\mathsf{derive}}
+\newcommand{\Dec}{\mathsf{decide}}
+\newcommand{\satisfies}{\vDash}
+\newcommand{\realizes}{\triangleright}
+
+\title{Belief Types: A Type System for Justified, Uncertain, Revisable Computation}
+\author{CLAIR Project}
+\date{Draft}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We present a type system where values carry epistemic metadata: confidence derived from Subjective Logic, provenance from database lineage research, justifications from Truth Maintenance Systems, and invalidation conditions for belief revision. We show how standard type-theoretic operations extend to beliefs while preserving epistemic properties. This provides a foundation for AI-native programming where code must be explainable, auditable, and revisable.
+\end{abstract}
+
+\section{Introduction}
+
+Traditional type systems classify \emph{values} and ensure operations are applied to appropriate data. A judgment $\Gamma \vdash e : \tau$ states that in context $\Gamma$, expression $e$ has type $\tau$.
+
+This is insufficient for AI-generated code, where we need to track:
+\begin{itemize}
+    \item \textbf{Confidence}: How certain is the system about this value or decision?
+    \item \textbf{Provenance}: Where did this value come from?
+    \item \textbf{Justification}: Why do we believe this is correct?
+    \item \textbf{Invalidation}: Under what conditions should this be reconsidered?
+\end{itemize}
+
+We introduce \emph{belief types}, where the fundamental object is not a bare value but a \emph{belief}---a value annotated with epistemic metadata.
+
+\section{Syntax}
+
+\subsection{Types}
+
+\begin{align*}
+\tau ::=\quad & \mathsf{Base} & \text{(base types: Int, Bool, String, ...)} \\
+    \mid\quad & \tau \to \tau & \text{(function types)} \\
+    \mid\quad & \tau \times \tau & \text{(product types)} \\
+    \mid\quad & \tau + \tau & \text{(sum types)} \\
+    \mid\quad & \Belief\langle\tau\rangle & \text{(belief type)}
+\end{align*}
+
+\subsection{Beliefs}
+
+A belief is a 5-tuple:
+
+\begin{definition}[Belief]
+A belief of type $\tau$ is:
+\[
+b = \langle v, c, p, j, I \rangle : \Belief\langle\tau\rangle
+\]
+where:
+\begin{itemize}
+    \item $v : \tau$ is the \textbf{value}
+    \item $c \in [0,1]$ is the \textbf{confidence}
+    \item $p \in \mathsf{Prov}$ is the \textbf{provenance}
+    \item $j \in \mathsf{Just}$ is the \textbf{justification}
+    \item $I \subseteq \mathsf{Cond}$ is the set of \textbf{invalidation conditions}
+\end{itemize}
+\end{definition}
+
+\subsection{Provenance}
+
+Provenance tracks the origin of a belief:
+
+\begin{align*}
+p \in \mathsf{Prov} ::=\quad & \mathsf{literal} & \text{(literal value in source)} \\
+    \mid\quad & \mathsf{input}(s) & \text{(external input from source } s \text{)} \\
+    \mid\quad & \mathsf{derived}(b_1, \ldots, b_n) & \text{(derived from other beliefs)} \\
+    \mid\quad & \mathsf{decided}(d) & \text{(result of decision } d \text{)} \\
+    \mid\quad & \mathsf{assumed} & \text{(assumed without justification)}
+\end{align*}
+
+\subsection{Justifications}
+
+Justifications explain why a belief is held:
+
+\begin{align*}
+j \in \mathsf{Just} ::=\quad & \mathsf{axiom} & \text{(self-evident or given)} \\
+    \mid\quad & \mathsf{rule}(r, j_1, \ldots, j_n) & \text{(derived by rule } r \text{)} \\
+    \mid\quad & \mathsf{choice}(opts, crit, reason) & \text{(chosen from options)} \\
+    \mid\quad & \mathsf{assumption}(a) & \text{(depends on assumption } a \text{)}
+\end{align*}
+
+\subsection{Invalidation Conditions}
+
+Conditions under which a belief should be reconsidered:
+
+\begin{align*}
+\phi \in \mathsf{Cond} ::=\quad & \mathsf{assumption\_false}(a) & \text{(assumption } a \text{ is invalidated)} \\
+    \mid\quad & \mathsf{confidence\_below}(c, threshold) & \text{(confidence drops)} \\
+    \mid\quad & \mathsf{input\_changed}(s) & \text{(input source } s \text{ changed)} \\
+    \mid\quad & \mathsf{constraint\_added}(\psi) & \text{(new constraint } \psi \text{)} \\
+    \mid\quad & \phi \land \phi \mid \phi \lor \phi & \text{(logical combinations)}
+\end{align*}
+
+\subsection{Terms}
+
+\begin{align*}
+e ::=\quad & x & \text{(variable)} \\
+    \mid\quad & v & \text{(literal value)} \\
+    \mid\quad & \lambda x:\tau.\, e & \text{(abstraction)} \\
+    \mid\quad & e\; e & \text{(application)} \\
+    \mid\quad & \mathsf{belief}(e, c, p, j, I) & \text{(belief constructor)} \\
+    \mid\quad & \val(e) & \text{(extract value from belief)} \\
+    \mid\quad & \conf(e) & \text{(extract confidence)} \\
+    \mid\quad & \Der\; e_1, \ldots, e_n \;\mathsf{by}\; r & \text{(derive new belief)} \\
+    \mid\quad & \Dec\; [e_1, \ldots, e_n] \;\mathsf{given}\; \phi \;\mathsf{by}\; c & \text{(make decision)}
+\end{align*}
+
+\section{Typing Rules}
+
+\subsection{Standard Rules (Extended)}
+
+The standard typing rules apply, with beliefs propagating through:
+
+\begin{mathpar}
+\inferrule[T-Var]
+  {x : \tau \in \Gamma}
+  {\Gamma \vdash x : \tau}
+
+\inferrule[T-Abs]
+  {\Gamma, x : \tau_1 \vdash e : \tau_2}
+  {\Gamma \vdash \lambda x:\tau_1.\, e : \tau_1 \to \tau_2}
+
+\inferrule[T-App]
+  {\Gamma \vdash e_1 : \tau_1 \to \tau_2 \\ \Gamma \vdash e_2 : \tau_1}
+  {\Gamma \vdash e_1\; e_2 : \tau_2}
+\end{mathpar}
+
+\subsection{Belief Rules}
+
+\begin{mathpar}
+\inferrule[T-Belief]
+  {\Gamma \vdash e : \tau \\ c \in [0,1] \\ p \in \mathsf{Prov} \\ j \in \mathsf{Just} \\ I \subseteq \mathsf{Cond}}
+  {\Gamma \vdash \mathsf{belief}(e, c, p, j, I) : \Belief\langle\tau\rangle}
+
+\inferrule[T-Val]
+  {\Gamma \vdash e : \Belief\langle\tau\rangle}
+  {\Gamma \vdash \val(e) : \tau}
+
+\inferrule[T-Conf]
+  {\Gamma \vdash e : \Belief\langle\tau\rangle}
+  {\Gamma \vdash \conf(e) : [0,1]}
+\end{mathpar}
+
+\subsection{Derivation Rules}
+
+When deriving a new belief from existing beliefs, confidence propagates:
+
+\begin{mathpar}
+\inferrule[T-Derive]
+  {\Gamma \vdash b_1 : \Belief\langle\tau_1\rangle \\ \cdots \\ \Gamma \vdash b_n : \Belief\langle\tau_n\rangle \\
+   r : (\tau_1, \ldots, \tau_n) \Rightarrow \tau \\
+   c' = f_r(\conf(b_1), \ldots, \conf(b_n))}
+  {\Gamma \vdash \Der\; b_1, \ldots, b_n \;\mathsf{by}\; r : \Belief\langle\tau\rangle @ c'}
+\end{mathpar}
+
+Where $f_r$ is a confidence propagation function for rule $r$. Common choices:
+\begin{itemize}
+    \item $f_{\land}(c_1, \ldots, c_n) = \prod_i c_i$ (conjunction: multiply)
+    \item $f_{\lor}(c_1, \ldots, c_n) = 1 - \prod_i (1 - c_i)$ (disjunction)
+    \item $f_{\mathsf{min}}(c_1, \ldots, c_n) = \min_i c_i$ (conservative)
+\end{itemize}
+
+\subsection{Decision Rules}
+
+\begin{mathpar}
+\inferrule[T-Decide]
+  {\Gamma \vdash e_1 : \Belief\langle\tau\rangle \\ \cdots \\ \Gamma \vdash e_n : \Belief\langle\tau\rangle \\
+   \text{criteria } crit \text{ selects } e_k \\
+   \text{rationale } reason}
+  {\Gamma \vdash \Dec\; [e_1, \ldots, e_n] \;\mathsf{given}\; \phi \;\mathsf{by}\; crit : \Belief\langle\tau\rangle}
+\end{mathpar}
+
+The resulting belief has:
+\begin{itemize}
+    \item Value: $\val(e_k)$
+    \item Confidence: adjusted based on how strongly $e_k$ dominates alternatives
+    \item Provenance: $\mathsf{decided}(d)$ where $d$ records the full decision
+    \item Justification: $\mathsf{choice}([e_1, \ldots, e_n], crit, reason)$
+    \item Invalidation: conditions under which the choice should be revisited
+\end{itemize}
+
+\section{Confidence Algebra}
+
+Following Subjective Logic, we can define an algebra on confidence values.
+
+\begin{definition}[Confidence Combination]
+For beliefs $b_1$ and $b_2$ with confidences $c_1$ and $c_2$:
+\begin{align*}
+c_1 \otimes c_2 &= c_1 \cdot c_2 & \text{(conjunction)} \\
+c_1 \oplus c_2 &= c_1 + c_2 - c_1 \cdot c_2 & \text{(disjunction)} \\
+c_1 \triangleright c_2 &= c_1 \cdot c_2 & \text{(deduction/modus ponens)}
+\end{align*}
+\end{definition}
+
+\begin{theorem}[Confidence Monotonicity]
+Derivation cannot increase confidence beyond its premises:
+\[
+\conf(\Der\; b_1, \ldots, b_n \;\mathsf{by}\; r) \leq \min_i \conf(b_i)
+\]
+for conservative rules.
+\end{theorem}
+
+\section{Justification Composition}
+
+Justifications form a semi-lattice under combination.
+
+\begin{definition}[Justification Combination]
+\begin{align*}
+j_1 \sqcup j_2 &= \mathsf{rule}(\land, j_1, j_2) & \text{(both required)} \\
+j_1 \sqcap j_2 &= \mathsf{rule}(\lor, j_1, j_2) & \text{(either sufficient)}
+\end{align*}
+\end{definition}
+
+The justification of a derived belief is the combination of its premises' justifications:
+\[
+\just(\Der\; b_1, \ldots, b_n \;\mathsf{by}\; r) = \mathsf{rule}(r, \just(b_1), \ldots, \just(b_n))
+\]
+
+\section{Invalidation Propagation}
+
+Invalidation conditions propagate through derivation.
+
+\begin{definition}[Invalidation Closure]
+The invalidation conditions of a derived belief include those of all premises:
+\[
+\inv(\Der\; b_1, \ldots, b_n \;\mathsf{by}\; r) = \bigcup_i \inv(b_i) \cup \inv(r)
+\]
+where $\inv(r)$ is any rule-specific invalidation.
+\end{definition}
+
+\begin{theorem}[Invalidation Soundness]
+If any invalidation condition of a belief becomes true, the belief should be reconsidered:
+\[
+\phi \in \inv(b) \land \phi \text{ holds} \implies b \text{ is invalid}
+\]
+\end{theorem}
+
+\section{Operational Semantics}
+
+\subsection{Reduction Rules}
+
+\begin{mathpar}
+\inferrule[E-Val]
+  { }
+  {\val(\mathsf{belief}(v, c, p, j, I)) \longrightarrow v}
+
+\inferrule[E-Conf]
+  { }
+  {\conf(\mathsf{belief}(v, c, p, j, I)) \longrightarrow c}
+
+\inferrule[E-Derive]
+  {b_i = \mathsf{belief}(v_i, c_i, p_i, j_i, I_i) \text{ for } i \in 1..n \\
+   r(v_1, \ldots, v_n) = v' \\
+   c' = f_r(c_1, \ldots, c_n) \\
+   p' = \mathsf{derived}(b_1, \ldots, b_n) \\
+   j' = \mathsf{rule}(r, j_1, \ldots, j_n) \\
+   I' = \bigcup_i I_i}
+  {\Der\; b_1, \ldots, b_n \;\mathsf{by}\; r \longrightarrow \mathsf{belief}(v', c', p', j', I')}
+\end{mathpar}
+
+\section{Intent Realizability}
+
+Beyond typing, we introduce a realizability judgment.
+
+\begin{definition}[Intent]
+An intent $\iota$ is a specification of desired behavior:
+\[
+\iota ::= \mathsf{effect}(e, t, a) \mid \mathsf{returns}(\phi) \mid \mathsf{invariant}(\psi) \mid \iota \land \iota
+\]
+\end{definition}
+
+\begin{definition}[Realizability]
+A term $e$ realizes intent $\iota$, written $e \realizes \iota$, if the behavior of $e$ satisfies $\iota$.
+\end{definition}
+
+\begin{mathpar}
+\inferrule[R-Effect]
+  {e \text{ produces effect } (target, action) \text{ at type } t}
+  {e \realizes \mathsf{effect}(target, t, action)}
+
+\inferrule[R-Returns]
+  {\forall v.\; e \longrightarrow^* v \implies \phi(v)}
+  {e \realizes \mathsf{returns}(\phi)}
+
+\inferrule[R-Conj]
+  {e \realizes \iota_1 \\ e \realizes \iota_2}
+  {e \realizes \iota_1 \land \iota_2}
+\end{mathpar}
+
+\section{Example}
+
+\begin{verbatim}
+-- A simple belief derivation
+
+let user_age : Belief<Nat> = belief(
+    25,                                    -- value
+    0.95,                                  -- confidence
+    input("database.users.age"),           -- provenance
+    axiom,                                 -- justification (from DB)
+    {input_changed("database.users.age")}  -- invalidation
+)
+
+let drinking_age : Belief<Nat> = belief(21, 1.0, literal, axiom, {})
+
+let can_drink : Belief<Bool> = derive user_age, drinking_age
+    by (fun a d -> a >= d)
+
+-- Result:
+-- value: true
+-- confidence: 0.95 (limited by user_age)
+-- provenance: derived(user_age, drinking_age)
+-- justification: rule(>=, axiom, axiom)
+-- invalidation: {input_changed("database.users.age")}
+\end{verbatim}
+
+\section{Related Work}
+
+\subsection{Subjective Logic}
+Jøsang's Subjective Logic (2001, 2016) provides the algebraic foundation for reasoning with uncertain beliefs. Our confidence component and its algebra are directly inspired by this work.
+
+\subsection{Justification Logic}
+Artemov's Justification Logic (1995, 2001) extends modal logic with explicit justification terms. Our justification component makes this computational.
+
+\subsection{Truth Maintenance Systems}
+Doyle (1979) and de Kleer (1986) introduced systems where beliefs have justifications and can be retracted when support is removed. Our invalidation conditions extend this to a type-theoretic setting.
+
+\subsection{Provenance}
+Green, Karvounarakis, and Tannen's work on provenance semirings (2007) provides algebraic foundations for data provenance. Our provenance component adapts this to computation.
+
+\section{Future Work}
+
+\begin{itemize}
+    \item \textbf{Dependent Belief Types}: Beliefs whose type depends on their confidence level
+    \item \textbf{Gradual Beliefs}: Mixed certain/uncertain code with runtime checks
+    \item \textbf{Belief Inference}: Automatically inferring confidence and invalidation
+    \item \textbf{Decision Optimization}: Choosing among alternatives to maximize confidence
+    \item \textbf{Multi-Agent Beliefs}: Beliefs attributed to different reasoning agents
+\end{itemize}
+
+\section{Conclusion}
+
+Belief types provide a foundation for programming languages where epistemic state is a first-class concern. By tracking confidence, provenance, justification, and invalidation conditions, we enable AI systems to generate code that is not merely correct, but \emph{justified}---and that can be automatically revised when its justifications no longer hold.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{10}
+
+\bibitem{josang2001}
+A. Jøsang.
+\newblock A Logic for Uncertain Probabilities.
+\newblock {\em International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems}, 9(3):279--311, 2001.
+
+\bibitem{artemov2001}
+S. Artemov.
+\newblock Explicit Provability and Constructive Semantics.
+\newblock {\em Bulletin of Symbolic Logic}, 7(1):1--36, 2001.
+
+\bibitem{doyle1979}
+J. Doyle.
+\newblock A Truth Maintenance System.
+\newblock {\em Artificial Intelligence}, 12(3):231--272, 1979.
+
+\bibitem{dekleer1986}
+J. de Kleer.
+\newblock An Assumption-based TMS.
+\newblock {\em Artificial Intelligence}, 28(2):127--162, 1986.
+
+\bibitem{green2007}
+T.J. Green, G. Karvounarakis, and V. Tannen.
+\newblock Provenance Semirings.
+\newblock {\em PODS}, 2007.
+
+\end{thebibliography}
+
+\end{document}
