@@ -322,6 +322,11 @@ What I believe I know:
 | Independence critical for ⊕ | 0.95 | Session 19: correlated evidence overcounts | Prove independence optional | ✓ Session 19 |
 | Aggregation increases confidence | 0.99 | Session 19: a ⊕ b ≥ max(a,b) | None (mathematical) | ✓ Proven |
 | Diminishing returns for aggregation | 0.99 | Session 19: marginal gain = a(1-c) | None (mathematical) | ✓ Proven |
+| Correlated evidence needs dependency-adjusted aggregation | 0.95 | Session 20: interpolation formula | Find better model | ✓ Session 20 |
+| Dependency interpolation: (1-δ)(⊕) + δ(avg) | 0.90 | Session 20: smooth interpolation | Find counterexample | ✓ Session 20 |
+| More dependency → less aggregate confidence | 0.99 | Session 20: monotonicity proof | None (mathematical) | ✓ Proven |
+| Provenance overlap indicates dependency | 0.80 | Session 20: Jaccard-like heuristic | Find better inference | ✓ Session 20 |
+| Conservative default δ=0.3 when unknown | 0.75 | Session 20: practical recommendation | Find principled derivation | ⚠ Heuristic |
 
 ---
 
@@ -1034,3 +1039,64 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - Task 2.13: Correlated evidence (what to do when independence fails)
   - Task 8: Lean formalization of aggregation
   - Task 5: Interaction of aggregation with belief revision
+
+### Session 20: Task 2.13 Exploration (CORRELATED EVIDENCE)
+- **COMPLETED TASK 2.13: Correlated Evidence — How does aggregation handle non-independent evidence?**
+- **Core question answered**: Dependency-adjusted aggregation interpolates between ⊕ and average:
+  ```
+  aggregate_δ(c₁, c₂) = (1-δ)(c₁ ⊕ c₂) + δ(c₁ + c₂)/2
+  ```
+  - δ = 0: fully independent → use ⊕
+  - δ = 1: fully dependent → use average
+  - 0 < δ < 1: smooth interpolation
+- **The overcounting problem analyzed**:
+  - Treating correlated evidence as independent → overconfidence
+  - Example: 10 sources all citing same underlying report aren't 10 independent witnesses
+  - Independence is the OPTIMISTIC assumption; correlation reduces confidence
+- **Mathematical derivation provided**:
+  - From Bernoulli correlation: P(X₁=1 ∧ X₂=1) = c₁c₂ + ρσ where σ = √(c₁c₂(1-c₁)(1-c₂))
+  - General formula: aggregate_ρ = (c₁ ⊕ c₂) - ρσ
+  - Simplified to interpolation form for practical use
+- **Boundary cases verified**:
+  - δ=0 reduces to c₁ ⊕ c₂ (independent case) ✓
+  - δ=1 reduces to (c₁+c₂)/2 (fully dependent case) ✓
+  - Equal confidences with δ=1 → confidence unchanged ✓
+- **Key properties proven**:
+  - Boundedness: aggregate_δ ∈ [0,1] for all δ ∈ [0,1]
+  - Monotonicity in confidence: higher c → higher aggregate
+  - Monotonicity in dependency: higher δ → lower aggregate (conservative)
+- **N-ary aggregation with correlation**:
+  - Full independence: 1 - ∏(1-cᵢ)
+  - Full dependence: (Σcᵢ)/n
+  - Effective sample size formula: n_eff = n / (1 + (n-1)·δ̄)
+  - Clustering approach: group highly correlated sources, average within, ⊕ across
+- **Dependency detection from provenance**:
+  - Shared ancestors in DAG → correlated evidence
+  - Jaccard-like similarity: δ ≈ |ancestors₁ ∩ ancestors₂| / |ancestors₁ ∪ ancestors₂|
+  - Heuristic but useful for automatic detection
+- **Prior art surveyed**:
+  - Copula theory (Nelsen 2006): Formal dependency structures
+  - Subjective Logic averaging fusion (Jøsang 2016): For dependent opinions
+  - Dempster-Shafer cautious rule (Smets 1993): Idempotent for unknown dependency
+  - Meta-analysis random effects: Adjusting for study correlation
+  - Condorcet jury theorem: Independence requirement explicitly stated
+- **Design recommendations for CLAIR**:
+  - Extend CombinationRule to include `correlated δ` option
+  - Add provenance-based dependency inference
+  - Warn on shared ancestry without explicit dependency annotation
+  - Report confidence ranges when dependency unknown
+  - Conservative default: assume δ = 0.3 when unknown
+- **Output**: exploration/thread-2.13-correlated-evidence.md
+- **Status**: Task 2.13 SUBSTANTIALLY COMPLETE
+- **Beliefs updated**:
+  - "Correlated evidence requires different treatment" → ESTABLISHED (0.95)
+  - "Dependency interpolation formula works" → ESTABLISHED (0.90)
+  - "Independence is optimistic assumption" → ESTABLISHED (0.95)
+  - "Provenance can indicate dependency" → ESTABLISHED (0.80)
+- **Thread 2 now fully explored**:
+  - 2.1-2.9: Core DAG structure ✓
+  - 2.10: Defeat confidence ✓
+  - 2.11: Independent aggregation ✓
+  - 2.12: Reinstatement ✓
+  - 2.13: Correlated aggregation ✓
+  - 2.14: Update derivation-calculus.md (remaining)

@@ -40,7 +40,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **2.10 Defeat confidence propagation** - ANSWERED Session 12: Undercut = multiplicative discounting c×(1-d); Rebut = probabilistic comparison c/(c+d). See exploration/thread-2.10-defeat-confidence.md
 - [x] **2.11 Aggregation confidence** - ANSWERED Session 19: Independent evidence combines via ⊕ (probabilistic OR): aggregate(c₁,...,cₙ) = 1 - ∏(1-cᵢ). "Survival of doubt" interpretation: combined confidence = probability at least one evidence succeeds. See exploration/thread-2.11-aggregation.md
 - [x] **2.12 Reinstatement** - ANSWERED Session 18: Reinstatement emerges compositionally from bottom-up evaluation. Formula: A_final = A_base × (1 - D_base × (1 - E_base)). Mutual defeat has fixed-point semantics. See exploration/thread-2.12-reinstatement.md
-- [ ] **2.13 Correlated evidence** - How does aggregation handle correlated (not independent) evidence?
+- [x] **2.13 Correlated evidence** - ANSWERED Session 20: Dependency-adjusted aggregation: aggregate_δ(c₁,c₂) = (1-δ)(c₁⊕c₂) + δ·avg. δ=0 independent, δ=1 fully dependent. Can infer dependency from provenance overlap. See exploration/thread-2.13-correlated-evidence.md
 - [ ] **2.14 Update derivation-calculus.md** - Incorporate DAG structure, labeled edges, new constructors
 
 **Prior art surveyed (Session 9)**:
@@ -730,6 +730,65 @@ This is not a software implementation plan—it's a research exploration plan. E
     - `aggregate` node type combines support edges using ⊕
     - `CombinationRule.independent` explicitly marks independent aggregation
     - Future: `CombinationRule.correlated` for non-independent case (Task 2.13)
+
+### Session 20 Discoveries (Task 2.13 Correlated Evidence)
+
+104. **TASK 2.13 CORRELATED EVIDENCE ANSWERED** — Dependency-adjusted aggregation formula derived.
+
+105. **Correlation reduces effective evidence count**:
+    - Independent (ρ=0) → use ⊕
+    - Fully dependent (ρ=1) → use average
+    - Partially dependent → interpolate between them
+
+106. **Dependency-adjusted aggregation formula**:
+    ```
+    aggregate_δ(c₁, c₂) = (1-δ)(c₁ ⊕ c₂) + δ(c₁ + c₂)/2
+    ```
+    - δ = 0: independent, reduces to ⊕
+    - δ = 1: fully dependent, reduces to average
+    - 0 < δ < 1: smooth interpolation
+
+107. **Key properties verified**:
+    - Boundedness: aggregate_δ ∈ [0,1] for all δ ∈ [0,1]
+    - Monotonicity in confidence: higher confidence → higher aggregate
+    - Monotonicity in dependency: more dependency → lower aggregate (conservative)
+
+108. **Overcounting is the danger**:
+    - Treating correlated evidence as independent → overconfidence
+    - Independence is the OPTIMISTIC assumption
+    - When in doubt, assume some dependency
+
+109. **Dependency can be inferred from provenance**:
+    - Shared ancestors in justification DAG → correlated sources
+    - Jaccard-like similarity: δ ≈ |ancestors₁ ∩ ancestors₂| / |ancestors₁ ∪ ancestors₂|
+    - Heuristic, not exact, but useful default
+
+110. **N-ary aggregation with correlation**:
+    - Full independence: 1 - ∏(1-cᵢ)
+    - Full dependence: (Σcᵢ)/n
+    - Effective sample size: n_eff = n / (1 + (n-1)·δ̄)
+    - Clustering approach: group correlated sources, aggregate within (average), then across (⊕)
+
+111. **Prior art surveyed**:
+    - Copula theory (Nelsen 2006): Formal dependency structures
+    - Subjective Logic averaging fusion (Jøsang 2016): Dependent opinion combination
+    - Dempster-Shafer cautious rule (Smets 1993): Idempotent for possible dependency
+    - Meta-analysis random effects: Adjusting for study correlation
+
+112. **Design recommendations for CLAIR**:
+    - Extend CombinationRule with `correlated δ` option
+    - Add provenance-based dependency inference
+    - Warn when aggregating sources with shared ancestry
+    - Report confidence ranges when dependency uncertain
+    - Default to δ = 0.3 when unknown (conservative)
+
+113. **Thread 2 now fully explored**:
+    - 2.1-2.9: Core justification structure (DAG with labeled edges) ✓
+    - 2.10: Defeat confidence (undercut = multiply, rebut = compare) ✓
+    - 2.11: Independent aggregation (⊕) ✓
+    - 2.12: Reinstatement (compositional, fixed-point) ✓
+    - 2.13: Correlated aggregation (dependency-adjusted interpolation) ✓
+    - 2.14: Update derivation-calculus.md (remaining)
 
 ## Impossibilities Encountered
 

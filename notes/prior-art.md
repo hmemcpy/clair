@@ -685,3 +685,54 @@ See exploration/thread-5-belief-revision.md for detailed exploration.
 - Independence is CRITICAL—correlated evidence needs different treatment (Task 2.13)
 
 See exploration/thread-2.11-aggregation.md for detailed exploration.
+
+### ✓ SURVEYED (Session 20)
+
+**Thread 2.13 (Correlated Evidence Aggregation):** ✓ SUBSTANTIALLY COMPLETE
+
+**Copula Theory (Nelsen 2006)**:
+- Copulas describe dependence structure separately from marginal distributions
+- Sklar's Theorem: Every joint distribution F(x,y) = C(F_X(x), F_Y(y)) where C is a copula
+- Key copulas: Product (independence), Minimum (perfect positive correlation), Maximum (perfect negative)
+- Gaussian copula uses bivariate normal CDF with correlation parameter
+- **For CLAIR**: Principled dependency modeling, but requires knowing dependency structure
+
+**Bernoulli Correlation Analysis**:
+- For Bernoulli random variables X~Ber(p), Y~Ber(q) with correlation ρ:
+- P(X=1 ∧ Y=1) = pq + ρ√(pq(1-p)(1-q))
+- P(X=1 ∨ Y=1) = (p ⊕ q) - ρσ where σ = √(pq(1-p)(1-q))
+- Perfect correlation (ρ=1) is only achievable when p = q
+- **For CLAIR**: Direct mathematical derivation of correlation adjustment
+
+**Subjective Logic Averaging Fusion (Jøsang 2016)**:
+- For dependent sources, SL uses averaging rather than cumulative fusion
+- Averaging fusion: treats dependent evidence as observing same underlying source
+- Formula more complex than simple average due to opinion structure
+- **For CLAIR**: Inspires using average for fully dependent case (δ=1)
+
+**Dempster-Shafer Cautious Rule (Smets 1993)**:
+- Cautious combination: m₁⋀₂(A) = ⋀_{B∩C=A} min(m₁(B), m₂(C))
+- Key property: Idempotent — m ⋀ m = m
+- Suitable when evidence might be dependent (unknown dependency)
+- **For CLAIR**: Inspires conservative defaults when dependency unknown
+
+**Meta-Analysis Dependency Handling (Borenstein et al. 2009)**:
+- Fixed effects vs random effects models
+- Effective sample size adjustments for correlated studies
+- Studies from same lab, same method, same population get reduced weight
+- **For CLAIR**: Effective sample size formula n_eff = n / (1 + (n-1)·δ̄)
+
+**Condorcet's Jury Theorem (1785)**:
+- Independence assumption is EXPLICIT and CRITICAL
+- Violation of independence undermines the theorem's conclusions
+- **For CLAIR**: Independence is optimistic assumption; when violated, must adjust
+
+**Key design decisions for CLAIR (Session 20)**:
+- Dependency-adjusted aggregation: aggregate_δ(c₁,c₂) = (1-δ)(c₁⊕c₂) + δ(c₁+c₂)/2
+- δ=0: independent → ⊕
+- δ=1: fully dependent → average
+- 0 < δ < 1: smooth interpolation
+- Provenance-based dependency inference via Jaccard-like similarity on DAG ancestors
+- Conservative default: assume moderate dependency (δ ≈ 0.3) when unknown
+
+See exploration/thread-2.13-correlated-evidence.md for detailed exploration.
