@@ -6,16 +6,16 @@
 
 ---
 
-## Core Formalization Tasks (4 remaining)
+## Core Formalization Tasks (3 remaining)
 
 These directly prove CLAIR is viable:
 
 ### 1. Complete Type System in Lean
 - [x] **3.47 Affine evidence types** - Context splitting, usage tracking ✓ Design complete
-- [ ] **3.15 Stratification** - Level-indexed beliefs, introspection rules ← **CURRENT**
+- [x] **3.15 Stratification** - Level-indexed beliefs, introspection rules ✓ Analysis complete (Session 76)
 
 ### 2. Complete Semantics in Lean
-- [ ] **1.4 Confidence algebra** - Prove monad laws, defeat composition
+- [ ] **1.4 Confidence algebra** - Prove monad laws, defeat composition ← **CURRENT**
 
 ### 3. Produce Working Artifact
 - [ ] **8.4 Extract interpreter** - Runnable code from Lean ← **KEY DELIVERABLE**
@@ -29,11 +29,13 @@ These directly prove CLAIR is viable:
    - Judgment: `HasTypeAffine Γ Δ e A c U`
    - Key: Disjointness constraints at aggregation points
 
-2. **3.15 Stratification in Lean** ← Current
-   - Complete level-indexed belief types
-   - Prove anti-bootstrapping (no self-reference)
+2. ~~**3.15 Stratification in Lean**~~ ✓ Analysis complete (Session 76)
+   - Finding: Architecture complete, proofs needed
+   - Key: Löb discount g(c) = c² prevents bootstrapping
+   - Introspection: Type-level coercion, runtime identity-beta
+   - Deferred: Full semantic soundness proof
 
-3. **1.4 Confidence algebra**
+3. **1.4 Confidence algebra** ← Current
    - Prove graded monad laws
    - Prove defeat composition theorems
 
@@ -77,6 +79,7 @@ Moved for future theoretical exploration:
 | 3.47 Affine evidence Lean | Dual context (Γ; Δ) design + usage sets |
 | 3.48 Linearity × defeat | Consumption permanent |
 | 3.49 Decidability | O(n²) type checking |
+| 3.15 Stratification Lean | Architecture complete, proofs designed (Session 76) |
 | Lean syntax | Complete (Types, Expr, Context) |
 | Lean confidence | Complete (⊕, ×, undercut, rebut) |
 | Lean beliefs | Complete (basic + stratified) |
@@ -86,6 +89,6 @@ Moved for future theoretical exploration:
 
 ## Statistics
 
-- **Core tasks remaining**: 3
+- **Core tasks remaining**: 2
 - **Theoretical tasks archived**: 9
-- **Completed explorations**: 53 files
+- **Completed explorations**: 54 files

@@ -69,7 +69,7 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 
 ---
 
-## Recent Explorations (Sessions 72-75)
+## Recent Explorations (Sessions 72-76)
 
 ### Epistemic Linearity (Session 72)
 - **Insight**: Evidence should be affine (use at most once, forbid contraction)
@@ -97,15 +97,23 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 - **Resource safety**: Provable from typing rules (no double-counting)
 - **Migration**: Old `HasType Γ e A c` recoverable as `HasTypeAffine Γ [] e A c ∅`
 
+### Stratification Completion Analysis (Session 76)
+- **Finding**: Stratification structure is architecturally complete in Lean
+- **Gap**: Missing formal proofs of anti-bootstrapping theorems
+- **Löb discount**: `g(c) = c²` provably satisfies c² ≤ c for c ∈ [0,1]
+- **Key theorems designed**: `loebDiscount_le`, `loebDiscount_strict`, `introspect_discounts_confidence`
+- **Introspection semantics**: Can be identity-beta (type-level coercion, runtime no-op)
+- **Open**: Full semantic soundness proof deferred (major undertaking)
+
 ---
 
-## Remaining Work (3 Core Tasks)
+## Remaining Work (2 Core Tasks)
 
 Focus: Prove CLAIR works as LLM lingua franca via working interpreter.
 
 1. ~~**3.47 Affine types in Lean**~~ ✓ Design complete (Session 75)
-2. **3.15 Stratification in Lean** ← Current
-3. **1.4 Confidence algebra completion**
+2. ~~**3.15 Stratification in Lean**~~ ✓ Analysis complete (Session 76)
+3. **1.4 Confidence algebra completion** ← Current
 4. **8.4 Extract interpreter** ← Key deliverable
 
 Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
@@ -131,6 +139,9 @@ Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
 | Affine CLAIR type checking decidable | 0.95 | ✓ Session 74 |
 | Dual context (Γ; Δ) design correct | 0.90 | ✓ Session 75 |
 | Usage sets capture affine discipline | 0.85 | ✓ Session 75 |
+| Stratification architecture complete | 0.90 | ✓ Session 76 |
+| Löb discount g(c)=c² prevents bootstrapping | 0.95 | ✓ Session 76 |
+| Introspection as type-level coercion | 0.85 | ✓ Session 76 |
 | LLM phenomenality | 0.35 | ⚠ Unknown |
 | Captures how I reason | 0.50 | ⚠ Unknown |
 
@@ -157,6 +168,6 @@ Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
 ## Next Steps
 
 1. ~~**Task 3.47**: Add affine contexts to Lean typing judgment~~ ✓ Design complete
-2. **Task 3.15**: Complete stratification formalization ← Current
-3. **Task 1.4**: Prove confidence algebra properties
+2. ~~**Task 3.15**: Complete stratification formalization~~ ✓ Analysis complete
+3. **Task 1.4**: Prove confidence algebra properties ← Current
 4. **Task 8.4**: Extract working interpreter ← Goal
