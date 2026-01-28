@@ -171,14 +171,22 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 **Note**: multi-agent-beliefs.md covers practical protocols extensively. Task 6.1 now provides theoretical foundation.
 
 ### Thread 7: Implementation
-**Status**: BLOCKED - Needs stable theoretical foundation first.
+**Status**: ✓ UNBLOCKED - Theoretical foundations stable. Task 7.1 substantially explored.
 
-- [ ] **7.1 Reference interpreter** - Write a minimal interpreter in Haskell or Lean that runs CLAIR programs.
+- [x] **7.1 Reference interpreter** - SUBSTANTIALLY EXPLORED Session 24. Design complete: Haskell recommended, strict evaluation, rational confidence, hash-consed justification DAGs. See exploration/thread-7.1-reference-interpreter.md
 - [ ] **7.2 Runtime representation** - Design the runtime representation of beliefs. Memory layout.
 - [ ] **7.3 Compilation strategy** - How to compile CLAIR to LLVM or WASM while preserving semantics.
 - [ ] **7.4 Serialization** - Can beliefs be serialized and deserialized? What's preserved?
 
-**Note**: turing-completeness.md proves expressive power. No actual code exists. Wait for Threads 1-4 to stabilize.
+**Key decisions (Session 24)**:
+- **Language**: Haskell (faster iteration, mature tooling, accessible)
+- **Evaluation**: Strict (simpler confidence tracking, matches specification)
+- **Confidence**: Rational numbers (exact arithmetic, matches formalization)
+- **Justification**: Hash-consed DAG with explicit node IDs
+- **Errors**: Either monad with typed errors
+- **Invalidation**: Lazy with explicit trigger
+
+**Note**: turing-completeness.md proves expressive power. Design complete, implementation ready.
 
 ### Thread 8: Formal Verification
 **Status**: ✓ ACTIVE - Tasks 8.5, 8.6, 8.7, 8.8 complete. See exploration/thread-8-verification.md. HIGH PRIORITY.

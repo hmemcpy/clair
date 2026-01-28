@@ -198,22 +198,41 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 7: Implementation and Computation
-**Status**: Proven Turing-complete
-**Depth**: Theoretical only
+**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 24)
+**Depth**: Deep (see exploration/thread-7.1-reference-interpreter.md)
 
-CLAIR can compute anything. But:
-- What's the actual implementation strategy?
-- How do beliefs exist at runtime?
-- What's the performance model?
-- Can this actually be built and used?
+**Core question explored (Session 24)**: What would a reference interpreter for CLAIR look like?
 
-**Prior work**: Compiler design, Runtime systems, Dependent type implementations
-**Formal tools**: Operational semantics, Abstract machines, Reference interpreter
-**Open questions**:
-- Q7.1: What's the minimal runtime for beliefs?
-- Q7.2: How do you compile away metadata when not needed?
-- Q7.3: Can beliefs be serialized and transmitted?
-- Q7.4: What's the debugging experience?
+**Key design decisions**:
+- **Language**: Haskell (faster iteration, mature tooling, accessible to non-theorem-provers)
+- **Evaluation**: Strict (simpler confidence tracking, matches specification)
+- **Confidence**: Rational numbers (exact arithmetic, matches Lean formalization)
+- **Justification**: Hash-consed DAG with explicit node IDs and labeled edges
+- **Errors**: Either monad with typed errors
+- **Invalidation**: Lazy with explicit triggers
+
+**Prior work surveyed (Session 24)**:
+- TMS implementations (Lisp): JTMS, ATMS dependency-directed propagation
+- Subjective Logic implementations (Java): (b,d,u,a) tuples and fusion
+- Dependently-typed interpreters: Pie, Idris, Agda
+- Provenance-tracking systems: PROV-DM implementations
+
+**Key insights**:
+1. Core interpreter is straightforward (standard lambda calculus + belief operations)
+2. Justification DAGs with acyclicity checking is the most complex part
+3. Defeat evaluation order matters: supports → undercuts → rebuts
+4. Lazy evaluation problematic for confidence tracking (strict is better)
+5. Estimated scope: ~1000-1500 lines of Haskell for minimal viable interpreter
+
+**Questions answered**:
+- Q7.1: ✓ Minimal runtime = values + confidence + provenance + justification DAG + invalidation set
+- Q7.2: Deferred (compilation strategy separate task)
+- Q7.3: Deferred (serialization separate task)
+- Q7.4: Deferred (debugging experience separate task)
+
+**Prior work**: TMS, Subjective Logic, Pie, Idris, PROV-DM
+**Formal tools**: Operational semantics, Reference interpreter design complete
+**Remaining tasks**: 7.2 (runtime representation), 7.3 (compilation), 7.4 (serialization)
 
 ---
 
@@ -360,6 +379,11 @@ What I believe I know:
 | Arrow applies to belief aggregation | 0.90 | Session 23: discursive dilemma | Find escape | ✓ Session 23 |
 | CLAIR should sacrifice universal domain | 0.85 | Session 23: framework compatibility | Find alternative sacrifice | ✓ Session 23 |
 | Disagreement is informative | 0.90 | Session 23: multiple interpretations | Find noise interpretation | ✓ Session 23 |
+| Reference interpreter tractable | 0.90 | Session 24: design complete | Implementation failure | ✓ Session 24 |
+| Haskell right for reference interpreter | 0.85 | Session 24: faster iteration, accessibility | Find better language | ✓ Session 24 |
+| Strict evaluation appropriate for CLAIR | 0.90 | Session 24: confidence tracking requires it | Find lazy alternative | ✓ Session 24 |
+| Justification DAG most complex part | 0.90 | Session 24: acyclicity, defeat order | Find simpler structure | ✓ Session 24 |
+| Thread 7 now unblocked | 0.95 | Session 24: design validates implementability | Find blocker | ✓ Session 24 |
 
 ---
 
@@ -1288,3 +1312,76 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Disagreement is informative" → ESTABLISHED (0.90)
 - **Thread 6 unblocked**: Task 6.1 provides theoretical foundation for Tasks 6.2, 6.3, 6.4
 - **Seven foundational threads now substantially complete**: 1, 2, 3, 4, 5, 6, 9
+
+### Session 24: Task 7.1 Exploration (REFERENCE INTERPRETER)
+- **COMPLETED TASK 7.1: Reference interpreter design — What would a minimal CLAIR interpreter look like?**
+- **Core question explored**: Design a reference interpreter that demonstrates CLAIR's implementability
+- **Key design decisions made**:
+  - **Language**: Haskell recommended over Lean for reference interpreter
+    - Faster iteration for initial development
+    - Mature tooling (GHC, Cabal/Stack, profiling)
+    - More accessible to non-theorem-prover users
+    - Lean for verified version later (can prove properties about formalized version)
+  - **Evaluation strategy**: Strict (not lazy)
+    - Simpler confidence tracking (lazy: what's the confidence of a thunk?)
+    - Predictable performance
+    - Matches CLAIR's epistemic tracking focus
+  - **Confidence representation**: Rational numbers
+    - Exact arithmetic (avoids floating-point weirdness like 0.1 + 0.2 ≠ 0.3)
+    - Matches formal specification
+    - Haskell's `Data.Ratio` is well-tested
+  - **Justification representation**: Hash-consed DAG with explicit IDs
+    - Explicit node IDs enable sharing without reference equality issues
+    - IntMap provides efficient lookup
+    - Acyclicity checked at construction time
+  - **Error handling**: Either monad with typed errors
+    - Explicit error handling matches epistemic focus
+    - No hidden control flow
+    - Composable with State monad
+  - **Invalidation checking**: Lazy with explicit trigger
+    - Eager checking too expensive (every access)
+    - User controls when to validate
+- **Architecture designed**:
+  - Module structure: Types, Syntax, Parser, TypeChecker, Confidence, Justification, Provenance, Invalidation, Evaluator, Primitives, World, Main
+  - Core types: Confidence, Belief, Provenance, JustificationGraph, Condition
+  - Full evaluation semantics sketched (lambda calculus + belief operations)
+- **Implementation challenges identified**:
+  1. Justification DAG acyclicity: Check on construction with canReach traversal
+  2. Defeat evaluation order: Three-phase (supports → undercuts → rebuts)
+  3. Reinstatement: Emerges from bottom-up evaluation (no special mechanism)
+  4. Correlated evidence: Check provenance overlap for dependency estimation
+  5. Type checking: Belief<A> types with proper unwrapping
+- **Prior art surveyed**:
+  - TMS (Doyle 1979, de Kleer 1986): IN/OUT lists, dependency propagation
+  - Subjective Logic (Jøsang): (b,d,u,a) tuples, discounting operators
+  - Dependently-typed interpreters (Pie, Idris, Agda): Reference implementations
+  - PROV-DM: W3C provenance model implementations
+- **Testing strategy designed**:
+  - Unit tests for confidence operations, DAG acyclicity, evaluation
+  - Integration tests for derivation chains, defeat, invalidation
+  - Property-based tests (QuickCheck) for algebraic properties
+  - Regression tests from formal documents and prior art
+- **Scope defined for minimal viable interpreter**:
+  - INCLUDE: Core lambda calculus, products/sums, base types, Belief type, basic operations, confidence propagation, justification DAG, simple invalidation
+  - EXCLUDE initially: Effect system, full decision syntax, modules, refinement types, parser (use Haskell DSL)
+  - Estimated size: ~1000-1500 lines of Haskell
+- **Output**: exploration/thread-7.1-reference-interpreter.md
+- **Status**: Task 7.1 SUBSTANTIALLY EXPLORED (design complete, implementation ready)
+- **Key insights**:
+  1. Core interpreter is straightforward—standard lambda calculus with belief operations
+  2. Justification DAG handling is the most complex part
+  3. Lazy evaluation is problematic for confidence tracking
+  4. Defeat evaluation order must be respected
+  5. All theoretical foundations from Threads 1-5 translate directly to implementation
+- **Beliefs updated**:
+  - "Can be implemented" → 0.80 → 0.90 (design validates implementability)
+  - "Thread 7 blocked" → REFUTED (now unblocked, design complete)
+  - "Reference interpreter tractable" → ESTABLISHED (0.90)
+  - "Haskell right choice for reference" → ESTABLISHED (0.85)
+  - "Strict evaluation appropriate" → ESTABLISHED (0.90)
+- **Thread 7 status**: Task 7.1 substantially explored
+  - Design complete for reference interpreter
+  - Implementation ready when desired
+  - Remaining: 7.2 (runtime representation), 7.3 (compilation), 7.4 (serialization)
+- **Eight threads now substantially complete**: 1, 2, 3, 4, 5, 6, 7, 9
+- **Remaining high-priority**: Thread 8 (Lean implementation of proofs)
