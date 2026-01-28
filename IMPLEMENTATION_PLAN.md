@@ -39,7 +39,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **New tasks discovered (Session 9)**:
 - [x] **2.10 Defeat confidence propagation** - ANSWERED Session 12: Undercut = multiplicative discounting c×(1-d); Rebut = probabilistic comparison c/(c+d). See exploration/thread-2.10-defeat-confidence.md
 - [ ] **2.11 Aggregation confidence** - How do independent lines of evidence combine? (Subjective Logic fusion?)
-- [ ] **2.12 Reinstatement** - What happens when a defeater is itself defeated?
+- [x] **2.12 Reinstatement** - ANSWERED Session 18: Reinstatement emerges compositionally from bottom-up evaluation. Formula: A_final = A_base × (1 - D_base × (1 - E_base)). Mutual defeat has fixed-point semantics. See exploration/thread-2.12-reinstatement.md
 - [ ] **2.13 Correlated evidence** - How does aggregation handle correlated (not independent) evidence?
 - [ ] **2.14 Update derivation-calculus.md** - Incorporate DAG structure, labeled edges, new constructors
 
@@ -635,6 +635,54 @@ This is not a software implementation plan—it's a research exploration plan. E
     - Thread 4 (Grounding), Thread 5 (Belief Revision), Thread 9 (Phenomenology)
     - Remaining high-priority: Thread 8 (Lean implementation)
 
+### Session 18 Discoveries (Task 2.12 Reinstatement)
+
+88. **TASK 2.12 REINSTATEMENT ANSWERED** — Core question resolved compositionally.
+
+89. **Reinstatement emerges from bottom-up evaluation**:
+    - No special mechanism needed
+    - When evaluating A's confidence, first evaluate its defeaters
+    - Defeaters' effective strength reflects their own counter-defeaters
+    - Reinstatement is automatic: A_final = A_base × (1 - D_effective)
+
+90. **Reinstatement Formula**:
+    ```
+    A_final = A_base × (1 - D_base × (1 - E_base))
+    reinstatement_boost = A_base × D_base × E_base
+    ```
+    - Product of all three confidences
+    - Intuitive: high A (more to recover) × high D (more lost) × high E (more recovered)
+
+91. **Chain convergence proven**:
+    - Infinite chains of constant strength d converge to d/(1+d)
+    - Odd positions attack, even positions defend (matches Dung)
+    - Proof via fixed-point analysis
+
+92. **Mutual defeat has well-defined semantics**:
+    - Unlike justification cycles (forbidden), defeat cycles are allowed
+    - Fixed point: A* = A_base × (1 - B_base) / (1 - A_base × B_base)
+    - Symmetric case: A* = d/(1+d) — same as infinite chain
+    - Convergence guaranteed by Banach fixed-point theorem
+
+93. **Prior art surveyed for reinstatement**:
+    - Dung (1995): Defense concept ("Args defends A if all A's attackers are attacked")
+    - Pollock (1987, 2001): "Ultimately undefeated argument" principle
+    - Prakken (2010): ASPIC+ defense mechanism
+    - h-categorizer (Besnard & Hunter): Gradual semantics with denominator accumulation
+    - TMS (Doyle 1979): Dependency-directed backtracking and restoration
+    - Horty (2001): Floating conclusions problem
+
+94. **Key insight: CLAIR's architecture already handles this**:
+    - DAG structure (Thread 2) ✓
+    - Undercut formula c × (1-d) (Thread 2.10) ✓
+    - Bottom-up evaluation (Thread 5) ✓
+    - All components combine to produce natural reinstatement
+
+95. **New questions discovered**:
+    - Higher-order defeat (attacking edges, not arguments)
+    - Temporal dynamics / hysteresis in reinstatement
+    - Correlated counter-defeaters (connects to Task 2.13)
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -677,7 +725,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 ---
 
-## Current Status Summary (Session 17)
+## Current Status Summary (Session 18)
 
 ### Thread Status Table
 

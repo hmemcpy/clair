@@ -313,6 +313,11 @@ What I believe I know:
 | Axioms cannot be enumerated | 0.90 | Session 17: pragmatic, not fixed | Find finite axiom set | ✓ Session 17 |
 | Honest uncertainty is appropriate | 0.95 | Session 17: Gödelian-style limit | Resolve grounding externally | ✓ Session 17 |
 | Thread 4 substantially explored | 0.85 | Session 17: core questions addressed | Find missed case | ✓ Session 17 |
+| Reinstatement needs special mechanism | 0.05 | **REFUTED** Session 18: compositional emergence | Find non-compositional case | ✗ False |
+| Chain convergence d/(1+d) | 0.99 | Session 18: fixed-point proof | None (mathematical) | ✓ Proven |
+| Mutual defeat has fixed point | 0.99 | Session 18: Banach theorem | None (mathematical) | ✓ Proven |
+| CLAIR handles reinstatement | 0.95 | Session 18: bottom-up evaluation | Find counterexample | ✓ Session 18 |
+| Reinstatement boost = A×D×E | 0.99 | Session 18: algebraic derivation | None (mathematical) | ✓ Proven |
 
 ---
 
@@ -908,3 +913,59 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Honest uncertainty is appropriate" → ESTABLISHED (0.95)
 - **Six foundational threads now substantially complete**: 1, 2, 3, 4, 5, 9
 - **Remaining high-priority threads**: 8 (Lean implementation), 6 (Multi-Agent)
+
+### Session 18: Task 2.12 Exploration (REINSTATEMENT)
+- **COMPLETED TASK 2.12: Reinstatement — What happens when a defeater is itself defeated?**
+- **Core question answered**: Reinstatement **emerges compositionally** from bottom-up evaluation
+  - No special mechanism needed — existing architecture handles it
+  - When evaluating A's confidence, first evaluate its defeaters
+  - Defeaters' effective strength reflects their own counter-defeaters
+  - Reinstatement is automatic: A_final = A_base × (1 - D_effective)
+- **Reinstatement formula derived**:
+  ```
+  A_final = A_base × (1 - D_base × (1 - E_base))
+  reinstatement_boost = A_base × D_base × E_base
+  ```
+  - The boost is the product of all three confidences
+  - Intuitive: high A (more to recover) × high D (more lost) × high E (more recovered)
+- **Chain convergence proven**:
+  - Infinite chains of constant strength d converge to d/(1+d)
+  - Odd positions attack A, even positions defend A (matches Dung's odd/even attack paths)
+  - Proof via fixed-point analysis: x = d(1-x) → x = d/(1+d)
+- **Mutual defeat analyzed**:
+  - Unlike justification cycles (forbidden), defeat cycles are allowed
+  - Fixed point: A* = A_base × (1 - B_base) / (1 - A_base × B_base)
+  - Symmetric case: A* = d/(1+d) — same formula as infinite chains
+  - Convergence guaranteed by Banach fixed-point theorem (contraction mapping)
+- **Prior art surveyed**:
+  - Dung (1995): Defense concept ("A set defends A if all A's attackers are attacked")
+  - Pollock (1987, 2001): "Ultimately undefeated argument" principle
+  - Prakken (2010): ASPIC+ defense mechanism
+  - h-categorizer (Besnard & Hunter): Gradual semantics with denominator accumulation
+  - TMS (Doyle 1979): Dependency-directed backtracking and restoration
+  - Horty (2001): Floating conclusions problem
+  - Weighted bipolar argumentation (Amgoud & Ben-Naim): Numerical strength evaluation
+- **Key insight**: CLAIR's existing architecture already handles reinstatement
+  - DAG structure (Thread 2) ✓
+  - Undercut formula c × (1-d) (Thread 2.10) ✓
+  - Bottom-up evaluation with memoization (Thread 5) ✓
+  - All components combine naturally
+- **Algorithm clarified**:
+  ```python
+  def evaluate_confidence(node, graph, memo={}):
+      if node in memo: return memo[node]
+      # ... recursively evaluate attackers first
+      # ... attackers' strength already reflects their counter-attackers
+      # ... reinstatement emerges automatically
+  ```
+- **New questions raised**:
+  - Higher-order defeat (attacking edges, not arguments)
+  - Temporal dynamics / hysteresis in reinstatement
+  - Correlated counter-defeaters (connects to Task 2.13)
+- **Output**: exploration/thread-2.12-reinstatement.md
+- **Status**: Task 2.12 SUBSTANTIALLY COMPLETE
+- **Beliefs updated**:
+  - "Reinstatement requires special mechanism" → REFUTED (compositional emergence)
+  - "Chain convergence to d/(1+d)" → PROVEN (0.99)
+  - "Mutual defeat has fixed point" → PROVEN (0.99)
+  - "CLAIR architecture already handles reinstatement" → ESTABLISHED (0.95)
