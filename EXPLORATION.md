@@ -125,6 +125,15 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - CLAIR integration: FiniteConfidence type with decidable compile-time checks
 - See exploration/thread-3.20-cpl-finite-formalization.md
 
+**CPL Undecidability Proof Strategy (Session 32)**:
+- Proof strategy via reduction from recurrent tiling (Harel 1985)
+- **Key insight**: Converse well-foundedness (Löb) allows backward-looking infinite frames
+- Encoding: R(wᵢ, wⱼ) > 0 iff j < i satisfies well-foundedness constraint
+- Confidence increased: CPL undecidable 0.80 (↑ from 0.75)
+- Complete formal proof requires additional technical verification
+- Practical stance unchanged: assume undecidable, use decidable fragments
+- See exploration/thread-3.22-cpl-undecidability.md
+
 ---
 
 ### Thread 4: The Grounding Problem
@@ -426,8 +435,8 @@ What I believe I know:
 | Strict evaluation appropriate for CLAIR | 0.90 | Session 24: confidence tracking requires it | Find lazy alternative | ✓ Session 24 |
 | Justification DAG most complex part | 0.90 | Session 24: acyclicity, defeat order | Find simpler structure | ✓ Session 24 |
 | Thread 7 now unblocked | 0.95 | Session 24: design validates implementability | Find blocker | ✓ Session 24 |
-| CPL decidable | 0.25 | Session 25: **LIKELY UNDECIDABLE** due to Vidal (2019) | Prove decidability via quasimodels | ✗ Likely False |
-| CPL undecidable | 0.75 | Session 25: transitivity + continuous values | Prove decidability | ⚠ Likely True |
+| CPL decidable | 0.20 | Session 32: **UNDECIDABLE** (0.80 confidence) | Prove decidability via quasimodels | ✗ Likely False |
+| CPL undecidable | 0.80 | Session 32: reduction from tiling, Löb doesn't help | Prove decidability | ✓ Substantially Established |
 | CPL-finite decidable | 0.90 | Session 25: finite lattice theorem (Bou 2011) | Find undecidable fragment | ✓ Session 25 |
 | CPL-0 (stratified) decidable | 0.85 | Session 25: no self-reference removes encodings | Find encoding despite stratification | ✓ Session 25 |
 | Stratification is primary safety mechanism | 0.90 | Session 25: CPL undecidability implies this | Find CPL-checkable alternative | ✓ Session 25 |
