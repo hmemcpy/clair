@@ -176,8 +176,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 3: Self-Reference and Introspection
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27, 29, 32, 33, 63, 67, 68, 69, 70, 71, 72)
-**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md, thread-3.20-cpl-finite-formalization.md, thread-3.21-cpl-godel-variant.md, thread-3.22-cpl-undecidability.md, thread-3.27-optimal-lattice-choice.md, thread-3.12-fixedpoint-complexity.md, thread-3.30-loeb-fixedpoint-interaction.md, thread-3.33-multilevel-introspection-threshold.md, thread-3.34-aggregated-introspection.md, thread-3.40-correlation-aware-introspection-enforcement.md, thread-3.46-epistemic-linearity.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27, 29, 32, 33, 63, 67, 68, 69, 70, 71, 72, 73)
+**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md, thread-3.20-cpl-finite-formalization.md, thread-3.21-cpl-godel-variant.md, thread-3.22-cpl-undecidability.md, thread-3.27-optimal-lattice-choice.md, thread-3.12-fixedpoint-complexity.md, thread-3.30-loeb-fixedpoint-interaction.md, thread-3.33-multilevel-introspection-threshold.md, thread-3.34-aggregated-introspection.md, thread-3.40-correlation-aware-introspection-enforcement.md, thread-3.46-epistemic-linearity.md, thread-3.48-linearity-defeat-interaction.md)
 
 CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 
@@ -381,6 +381,23 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - **Design recommendations**: Affine self-introspections by default; exponential for axioms; correlation-aware aggregation as fallback
 - **Task 3.23 substantially addressed**: Linear types for evidence consumption = affine types forbidding contraction
 - See exploration/thread-3.46-epistemic-linearity.md
+
+**Epistemic Linearity and Defeat Interaction (Session 73)**:
+- **Task 3.48 answered**: How do affine evidence types interact with defeat?
+- **Core finding**: Evidence consumption is permanent regardless of defeat
+  - Once affine evidence is committed to a derivation, it's consumed even if the derivation is fully undercut
+  - Defeat affects derivation confidence, not evidence availability
+  - "Spending" interpretation: committing evidence "spends" it regardless of outcome
+- **Defeat evidence follows the same discipline**: Evidence used for undercut/rebut is itself affine
+  - Prevents "free" attacks that can be reused indefinitely
+  - Maintains epistemic balance between supporting and attacking
+- **Source-level defeaters should be exponential (!)**: Evidence attacking a source's reliability (not a specific inference) should be reusable
+  - "Witness was drunk" affects all testimony from that witness
+  - Domain-general defeaters (e.g., "induction is uncertain") marked exponential
+- **Reinstatement doesn't release evidence**: Counter-defeat restores confidence but doesn't un-consume evidence
+- **No partial release**: Partial undercut (d=0.5) doesn't release partial evidence—simplicity over precision
+- **Formal typing rules provided**: Undercut/Rebut rules require disjoint evidence contexts
+- See exploration/thread-3.48-linearity-defeat-interaction.md
 
 ---
 

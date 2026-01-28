@@ -123,9 +123,14 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 **New tasks discovered (Session 72)**:
 - [ ] **3.47 Affine evidence types in Lean** - Full Lean 4 formalization of affine evidence types with context splitting for aggregation.
-- [ ] **3.48 Epistemic linearity and defeat interaction** - How does affine evidence interact with defeat? Can undercut evidence be reused elsewhere?
+- [x] **3.48 Epistemic linearity and defeat interaction** - ANSWERED Session 73: Evidence consumption is permanent regardless of defeat. Key findings: (1) Once affine evidence is committed to a derivation, it's consumed even if the derivation is undercut, (2) Defeat evidence itself follows affine discipline (unless exponential), (3) Source-level defeaters should be marked exponential (!) as they affect all derivations from that source, (4) Reinstatement restores confidence but doesn't release evidence, (5) No partial release for partial undercut—simplicity over precision, (6) Formal typing rules provided with disjoint context requirement. See exploration/thread-3.48-linearity-defeat-interaction.md
 - [ ] **3.49 Decidability of affine CLAIR** - Prove decidability of type checking for CLAIR with affine evidence types.
 - [ ] **3.50 Gradual linearity adoption** - Design gradual typing approach for incremental adoption of affine evidence discipline.
+
+**New tasks discovered (Session 73)**:
+- [ ] **3.51 Evidence decomposition formalization** - How should complex evidence (documents with multiple claims) be decomposed into affine resources?
+- [ ] **3.52 Affine evidence and belief revision** - How does affine typing interact with Thread 5's belief revision algorithm?
+- [ ] **3.53 Computational costs of affine defeat tracking** - What are the performance implications of tracking affine defeat evidence?
 
 **New tasks discovered (Session 22)**:
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
@@ -2328,6 +2333,52 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Task 3.48: How epistemic linearity interacts with defeat
     - Task 3.49: Decidability proof for CLAIR with affine evidence
     - Task 3.50: Gradual linearity for incremental adoption
+
+### Session 73 Discoveries (Task 3.48 Epistemic Linearity and Defeat Interaction)
+
+365. **LINEARITY-DEFEAT INTERACTION RESOLVED** — Evidence consumption is permanent regardless of defeat. The "spending" interpretation of affine resources applies: committing evidence to a derivation spends it, whether the derivation succeeds or fails.
+
+366. **Evidence consumption is irreversible**:
+    - Once affine evidence e supports conclusion P, e is consumed
+    - Even if the e→P derivation is fully undercut (d=1), e doesn't "return"
+    - Type-theoretically consistent: consumption tracks allocation, not outcome
+    - Matches "spending" intuition from resource economics
+
+367. **Two interpretations analyzed**:
+    - Interpretation A (ADOPTED): Evidence permanently consumed—simpler, type-theoretically clean
+    - Interpretation B (REJECTED): Defeat releases evidence—informationally justified but complex
+    - Key argument: Linear types track resource *usage*, not *effectiveness*
+    - Analogous to function arguments: output being discarded doesn't un-consume input
+
+368. **Defeat evidence follows the same discipline**:
+    - Evidence d used to undercut is itself affine (unless exponential)
+    - Prevents "free" attacks that can be applied indefinitely
+    - Maintains epistemic symmetry: supporting and attacking both have costs
+
+369. **Source-level defeaters should be exponential (!)**:
+    - Evidence attacking a source's reliability (vs specific inference) should be reusable
+    - Example: "witness was drunk" affects ALL testimony from that witness
+    - Classification: specific counter-evidence (affine), source attacks (exponential), methodological critiques (exponential)
+
+370. **Formal typing rules established**:
+    - Undercut rule requires disjoint contexts: Δ₁ ⊢ D : A @c, Δ₂ ⊢ d : Attacks(D) @d_conf, Δ₁ ∩ Δ₂ = ∅
+    - Ensures defeat evidence is distinct from derivation evidence
+    - Rebut rule similarly requires disjoint contexts for for/against evidence
+
+371. **No partial release for partial undercut**:
+    - If d=0.5 undercuts derivation, evidence is NOT "half released"
+    - Simplicity over precision: evidence is atomic commitment
+    - Alternative: explicit evidence splitting at source level if needed
+
+372. **Reinstatement doesn't release evidence**:
+    - Counter-defeating a defeater restores confidence via Thread 2.12's formula
+    - All evidence (original, defeater, counter-defeater) remains consumed
+    - Reinstatement affects confidence values, not evidence availability
+
+373. **New questions raised**:
+    - Task 3.51: How should complex evidence (documents with claims) decompose into affine resources?
+    - Task 3.52: How does affine typing interact with Thread 5's belief revision?
+    - Task 3.53: Computational costs of tracking affine defeat evidence?
 
 ## Impossibilities Encountered
 
