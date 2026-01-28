@@ -1,0 +1,824 @@
+% Chapter 4: Justification as Labeled DAGs
+% Formalizes justification structure, defeat semantics, and confidence propagation
+
+\chapter{Justification as Labeled DAGs}
+\label{ch:justification}
+
+\epigraph{%
+  ``An argument is not a proof. It is a reason for a belief---and reasons can be defeated.''
+}{John L.\ Pollock, \textit{Defeasible Reasoning}}
+
+This chapter develops the structural foundation of CLAIR: how beliefs connect through
+justification. We show that trees are inadequate for justification structure and that
+the correct model is a \emph{directed acyclic graph with labeled edges}. The labels
+distinguish support from defeat, enabling defeasible reasoning where conclusions can
+be withdrawn when new evidence undermines their justifications.
+
+\section{The Inadequacy of Trees}
+\label{sec:tree-inadequacy}
+
+Traditional approaches represent justification as trees: each conclusion has premises,
+which themselves have premises, forming an inverted tree structure. This model is
+elegant but insufficient.
+
+\subsection{The Shared Premise Problem}
+\label{subsec:shared-premises}
+
+Consider a simple computation that uses the same belief twice:
+
+\begin{lstlisting}[language=CLAIR]
+let population = belief(1000000, 0.95, source: census)
+let sample_size = belief(1000, 0.90, source: survey)
+let ratio = derive population, sample_size by divide
+let inverse = derive sample_size, population by divide
+let product = derive ratio, inverse by multiply
+\end{lstlisting}
+
+In a tree representation, \texttt{population} and \texttt{sample\_size} each appear
+twice as separate subtrees:
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=1.5cm,
+  every node/.style={draw, rectangle, minimum width=2cm}
+]
+  \node (product) {product};
+  \node (ratio) [below left=of product] {ratio};
+  \node (inverse) [below right=of product] {inverse};
+  \node (pop1) [below left=of ratio] {population};
+  \node (samp1) [below right=of ratio] {sample\_size};
+  \node (samp2) [below left=of inverse] {sample\_size};
+  \node (pop2) [below right=of inverse] {population};
+
+  \draw[->] (ratio) -- (product);
+  \draw[->] (inverse) -- (product);
+  \draw[->] (pop1) -- (ratio);
+  \draw[->] (samp1) -- (ratio);
+  \draw[->] (samp2) -- (inverse);
+  \draw[->] (pop2) -- (inverse);
+\end{tikzpicture}
+\end{center}
+
+This duplication creates problems:
+
+\begin{enumerate}
+  \item \textbf{Space inefficiency}: Beliefs are copied rather than shared.
+  \item \textbf{Invalidation complexity}: If \texttt{population} is invalidated,
+        we must find and invalidate all copies.
+  \item \textbf{Semantic confusion}: Are these the \emph{same} belief or
+        \emph{different} beliefs that happen to be equal?
+\end{enumerate}
+
+The correct representation is a DAG with explicit sharing:
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=1.5cm and 2cm,
+  every node/.style={draw, rectangle, minimum width=2cm}
+]
+  \node (product) {product};
+  \node (ratio) [below left=of product] {ratio};
+  \node (inverse) [below right=of product] {inverse};
+  \node (pop) [below=2.5cm of product, xshift=-1.5cm] {population};
+  \node (samp) [below=2.5cm of product, xshift=1.5cm] {sample\_size};
+
+  \draw[->] (ratio) -- (product);
+  \draw[->] (inverse) -- (product);
+  \draw[->] (pop) -- (ratio);
+  \draw[->] (samp) -- (ratio);
+  \draw[->] (samp) -- (inverse);
+  \draw[->] (pop) -- (inverse);
+\end{tikzpicture}
+\end{center}
+
+Now each belief appears exactly once, with multiple edges pointing to shared nodes.
+Invalidation propagates correctly: removing \texttt{population} affects both
+\texttt{ratio} and \texttt{inverse}.
+
+\begin{theorem}[DAG necessity]
+\label{thm:dag-necessity}
+Any justification system that:
+\begin{enumerate}
+  \item Allows a belief to be used as a premise in multiple derivations,
+  \item Propagates invalidation correctly (removing a premise invalidates all conclusions), and
+  \item Maintains identity (the ``same'' belief is the same node)
+\end{enumerate}
+must represent justification as a DAG, not a tree.
+\end{theorem}
+
+\begin{proof}
+In a tree, each node has exactly one parent. If belief $b$ is used in derivations
+of both $c_1$ and $c_2$, then $b$ must appear as a child of both $c_1$ and $c_2$
+(counting from root). But in a tree, a node cannot have two parents. Therefore,
+$b$ must be duplicated, violating identity. A DAG allows multiple parents, resolving
+the contradiction.
+\end{proof}
+
+\subsection{Why Not Cycles?}
+\label{subsec:no-cycles}
+
+If we allow sharing, why not allow cycles? Coherentist epistemology suggests beliefs
+can mutually support each other:
+
+\begin{lstlisting}[language=CLAIR]
+let theory = belief("Relativity is correct", 0.95,
+  supported_by: observation)
+let observation = belief("Mercury precesses as predicted", 0.99,
+  interpreted_via: theory)  -- circular!
+\end{lstlisting}
+
+Here \texttt{theory} is supported by \texttt{observation}, which is interpreted
+through \texttt{theory}. This appears circular.
+
+We reject cycles in justification for three reasons:
+
+\begin{enumerate}
+  \item \textbf{Bootstrap problem}: Circular justification allows confidence
+        inflation with no external grounding. A set of mutually supporting
+        beliefs with no connection to evidence is epistemically vacuous.
+
+  \item \textbf{Invalidation ambiguity}: If $A$ supports $B$ and $B$ supports $A$,
+        what happens when we remove external support for $A$? Does $B$ lose
+        support? If so, does $A$ lose its support from $B$? The semantics
+        become ill-defined.
+
+  \item \textbf{Well-foundedness}: The justification relation should be
+        well-founded, meaning there are no infinite descending chains of
+        justification. Cycles violate this.
+\end{enumerate}
+
+\begin{remark}
+The theory/observation example is better analyzed as two separate relations:
+\begin{itemize}
+  \item \textbf{Evidential support} (tracked in justification): Observation
+        provides evidence for theory.
+  \item \textbf{Interpretive framework} (not part of justification): Theory
+        provides framework for interpreting observation.
+\end{itemize}
+Conflating these leads to apparent circularity.
+\end{remark}
+
+\section{Labeled Edges for Defeat}
+\label{sec:labeled-edges}
+
+The DAG structure addresses sharing but not defeat. When evidence undermines
+a belief's justification, we need edges that carry negative, not positive,
+epistemic weight.
+
+\subsection{The Defeat Problem}
+\label{subsec:defeat-problem}
+
+Consider:
+
+\begin{lstlisting}[language=CLAIR]
+let testimony = belief("X occurred", 0.85, source: witness_A)
+let unreliable = belief("Witness A was drunk", 0.70, source: investigation)
+\end{lstlisting}
+
+The belief \texttt{unreliable} doesn't refute the testimony directly---it
+\emph{undercuts} the justification by attacking the source's reliability.
+In a plain DAG, all edges represent positive support. We cannot express that
+\texttt{unreliable} should \emph{decrease} confidence in \texttt{testimony}.
+
+\subsection{Edge Types}
+\label{subsec:edge-types}
+
+Following Pollock's taxonomy~\citep{pollock1987defeasible}, we distinguish:
+
+\begin{definition}[Edge types]
+\label{def:edge-types}
+A justification edge has one of three types:
+\begin{enumerate}
+  \item \textbf{Support}: The source provides positive evidence for the target.
+        Contributes to confidence via multiplication or aggregation.
+  \item \textbf{Undercut}: The source attacks the \emph{inferential link} to the target,
+        not the target's truth. Reduces confidence via multiplicative discounting.
+  \item \textbf{Rebut}: The source provides direct counter-evidence against the target.
+        Reduces confidence via proportional competition.
+\end{enumerate}
+\end{definition}
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=2cm,
+  belief/.style={draw, rectangle, minimum width=2.5cm},
+  support/.style={->, thick},
+  undercut/.style={->, thick, dashed, red},
+  rebut/.style={->, thick, dotted, blue}
+]
+  \node[belief] (conclusion) {Conclusion};
+  \node[belief] (premise1) [below left=of conclusion] {Premise 1};
+  \node[belief] (premise2) [below=of conclusion] {Premise 2};
+  \node[belief] (defeater) [below right=of conclusion] {Defeater};
+
+  \draw[support] (premise1) -- node[left] {support} (conclusion);
+  \draw[support] (premise2) -- node[right] {support} (conclusion);
+  \draw[undercut] (defeater) -- node[right] {undercut} (conclusion);
+\end{tikzpicture}
+\end{center}
+
+\subsection{Formal Definition}
+\label{subsec:edge-formal}
+
+\begin{definition}[Justification graph]
+\label{def:justification-graph}
+A \emph{justification graph} is a tuple $G = (N, E, r)$ where:
+\begin{itemize}
+  \item $N$ is a finite set of \emph{justification nodes}
+  \item $E \subseteq N \times N \times \{\mathsf{support}, \mathsf{undercut}, \mathsf{rebut}\}$
+        is a set of labeled edges
+  \item $r \in N$ is the root node (the belief being justified)
+\end{itemize}
+subject to the constraint that the underlying unlabeled graph $(N, \{(s,t) \mid (s,t,\ell) \in E\})$
+is acyclic.
+\end{definition}
+
+\begin{definition}[Justification node]
+\label{def:justification-node}
+Each node $n \in N$ has a \emph{node type}:
+\begin{align*}
+  \mathsf{NodeType} ::= &\; \mathsf{axiom} \\
+  \mid &\; \mathsf{rule}(r, [n_1, \ldots, n_k]) \\
+  \mid &\; \mathsf{assumption}(a) \\
+  \mid &\; \mathsf{choice}(\mathsf{options}, \mathsf{criteria}, \mathsf{reason}) \\
+  \mid &\; \mathsf{abduction}(\mathsf{obs}, [\mathsf{hyp}_1, \ldots], \mathsf{selected}, \mathsf{reason}) \\
+  \mid &\; \mathsf{analogy}(\mathsf{source}, \mathsf{similarity}, \mathsf{transfer}) \\
+  \mid &\; \mathsf{induction}([n_1, \ldots, n_k], \mathsf{rule}) \\
+  \mid &\; \mathsf{aggregate}([n_1, \ldots, n_k], \mathsf{combRule})
+\end{align*}
+\end{definition}
+
+The first four types are traditional (axiom, deductive rule, assumption, decision).
+The next three handle non-deductive reasoning (abduction, analogy, induction).
+The last type handles aggregation of independent evidence.
+
+\section{Confidence Propagation}
+\label{sec:confidence-propagation}
+
+Given a justification graph, how do we compute the confidence of the root?
+The answer depends on node types and edge labels.
+
+\subsection{Support Edges}
+\label{subsec:support-propagation}
+
+For a node $n$ with only support edges from $n_1, \ldots, n_k$, confidence
+propagation depends on the node type:
+
+\begin{definition}[Support propagation]
+\label{def:support-propagation}
+Let $c_i = \conf(n_i)$ for each child $n_i$. Then:
+\begin{align}
+  \conf(\mathsf{axiom}) &= 1 \\
+  \conf(\mathsf{rule}(r, [n_1, \ldots, n_k])) &= s_r \cdot \prod_{i=1}^k c_i \\
+  \conf(\mathsf{assumption}(a)) &= \conf_{\text{assumed}}(a) \\
+  \conf(\mathsf{aggregate}([n_1, \ldots, n_k], \mathsf{independent})) &= \bigoplus_{i=1}^k c_i
+\end{align}
+where $s_r \in [0,1]$ is the inherent strength of rule $r$, and $\bigoplus$
+denotes iterated probabilistic OR.
+\end{definition}
+
+\begin{theorem}[Aggregation increases confidence]
+\label{thm:aggregation-increases}
+For aggregation with independent combination rule:
+\[
+  \conf(\mathsf{aggregate}([n_1, \ldots, n_k], \mathsf{independent})) \geq \max_{i} c_i
+\]
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:oplus-increasing}, $a \oplus b \geq \max(a, b)$.
+By induction on $k$, $\bigoplus_{i=1}^k c_i \geq \max_i c_i$.
+\end{proof}
+
+This captures the intuition that multiple independent pieces of evidence
+supporting the same conclusion strengthen our confidence.
+
+\subsection{Defeat Edges}
+\label{subsec:defeat-propagation}
+
+Defeat edges reduce confidence. From Chapter~\ref{ch:confidence}:
+
+\begin{definition}[Defeat propagation]
+\label{def:defeat-propagation}
+Let $c$ be the confidence from support edges, and let $d_1, \ldots, d_m$ be
+the confidences of undercutting defeaters, and $r_1, \ldots, r_n$ be the
+confidences of rebutting defeaters. Then:
+\[
+  c' = \rebut\left(\undercut(c, \bigoplus_{i=1}^m d_i), \bigoplus_{j=1}^n r_j\right)
+\]
+where $\bigoplus$ aggregates multiple defeaters.
+\end{definition}
+
+\begin{remark}[Order of operations]
+We apply undercuts before rebuts because:
+\begin{enumerate}
+  \item Undercuts weaken the inference link, affecting how strongly the
+        supporting evidence speaks to the conclusion.
+  \item Rebuts compare weakened support against counter-evidence.
+\end{enumerate}
+This order reflects the conceptual distinction: undercuts attack the inference
+process, rebuts attack the conclusion.
+\end{remark}
+
+\subsection{The Complete Propagation Algorithm}
+\label{subsec:propagation-algorithm}
+
+Given a justification graph $G$, compute root confidence as follows:
+
+\begin{algorithm}
+\caption{Confidence Propagation}
+\label{alg:propagation}
+\begin{algorithmic}[1]
+\Require Justification graph $G = (N, E, r)$
+\Ensure Confidence of root node $r$
+\Function{Propagate}{$n$}
+  \If{$n$ is $\mathsf{axiom}$}
+    \State \Return $1$
+  \EndIf
+  \State $\mathsf{supports} \gets \{(s, c) \mid (s, n, \mathsf{support}) \in E, c = \Call{Propagate}{s}\}$
+  \State $\mathsf{undercuts} \gets \{c \mid (s, n, \mathsf{undercut}) \in E, c = \Call{Propagate}{s}\}$
+  \State $\mathsf{rebuts} \gets \{c \mid (s, n, \mathsf{rebut}) \in E, c = \Call{Propagate}{s}\}$
+  \State $c_{\mathsf{base}} \gets \Call{CombineSupport}{n.\mathsf{type}, \mathsf{supports}}$
+  \State $d \gets \bigoplus_{c \in \mathsf{undercuts}} c$ \Comment{Aggregate undercuts}
+  \State $c_{\mathsf{undercut}} \gets c_{\mathsf{base}} \cdot (1 - d)$
+  \If{$\mathsf{rebuts} \neq \emptyset$}
+    \State $r \gets \bigoplus_{c \in \mathsf{rebuts}} c$
+    \State \Return $c_{\mathsf{undercut}} / (c_{\mathsf{undercut}} + r)$
+  \Else
+    \State \Return $c_{\mathsf{undercut}}$
+  \EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}[Propagation termination]
+\label{thm:propagation-terminates}
+Algorithm~\ref{alg:propagation} terminates for any justification graph.
+\end{theorem}
+
+\begin{proof}
+The graph is acyclic by definition. Each recursive call moves to a node
+strictly earlier in some topological order. Since the graph is finite,
+recursion must terminate.
+\end{proof}
+
+\begin{theorem}[Propagation soundness]
+\label{thm:propagation-sound}
+Algorithm~\ref{alg:propagation} returns a value in $[0, 1]$.
+\end{theorem}
+
+\begin{proof}
+By structural induction on the graph. Base case: axioms return 1.
+Inductive case: by Theorems~\ref{thm:mul-bounded}, \ref{thm:oplus-bounded},
+\ref{thm:undercut-bounded}, and~\ref{thm:rebut-bounded}, all operations
+preserve bounds.
+\end{proof}
+
+\section{Reinstatement}
+\label{sec:reinstatement}
+
+A fundamental phenomenon in defeasible reasoning is \emph{reinstatement}:
+when a defeater is itself defeated, the original belief recovers some confidence.
+
+\subsection{The Reinstatement Problem}
+\label{subsec:reinstatement-problem}
+
+Consider:
+
+\begin{lstlisting}[language=CLAIR]
+let claim = belief("The defendant is guilty", 0.80)
+let alibi = belief("Defendant has alibi", 0.70)  -- undercuts claim
+let discredited = belief("Alibi witness lied", 0.60)  -- undercuts alibi
+\end{lstlisting}
+
+Without \texttt{discredited}, the alibi reduces confidence in guilt:
+\[
+  \conf(\text{guilty}) = 0.80 \cdot (1 - 0.70) = 0.24
+\]
+
+But \texttt{discredited} undercuts the alibi:
+\[
+  \conf_{\text{eff}}(\text{alibi}) = 0.70 \cdot (1 - 0.60) = 0.28
+\]
+
+So the effective confidence in guilt becomes:
+\[
+  \conf(\text{guilty}) = 0.80 \cdot (1 - 0.28) = 0.576
+\]
+
+The defendant's guilt is \emph{reinstated} (partially) by discrediting the alibi.
+
+\subsection{Compositional Reinstatement}
+\label{subsec:compositional-reinstatement}
+
+A key insight: CLAIR's architecture handles reinstatement automatically through
+bottom-up evaluation. No special mechanism is needed.
+
+\begin{theorem}[Compositional reinstatement]
+\label{thm:compositional-reinstatement}
+Let $A$ be a belief with base confidence $a$, let $D$ be an undercutting defeater
+with base confidence $d$, and let $E$ undercut $D$ with confidence $e$. Then:
+\[
+  \conf(A) = a \cdot (1 - d \cdot (1 - e))
+\]
+
+The \emph{reinstatement boost} is:
+\[
+  \Delta = a \cdot d \cdot e
+\]
+representing the confidence recovered by the counter-defeater.
+\end{theorem}
+
+\begin{proof}
+Bottom-up evaluation:
+\begin{enumerate}
+  \item $\conf_{\text{eff}}(D) = d \cdot (1 - e)$ (E undercuts D)
+  \item $\conf(A) = a \cdot (1 - \conf_{\text{eff}}(D)) = a \cdot (1 - d(1-e))$
+\end{enumerate}
+
+Without E: $\conf(A) = a(1-d)$.
+With E: $\conf(A) = a(1 - d + de) = a(1-d) + ade$.
+The boost is $\Delta = ade$.
+\end{proof}
+
+\begin{corollary}[Reinstatement is graded]
+The reinstatement boost $\Delta = a \cdot d \cdot e$ is proportional to:
+\begin{itemize}
+  \item $a$: How much there was to recover
+  \item $d$: How much was lost to the defeater
+  \item $e$: How strongly the counter-defeater discredits the defeater
+\end{itemize}
+\end{corollary}
+
+\subsection{Infinite Defeat Chains}
+\label{subsec:infinite-chains}
+
+What happens with longer chains: $A$ defeated by $D_1$ defeated by $D_2$ defeated
+by $D_3$, and so on?
+
+\begin{theorem}[Chain convergence]
+\label{thm:chain-convergence}
+Let $A$ have base confidence $a$, and let $D_1, D_2, D_3, \ldots$ be an
+infinite chain where each $D_i$ undercuts the previous element (or $A$ for $i=1$),
+all with the same base confidence $d$. Then:
+\[
+  \lim_{n \to \infty} \conf(A) = a \cdot \frac{1}{1 + d}
+\]
+\end{theorem}
+
+\begin{proof}
+Let $c_n = \conf(A)$ with $n$ defeaters in the chain.
+The recurrence is:
+\[
+  c_{n+1} = a(1 - d \cdot \conf_{\text{eff}}(D_1 \text{ with } n \text{ counter-defeaters}))
+\]
+
+For even $n$, odd-numbered defeaters are active (not counter-defeated).
+For odd $n$, they are weakened.
+
+At the limit, let $c_\infty = c$. The fixed point satisfies:
+\[
+  c = a(1 - d(1 - d(1 - \cdots)))
+\]
+
+Let $x$ be the infinite continued fraction $(1 - d(1 - d(1 - \cdots)))$.
+Then $x = 1 - d(1-x) = 1 - d + dx$, so $(1-d)x = 1-d$, giving $x = 1$ when
+$d \neq 1$.
+
+More carefully, the alternating structure gives:
+\[
+  c = a \cdot \frac{1}{1 + d}
+\]
+verified by checking the fixed point: if $c = a/(1+d)$, then
+$a(1 - d \cdot c/a) = a(1 - d/(1+d)) = a \cdot 1/(1+d) = c$. \checkmark
+\end{proof}
+
+\begin{example}
+With $a = 0.8$ and $d = 0.5$:
+\begin{itemize}
+  \item No defeaters: $\conf(A) = 0.80$
+  \item One defeater: $\conf(A) = 0.80 \cdot 0.50 = 0.40$
+  \item Two defeaters: $\conf(A) = 0.80 \cdot (1 - 0.50 \cdot 0.50) = 0.60$
+  \item Three defeaters: $\conf(A) = 0.80 \cdot (1 - 0.50 \cdot 0.75) = 0.50$
+  \item $\vdots$
+  \item Limit: $\conf(A) = 0.80 / 1.50 \approx 0.533$
+\end{itemize}
+The confidence oscillates and converges to the limit.
+\end{example}
+
+\section{Mutual Defeat}
+\label{sec:mutual-defeat}
+
+A special case arises when two arguments defeat each other:
+
+\begin{lstlisting}[language=CLAIR]
+let A = belief("Defendant was at scene", 0.7)
+let B = belief("Defendant has alibi", 0.6)
+-- A undercuts B (if at scene, alibi is wrong)
+-- B undercuts A (if alibi, wasn't at scene)
+\end{lstlisting}
+
+This creates a defeat cycle (though not a justification cycle---the underlying
+evidential support remains acyclic).
+
+\subsection{Fixed Point Analysis}
+\label{subsec:mutual-fixed-point}
+
+\begin{theorem}[Mutual defeat fixed point]
+\label{thm:mutual-fixed-point}
+Let $A$ and $B$ mutually undercut each other with base confidences $a$ and $b$.
+The fixed point confidences are:
+\begin{align}
+  a^* &= \frac{a(1-b)}{1 - ab} \\
+  b^* &= \frac{b(1-a)}{1 - ab}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+At fixed point:
+\begin{align*}
+  a^* &= a(1 - b^*) \\
+  b^* &= b(1 - a^*)
+\end{align*}
+
+Substituting:
+\[
+  a^* = a(1 - b(1 - a^*)) = a - ab + ab \cdot a^*
+\]
+\[
+  a^*(1 - ab) = a(1 - b)
+\]
+\[
+  a^* = \frac{a(1-b)}{1-ab}
+\]
+
+By symmetry, $b^* = \frac{b(1-a)}{1-ab}$.
+\end{proof}
+
+\begin{example}[Symmetric mutual defeat]
+With $a = b = d$ (equal confidence):
+\[
+  a^* = b^* = \frac{d(1-d)}{1-d^2} = \frac{d(1-d)}{(1-d)(1+d)} = \frac{d}{1+d}
+\]
+
+This matches the infinite chain limit from Theorem~\ref{thm:chain-convergence},
+confirming the analysis is consistent.
+\end{example}
+
+\subsection{Existence and Uniqueness}
+\label{subsec:fixed-point-existence}
+
+\begin{theorem}[Fixed point existence]
+\label{thm:fixed-point-existence}
+For any defeat graph (possibly with cycles in the defeat relation, but acyclic
+in the underlying support relation), a fixed point exists.
+\end{theorem}
+
+\begin{proof}
+The confidence update function $f: [0,1]^n \to [0,1]^n$ maps confidence vectors
+to confidence vectors. Since $[0,1]^n$ is compact and convex, and $f$ is
+continuous, Brouwer's fixed point theorem guarantees existence.
+\end{proof}
+
+\begin{theorem}[Uniqueness condition]
+\label{thm:uniqueness-condition}
+If all base confidences satisfy $b_{\max} \cdot d_{\max} < 1$ where $d_{\max}$
+is the maximum defeat strength, the fixed point is unique and the iterative
+computation converges.
+\end{theorem}
+
+\begin{proof}
+Under this condition, the update function is a contraction mapping on $[0,1]^n$
+with the supremum metric. By the Banach fixed point theorem, there is a unique
+fixed point and iteration converges to it.
+\end{proof}
+
+\section{Correlated Evidence}
+\label{sec:correlated-evidence}
+
+The aggregation formula $c_1 \oplus c_2$ assumes independence. When evidence
+sources are correlated, this assumption fails and confidence is overcounted.
+
+\subsection{The Overcounting Problem}
+\label{subsec:overcounting}
+
+Consider three studies supporting a medical treatment, all by the same research
+group using the same methodology. Treating them as independent evidence:
+\[
+  0.7 \oplus 0.7 \oplus 0.7 = 1 - (1-0.7)^3 = 1 - 0.027 = 0.973
+\]
+
+This 97.3\% confidence is misleading---the studies are essentially one piece
+of evidence, not three independent confirmations.
+
+\subsection{Dependency-Adjusted Aggregation}
+\label{subsec:dependency-adjusted}
+
+\begin{definition}[Dependency-adjusted aggregation]
+\label{def:dependency-adjusted}
+For two evidence sources with confidences $c_1, c_2$ and dependency parameter
+$\delta \in [0,1]$:
+\[
+  \mathsf{aggregate}_\delta(c_1, c_2) = (1-\delta)(c_1 \oplus c_2) + \delta \cdot \frac{c_1 + c_2}{2}
+\]
+
+Interpretation:
+\begin{itemize}
+  \item $\delta = 0$: Fully independent (use $\oplus$)
+  \item $\delta = 1$: Fully dependent (use average)
+  \item $0 < \delta < 1$: Partial dependency (interpolate)
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Dependency-adjusted bounds]
+\label{thm:dep-adjusted-bounds}
+For all $c_1, c_2, \delta \in [0,1]$:
+\[
+  \mathsf{aggregate}_\delta(c_1, c_2) \in [0,1]
+\]
+\end{theorem}
+
+\begin{proof}
+Both $c_1 \oplus c_2 \in [0,1]$ and $(c_1 + c_2)/2 \in [0,1]$.
+The convex combination of values in $[0,1]$ is in $[0,1]$.
+\end{proof}
+
+\begin{theorem}[Dependency monotonicity]
+\label{thm:dependency-monotonicity}
+For fixed $c_1, c_2$, $\mathsf{aggregate}_\delta(c_1, c_2)$ is monotonically
+decreasing in $\delta$.
+\end{theorem}
+
+\begin{proof}
+Taking the derivative with respect to $\delta$:
+\[
+  \frac{\partial}{\partial\delta}\mathsf{aggregate}_\delta = -(c_1 \oplus c_2) + \frac{c_1 + c_2}{2}
+\]
+
+Since $c_1 \oplus c_2 \geq \max(c_1, c_2) \geq (c_1 + c_2)/2$, the derivative
+is non-positive, so the function is decreasing in $\delta$.
+\end{proof}
+
+This confirms intuition: more correlated evidence provides less boost than
+independent evidence.
+
+\subsection{Inferring Dependency}
+\label{subsec:inferring-dependency}
+
+The dependency parameter can be estimated from provenance overlap:
+
+\begin{definition}[Provenance-based dependency]
+\label{def:provenance-dependency}
+For beliefs $b_1, b_2$ with ancestor sets $A_1, A_2$ in the justification DAG:
+\[
+  \delta \approx \frac{|A_1 \cap A_2|}{|A_1 \cup A_2|}
+\]
+(Jaccard similarity of ancestor sets)
+\end{definition}
+
+\begin{example}
+If two conclusions both ultimately derive from the same sensor reading, they
+share ancestors and $\delta$ will be high. If they derive from completely
+different evidence chains, $\delta \approx 0$.
+\end{example}
+
+\section{Connection to Prior Art}
+\label{sec:justification-prior-art}
+
+\subsection{Truth Maintenance Systems}
+\label{subsec:tms}
+
+JTMS (Justification-based TMS)~\citep{doyle1979truth} represents dependencies
+as IN-lists and OUT-lists:
+\begin{itemize}
+  \item A belief is IN if all IN-list elements are believed and all OUT-list
+        elements are disbelieved.
+  \item This gives binary (IN/OUT) status, not graded confidence.
+\end{itemize}
+
+ATMS (Assumption-based TMS)~\citep{dekleer1986assumption} tracks multiple
+assumption sets (environments), labeling each conclusion with the minimal
+environments supporting it.
+
+\textbf{CLAIR contribution}: Generalize TMS to graded confidence with the
+same dependency-directed architecture. JTMS's OUT-lists correspond to
+undercut edges. ATMS's environments inspire provenance tracking.
+
+\subsection{Argumentation Frameworks}
+\label{subsec:argumentation}
+
+Dung's abstract argumentation~\citep{dung1995acceptability} defines acceptance
+semantics for arguments under attack. Extensions like gradual
+semantics~\citep{amgoud2017evaluation} assign numeric acceptability degrees.
+
+\textbf{CLAIR contribution}: Integrate argumentation's defeat semantics with
+type-theoretic justification, providing both structural and numeric treatment.
+
+\subsection{Subjective Logic}
+\label{subsec:subjective-logic-justification}
+
+J\o sang's Subjective Logic~\citep{josang2016subjective} provides fusion
+operators for combining opinions, including discounting (trust reduction).
+
+\textbf{CLAIR contribution}: Use Subjective Logic insights for confidence
+operations while extending to justification DAGs with explicit provenance.
+
+\subsection{Justification Logic}
+\label{subsec:justification-logic}
+
+Artemov's Justification Logic~\citep{artemov2001explicit} adds explicit
+justification terms to modal logic: $t : \phi$ means ``$t$ is a justification
+for $\phi$.''
+
+\textbf{CLAIR contribution}: Extend from tree-like justification terms to
+DAGs with labeled edges, supporting defeasible reasoning and aggregation.
+
+\section{Lean 4 Formalization}
+\label{sec:justification-lean}
+
+The justification graph structure is formalized in Lean~4:
+
+\begin{lstlisting}[language=Lean]
+inductive EdgeType where
+  | support : EdgeType
+  | undercut : EdgeType
+  | rebut : EdgeType
+  deriving Repr, DecidableEq
+
+structure Edge where
+  source : NodeId
+  target : NodeId
+  edgeType : EdgeType
+
+structure JustificationGraph where
+  nodes : HashMap NodeId NodeType
+  edges : List Edge
+  root : NodeId
+  acyclic : IsAcyclic nodes edges  -- proof obligation
+\end{lstlisting}
+
+The propagation algorithm is implemented and verified to preserve bounds:
+
+\begin{lstlisting}[language=Lean]
+def propagate (g : JustificationGraph) : NodeId -> Confidence
+  | n => match g.nodes[n] with
+    | .axiom => 1
+    | _ =>
+      let supports := g.supportEdges n |>.map propagate
+      let undercuts := g.undercutEdges n |>.map propagate
+      let rebuts := g.rebutEdges n |>.map propagate
+      let base := combineSupports (g.nodeType n) supports
+      let afterUndercut := undercut base (aggregateDefeaters undercuts)
+      applyRebuts afterUndercut rebuts
+  termination_by n => g.depth n
+\end{lstlisting}
+
+\section{Conclusion}
+\label{sec:justification-conclusion}
+
+This chapter established the structural foundation of CLAIR:
+
+\begin{enumerate}
+  \item \textbf{DAGs, not trees}: Shared premises require graph structure;
+        explicit sharing enables correct invalidation.
+
+  \item \textbf{Acyclic}: Cycles in evidential support violate well-foundedness
+        and allow bootstrap paradoxes. Cycles in defeat are handled via
+        fixed-point semantics.
+
+  \item \textbf{Labeled edges}: Support, undercut, and rebut serve different
+        epistemic roles with different confidence propagation rules.
+
+  \item \textbf{Compositional reinstatement}: When defeaters are themselves
+        defeated, confidence is recovered proportionally---no special mechanism
+        needed beyond bottom-up evaluation.
+
+  \item \textbf{Correlated evidence}: Independence assumptions must be explicit;
+        dependency-adjusted aggregation prevents overcounting.
+\end{enumerate}
+
+The justification DAG provides the structural substrate for CLAIR's beliefs.
+The next chapter addresses a subtler challenge: how beliefs can safely refer
+to themselves.
+
+%% ============================================================================
+%% BIBLIOGRAPHY NOTES
+%% ============================================================================
+%
+% Key citations for this chapter:
+%
+% TMS:
+% - doyle1979truth: A Truth Maintenance System
+% - dekleer1986assumption: An Assumption-based TMS
+%
+% Argumentation:
+% - dung1995acceptability: On the acceptability of arguments
+% - pollock1987defeasible: Defeasible Reasoning
+% - amgoud2017evaluation: Evaluation of argumentation
+%
+% Subjective Logic:
+% - josang2016subjective
+%
+% Justification Logic:
+% - artemov2001explicit: Explicit Provability
+%

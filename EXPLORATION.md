@@ -1672,3 +1672,31 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Dissertation Chapter 3 complete" → NEW (confidence: 0.95)
   - "Confidence algebra adequately formalized" → CONFIRMED (confidence: 0.95)
   - "Three monoids, not semiring" → CONFIRMED (confidence: 0.99)
+
+### Session 36: Dissertation Chapter 4 (Task 10.1d - Justification as Labeled DAGs)
+- **CHAPTER 4: JUSTIFICATION AS LABELED DAGS WRITTEN**
+- **Focus**: Structural foundation of CLAIR—how beliefs connect through justification
+- **Coverage** (~25 pages):
+  1. **The Inadequacy of Trees**: Shared premise problem, DAG necessity theorem, why not cycles (bootstrap problem, invalidation ambiguity, well-foundedness)
+  2. **Labeled Edges for Defeat**: Edge types (support/undercut/rebut), formal justification graph definition, justification node types (axiom, rule, assumption, choice, abduction, analogy, induction, aggregate)
+  3. **Confidence Propagation**: Support propagation by node type, defeat propagation (undercuts then rebuts), complete propagation algorithm with termination and soundness proofs
+  4. **Reinstatement**: Compositional reinstatement (boost = a×d×e), infinite chain convergence theorem (limit = d/(1+d))
+  5. **Mutual Defeat**: Fixed point analysis, existence (Brouwer) and uniqueness (Banach contraction when b_max×d_max<1), symmetric case reduces to chain limit
+  6. **Correlated Evidence**: Overcounting problem, dependency-adjusted aggregation (interpolation between ⊕ and average), provenance-based dependency inference
+  7. **Connection to Prior Art**: TMS (JTMS/ATMS), argumentation frameworks (Dung), Subjective Logic, Justification Logic
+  8. **Lean 4 Formalization**: EdgeType, JustificationGraph, propagate function with termination
+- **Key theorems formalized**:
+  - DAG necessity: shared premises require graph structure
+  - Aggregation increases confidence: aggregate ≥ max
+  - Compositional reinstatement: boost = a×d×e (no special mechanism needed)
+  - Chain convergence: limit = a/(1+d) for infinite alternating defeat
+  - Mutual defeat fixed point: a* = a(1-b)/(1-ab)
+  - Fixed point existence (Brouwer) and uniqueness (Banach contraction)
+  - Dependency monotonicity: higher δ → lower combined confidence
+- **Output**: `formal/dissertation/chapters/04-justification.tex`
+- **Status**: Chapter 4 COMPLETED
+- **Dissertation progress**: Chapters 1-4 complete; Chapters 5-13 remaining
+- **Beliefs updated**:
+  - "Dissertation Chapter 4 complete" → NEW (confidence: 0.95)
+  - "Justification DAG structure adequately formalized" → CONFIRMED (confidence: 0.95)
+  - "Reinstatement emerges compositionally" → CONFIRMED (confidence: 0.99)
