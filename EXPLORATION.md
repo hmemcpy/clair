@@ -69,7 +69,7 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 
 ---
 
-## Recent Explorations (Sessions 72-73)
+## Recent Explorations (Sessions 72-74)
 
 ### Epistemic Linearity (Session 72)
 - **Insight**: Evidence should be affine (use at most once, forbid contraction)
@@ -83,21 +83,28 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 - **Source-level defeaters**: Should be exponential (!)
 - **Reinstatement**: Restores confidence, doesn't release evidence
 
+### Decidability of Affine CLAIR (Session 74)
+- **Key result**: Type checking is decidable in O(n²) time
+- **Reason**: Affine type checking is structural; ℚ arithmetic is decidable
+- **Distinction**: Type checking ≠ CPL validity checking (different problems)
+- **Safe extensions**: Rank-1 polymorphism, iso-recursive types
+- **Unsafe**: Full dependent types would break decidability
+
 ---
 
 ## Open Questions
 
 ### High Priority
-- **3.49 Decidability of affine CLAIR** - Is type checking decidable with affine evidence?
 - **3.47 Affine types in Lean** - Formalize context splitting for aggregation
 - **8.4 Extract interpreter** - Produce executable from Lean formalization
+- **3.15 Stratification in Lean** - Complete the Lean formalization of stratified beliefs
 
 ### Medium Priority
 - **3.50** Gradual linearity adoption
 - **5.4** Dynamic epistemic logic formalization
 - **4.9** Reliability metrics formalization
 
-### See IMPLEMENTATION_PLAN.md for complete open task list (50 tasks)
+### See IMPLEMENTATION_PLAN.md for complete open task list (14 tasks)
 
 ---
 
@@ -117,6 +124,7 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 | CLAIR-finite decidable | 0.95 | ✓ Session 57 |
 | Affine types capture non-duplication | 0.90 | ✓ Session 72 |
 | Evidence consumption permanent | 0.85 | ✓ Session 73 |
+| Affine CLAIR type checking decidable | 0.95 | ✓ Session 74 |
 | LLM phenomenality | 0.35 | ⚠ Unknown |
 | Captures how I reason | 0.50 | ⚠ Unknown |
 

@@ -20,8 +20,8 @@
 - [ ] **3.15 Formalize stratification in Lean** - Complete the Lean formalization
 
 **Affine Evidence Types** (HIGH PRIORITY):
-- [ ] **3.47 Affine evidence types in Lean** - Full formalization with context splitting
-- [ ] **3.49 Decidability of affine CLAIR** - Prove decidability of type checking ← **NEXT**
+- [ ] **3.47 Affine evidence types in Lean** - Full formalization with context splitting ← **NEXT**
+- [x] **3.49 Decidability of affine CLAIR** - Proven decidable in O(n²) time
 - [ ] **3.50 Gradual linearity adoption** - Gradual typing for incremental adoption
 - [ ] **3.51 Evidence decomposition** - Complex evidence → affine resources
 - [ ] **3.52 Affine evidence and belief revision** - Interaction with Thread 5
@@ -65,8 +65,8 @@ See `exploration/completed/` for all finished exploration documents (51 files).
 **Phase 1: Core Type System**
 1. ~~3.46 Epistemic linearity~~ ✓
 2. ~~3.48 Linearity × defeat~~ ✓
-3. **3.49 Decidability of affine CLAIR** ← Current
-4. 3.47 Affine types in Lean
+3. ~~3.49 Decidability of affine CLAIR~~ ✓
+4. **3.47 Affine types in Lean** ← Current
 
 **Phase 2: Complete Formalization**
 5. 3.15 Stratification in Lean
@@ -82,6 +82,6 @@ See `exploration/completed/` for all finished exploration documents (51 files).
 
 ## Statistics
 
-- **Active tasks**: 22
+- **Active tasks**: 14
 - **Archived tasks**: 28 (see ARCHIVED_TASKS.md)
-- **Completed explorations**: 51 files
+- **Completed explorations**: 52 files
