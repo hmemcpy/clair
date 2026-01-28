@@ -267,6 +267,20 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - **Prior art connections**: Information flow types, effect systems, graded modal types
 - See exploration/thread-3.19-type-anti-bootstrapping.md
 
+**Optimal Lattice Choice (Session 63)**:
+- **Task 3.27 answered**: Is L₅ the right finite lattice?
+- **Conclusion**: L₅ = {0, 0.25, 0.5, 0.75, 1} is the optimal default
+- **L₃ rejected**: Too coarse (Medium × Medium = None is excessively pessimistic)
+- **L₁₀₀ rejected**: False precision, computational overhead, no cognitive benefit
+- **L₉ identified as alternative**: For high-precision domains requiring finer granularity
+- **Key arguments**:
+  - Miller's Law: Humans naturally distinguish ~5-7 categories
+  - Algebraic: 0.5² = 0.25 is exact in L₅ (nice property)
+  - Floor rounding is semantically correct for Löb discount (preserves g_L(c) ≤ c)
+  - Cognitive ergonomics: None/Low/Medium/High/Certain maps to natural language
+  - Computational: 25-entry operation tables fit efficiently
+- See exploration/thread-3.27-optimal-lattice-choice.md
+
 ---
 
 ### Thread 4: The Grounding Problem

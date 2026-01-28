@@ -103,7 +103,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [ ] **3.24 Dependent confidence types** - Can confidence bounds depend on runtime values? Requires dependent type features.
 - [ ] **3.25 Dynamic confidence narrowing** - Can runtime checks refine confidence bounds within type system?
 - [ ] **3.26 Multi-level Löb discount** - Should chained self-soundness (level n+2 about n+1 about n) discount multiplicatively?
-- [ ] **3.27 Optimal lattice choice** - Is L₅ the right finite lattice? Trade-offs with L₃, L₁₀, L₁₀₀?
+- [x] **3.27 Optimal lattice choice** - ANSWERED Session 63: L₅ confirmed as optimal default. Analysis: L₃ rejected (too coarse, Medium × Medium = None), L₁₀₀ rejected (false precision, computational overhead). L₉ identified as high-precision alternative. Key findings: (1) Miller's Law supports ~5 categories, (2) 0.5² = 0.25 is exact in L₅, (3) Floor rounding is semantically correct for Löb discount, (4) Cognitive ergonomics favor None/Low/Medium/High/Certain mapping. See exploration/thread-3.27-optimal-lattice-choice.md
 
 **New tasks discovered (Session 25)**:
 - [x] **3.20 CPL-finite formalization** - ANSWERED Session 29: CPL-finite fully formalized with L₅ = {0, 0.25, 0.5, 0.75, 1}. Key finding: no finite lattice is closed under c², requiring floor rounding for g_L(c) = floor_L(c²). Decidability established via finite model property (Bou et al. 2011). PSPACE-completeness conjectured. See exploration/thread-3.20-cpl-finite-formalization.md
