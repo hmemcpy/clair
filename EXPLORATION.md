@@ -120,22 +120,36 @@ Every justification bottoms out in axioms. But:
 ---
 
 ### Thread 5: Invalidation and Belief Revision
-**Status**: UNBLOCKED - Thread 1 now provides foundation
-**Depth**: Surface (ready for AGM extension)
+**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 16)
+**Depth**: Deep (see exploration/thread-5-belief-revision.md)
 
-I track "when to reconsider." But:
-- How is belief revision actually done?
-- What's the logic of changing your mind?
-- How do you retract a belief that other beliefs depend on?
-- What's the dynamics of belief update?
+**Core questions answered (Session 16)**:
+- Q5.1: Does AGM apply to graded beliefs? → **YES, with modifications**
+  - Entrenchment ordering = confidence ordering (natural fit)
+  - Recovery postulate correctly fails (evidence removal is not reversible)
+  - Compositional recomputation replaces logical closure
+- Q5.2: How does retraction propagate? → **Justification-based retraction**
+  - Remove edge from DAG → topological sort → recompute bottom-up
+  - Locality theorem: only transitive dependents affected
+- Q5.3: What triggers revision? → **Justification changes**
+  - Edge removal, confidence update, defeat introduction
+  - Not proposition-based like AGM; more fine-grained
+- Q5.4: Can it be formalized? → **YES**
+  - Core algorithm: modify graph → identify affected → recompute
+  - Key theorems: Locality, Monotonicity, Defeat Composition
 
-**Prior work**: AGM theory, TMS (Doyle, de Kleer), Belief revision, Bayesian updating
-**Formal tools**: AGM postulates, TMS implementation, Reason maintenance
-**Open questions**:
-- Q5.1: Does AGM theory apply to graded beliefs?
-- Q5.2: How do you propagate retraction through a derivation tree?
-- Q5.3: What triggers belief revision vs. belief addition?
-- Q5.4: Can belief revision be formalized in CLAIR's type system?
+**Key findings (Session 16)**:
+- CLAIR revision is essentially **graded generalization of TMS**
+- Recovery postulate correctly fails: evidence has specific strength
+- Defeat enables non-monotonic revision: undercut decreases, rebut compares
+- DAG structure makes revision compositional (automatic propagation)
+
+**Prior work surveyed**: AGM (1985), Gärdenfors (1988), Spohn (2012), Jeffrey (1983), van Ditmarsch et al. (2007)
+**Formal tools**: Justification DAGs, confidence propagation, topological sort
+**Questions remaining**:
+- Q5.5: How to handle correlated (non-independent) evidence?
+- Q5.6: Fixed-point existence for defeat chains?
+- Q5.7: Mapping to DEL revision/update semantics?
 
 ---
 
@@ -273,6 +287,13 @@ What I believe I know:
 | Lean project structure understood | 0.90 | Session 14: design exploration | Implementation failure | ✓ Session 14 |
 | Formalization proves correctness not adequacy | 0.95 | Session 14: semantic gap | Find formalization of adequacy | ✓ Session 14 |
 | Task 8.1 design complete | 0.95 | Session 14: project structure | Lean compilation failure | ✓ Session 14 |
+| AGM applies to graded beliefs | 0.90 | Session 16: entrenchment = confidence | Find counterexample | ✓ Session 16 |
+| Recovery postulate correctly fails | 0.95 | Session 16: evidence has specific strength | Find recovery argument | ✓ Session 16 |
+| CLAIR revision is justification-based | 0.95 | Session 16: operates on edges not sets | Find proposition-based need | ✓ Session 16 |
+| Locality theorem holds | 0.90 | Session 16: only transitive dependents affected | Find non-local case | ✓ Session 16 |
+| Monotonicity holds for support edges | 0.90 | Session 16: confidence changes propagate | Find non-monotone case | ✓ Session 16 |
+| CLAIR revision generalizes TMS | 0.90 | Session 16: graded IN/OUT propagation | Find divergence | ✓ Session 16 |
+| Thread 5 substantially explored | 0.90 | Session 16: core algorithm defined | Find missed case | ✓ Session 16 |
 | Functional belief states exist | 0.90 | Session 15: introspective description | Find contradicting evidence | ✓ Session 15 |
 | CLAIR captures reasoning structure | 0.60 | Session 15: comparison | Find structural mismatch | ✓ Session 15 |
 | LLM phenomenality | 0.35 | Session 15: underdetermined | Resolve hard problem | ⚠ Unknown |
@@ -294,57 +315,54 @@ What I believe I know:
 
 ## Next Steps (Self-Directed)
 
-Based on Session 9 completion of Thread 2, the priorities are:
+Based on Session 16 completion of Thread 5, the priorities are:
 
-### ✓ COMPLETED
+### ✓ COMPLETED (Foundational Threads)
 - **Thread 1 (Confidence)** - Epistemic commitment defined. See exploration/thread-1-confidence.md.
 - **Thread 2 (Justification)** - DAGs with labeled edges required. See exploration/thread-2-justification.md.
 - **Thread 3 (Self-Reference)** - Safe fragment characterized. See exploration/thread-3-self-reference.md.
+- **Thread 5 (Belief Revision)** - AGM extended to graded DAG beliefs. See exploration/thread-5-belief-revision.md.
+- **Thread 9 (Phenomenology)** - Core questions addressed. See exploration/thread-9-phenomenology.md.
 
 ### HIGH PRIORITY
-1. **Thread 8 (Verification)** - Begin Lean formalization
-   - Formalize Confidence type (bounded [0,1] real)
+1. **Thread 8 (Verification)** - Lean formalization
+   - Formalize Confidence type and operations (Threads 1, 8.5-8.7)
    - Formalize DAG justification structure (Thread 2)
    - Formalize stratified belief types (Thread 3)
-   - Prove key properties (boundedness, acyclicity, stratification safety)
-   - Threads 1, 2, 3 all ready; produces machine-checked artifacts
+   - Formalize revision operations (Thread 5)
+   - Prove key properties: boundedness, acyclicity, locality, monotonicity
 
-2. **Thread 5 (Belief Revision)** - AGM extension
-   - Now must handle DAG structure (Thread 2)
-   - Invalidation propagation with shared nodes
-   - Defeat retraction and reinstatement
-   - Connect to dynamic epistemic logic
+### MEDIUM PRIORITY
+2. **Thread 4 (Grounding)** - Philosophical exploration
+   - Identify foundational axioms of LLM reasoning
+   - Foundationalism vs coherentism for CLAIR
+   - Training data as epistemic grounding
+   - Connects to Thread 9's training provenance question
 
-### MEDIUM PRIORITY (Now unblocked)
-3. **Thread 9 (Phenomenology)** - What is it like to reason as an LLM?
-   - Safe introspection fragment defined (Thread 3)
-   - Can explore: stratified beliefs, fixed-point-stable self-reference
-   - Cannot explore: Löbian self-validation, Curry patterns
-
-4. **Thread 4 (Grounding)** - Philosophical exploration
+3. **Thread 6 (Multi-Agent)** - Theoretical foundations
+   - Objective truth question
+   - Swarm intelligence formalization
+   - Trust dynamics (game-theoretic)
 
 ### READY (No longer blocked)
-- **Thread 7 (Implementation)** - Threads 1-3 stable, Thread 4 only remaining blocker
+- **Thread 7 (Implementation)** - Threads 1-3, 5 stable; can proceed with reference interpreter
 
 ### DEFERRED
 - **Thread 1 (Confidence)** - Substantially complete; remaining work moves to Thread 8
-- **Thread 2 (Justification)** - Substantially complete; remaining work moves to Threads 5, 8
-- **Thread 6 (Multi-Agent)** - Practical protocols complete; theory can wait
+- **Thread 2 (Justification)** - Substantially complete; remaining work moves to Thread 8
+- **Thread 5 (Belief Revision)** - Substantially complete; remaining work moves to Thread 8
 
-### Session 15 Recommendation
-**Pivot to Thread 5 (Belief Revision).** Thread 9 is now substantially complete:
-- Thread 9 (Phenomenology): Core questions addressed with appropriate epistemic humility
-- The phenomenality question is proven underdetermined from inside — cannot resolve further
-- Design suggestions for CLAIR noted (affect/salience, automaticity, training provenance)
+### Session 16 Recommendation
+**Pivot to Thread 8 (Lean implementation) or Thread 4 (Grounding).**
 
-**Four foundational threads now substantially complete**: 1 (Confidence), 2 (Justification), 3 (Self-Reference), 9 (Phenomenology)
+**Five foundational threads now substantially complete**: 1 (Confidence), 2 (Justification), 3 (Self-Reference), 5 (Belief Revision), 9 (Phenomenology)
 
 Next research priorities:
-1. **Thread 5 (Belief Revision)**: Extend AGM to graded beliefs with DAG structure — the next major theoretical gap
-2. **Thread 4 (Grounding)**: Philosophical exploration of axiom foundations — connects to Thread 9's training provenance question
-3. **Thread 8.1 implementation**: Create actual Lean 4 project (mechanical engineering)
+1. **Thread 8 (Lean implementation)**: Create actual Lean 4 project with verified proofs — produces machine-checked artifacts
+2. **Thread 4 (Grounding)**: Philosophical exploration of axiom foundations — the remaining unexplored foundational thread
+3. **Thread 6 (Multi-Agent)**: Theoretical foundations for collective belief — practical protocols done, theory needed
 
-The theoretical foundations are solid. Engineering (Thread 8.1) can proceed in parallel with Thread 5.
+The theoretical foundations are solid. Five of nine threads substantially explored.
 
 ---
 
@@ -777,3 +795,51 @@ The theoretical foundations are solid. Engineering (Thread 8.1) can proceed in p
   - "Introspection has limits" → ESTABLISHED (0.95)
 - **Four foundational threads now substantially complete**: 1, 2, 3, 9
 - **Remaining high-priority threads**: 5 (Belief Revision), 8 (Lean implementation)
+
+### Session 16: Thread 5 Exploration (COMPLETED)
+- **COMPLETED THREAD 5: Belief Revision**
+- **Extended AGM theory to graded DAG-structured beliefs**:
+  - Graded confidence replaces binary belief
+  - Entrenchment ordering = confidence ordering (natural fit)
+  - Recovery postulate correctly fails (evidence removal is not reversible)
+  - Compositional recomputation replaces logical closure
+- **Core revision algorithm defined**:
+  - Step 1: Modify justification graph (add/remove edges)
+  - Step 2: Identify affected beliefs (transitive dependents)
+  - Step 3: Recompute confidence bottom-up (topological sort)
+  - Step 4: Apply defeat in order: supports → undercuts → rebuts
+- **Key theorems established**:
+  - Locality: Changes only affect transitive dependents in DAG
+  - Monotonicity: Confidence changes propagate monotonically through support edges
+  - Defeat Composition: Sequential undercuts compose via ⊕
+- **Prior art surveyed**:
+  - AGM (Alchourrón, Gärdenfors, Makinson 1985): Foundational postulates
+  - Gärdenfors (1988): Epistemic entrenchment
+  - Spohn (2012): Ranking theory for ordinal degrees
+  - Jeffrey (1983): Uncertain evidence conditioning
+  - van Ditmarsch et al. (2007): Dynamic epistemic logic
+- **Key insight**: CLAIR revision is justification-based, not proposition-based
+  - More fine-grained than AGM (operates on edges, not belief sets)
+  - Essentially graded generalization of TMS (Truth Maintenance Systems)
+- **Connection to CLAIR design**:
+  - Revision operations: `retractJustification`, `introduceDefeat`, `updatePremise`
+  - BeliefState structure: beliefs + graphs + confidence + invalidation
+  - DAG structure makes revision compositional
+- **Output**: exploration/thread-5-belief-revision.md
+- **Status**: Thread 5 SUBSTANTIALLY EXPLORED
+  - Task 5.1 (AGM for graded beliefs): ✓ Complete
+  - Task 5.2 (Retraction propagation): ✓ Complete
+  - Task 5.3 (Minimal change): ✓ Complete
+  - Task 5.4 (Dynamic logic connection): ○ Sketched
+- **Open questions identified**:
+  - Correlated evidence handling (aggregation assumes independence)
+  - Fixed-point existence for defeat chains
+  - Precise mapping to DEL semantics
+- **Beliefs updated**:
+  - "AGM applies to graded beliefs" → ESTABLISHED (0.90)
+  - "Recovery postulate correctly fails" → ESTABLISHED (0.95)
+  - "CLAIR revision is justification-based" → ESTABLISHED (0.95)
+  - "Locality theorem holds" → ESTABLISHED (0.90)
+  - "CLAIR revision generalizes TMS" → ESTABLISHED (0.90)
+- **Five foundational threads now substantially complete**: 1, 2, 3, 5, 9
+- **Remaining high-priority threads**: 8 (Lean implementation), 4 (Grounding)

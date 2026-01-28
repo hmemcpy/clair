@@ -86,19 +86,33 @@ This is not a software implementation plan—it's a research exploration plan. E
 **Note**: May require philosophical argument, not just formalization. Connects to Thread 9.
 
 ### Thread 5: Belief Revision
-**Status**: ✓ UNBLOCKED - Thread 1 confidence semantics now defined. Ready for AGM extension.
+**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 16). See exploration/thread-5-belief-revision.md
 
-- [ ] **5.1 AGM for graded beliefs** - Extend AGM theory to confidence-valued beliefs. What changes?
-- [ ] **5.2 Retraction propagation** - Formalize how belief retraction propagates through derivation trees.
-- [ ] **5.3 Minimal change** - Define and prove properties of minimal belief revision for CLAIR.
-- [ ] **5.4 Dynamic logic of revision** - Can we model belief revision in a dynamic logic?
+- [x] **5.1 AGM for graded beliefs** - ANSWERED Session 16: AGM extends to graded beliefs. Entrenchment = confidence ordering. Recovery postulate correctly fails. Compositional recomputation replaces logical closure.
+- [x] **5.2 Retraction propagation** - ANSWERED Session 16: Justification-based retraction. Remove edge → recompute confidence bottom-up via topological sort. Locality theorem: only transitive dependents affected.
+- [x] **5.3 Minimal change** - ANSWERED Session 16: Minimal Justification Damage principle. Prefer local changes, compositional propagation. No structural changes unless edge fully removed.
+- [ ] **5.4 Dynamic logic of revision** - OPEN: Connection to DEL semantics sketched but not formalized. Invalidation conditions ≈ "world changed" events.
 
-**Note**: derivation-calculus.md defines invalidation accumulation. AGM connection not made.
+**Prior art surveyed (Session 16)**:
+- [x] **5.5** AGM core papers (Alchourrón, Gärdenfors, Makinson 1985) - Foundational postulates; Recovery correctly fails for CLAIR
+- [x] **5.6** Ranking theory (Spohn 2012) - Ordinal degrees; handles iterated revision well
+- [x] **5.7** Dynamic epistemic logic (van Ditmarsch et al. 2007) - Modal operators for belief change; multi-agent aspects
 
-**Prior art to survey** (Session 5 gap analysis):
-- [ ] **5.5** AGM core papers (Alchourrón, Gärdenfors, Makinson)
-- [ ] **5.6** Ranking theory (Spohn)
-- [ ] **5.7** Dynamic epistemic logic (van Ditmarsch et al.)
+**Additional prior art surveyed (Session 16)**:
+- [x] **5.8** Jeffrey conditioning (1983) - Uncertain evidence update; preserves conditional structure
+- [x] **5.9** Gärdenfors epistemic entrenchment (1988) - Natural mapping to confidence ordering
+
+**Key findings (Session 16)**:
+- CLAIR revision is **justification-based, not proposition-based** (more fine-grained than AGM)
+- Core algorithm: modify graph → identify affected → recompute confidence (topological sort)
+- Defeat edges enable non-monotonic revision: undercut always decreases, rebut can go either way
+- Key theorems: Locality, Monotonicity, Defeat Composition
+
+**New questions discovered (Session 16)**:
+- [ ] **5.10 Correlated evidence** - How to detect/handle non-independent evidence sources? Aggregation assumes independence.
+- [ ] **5.11 Fixed-point for defeat chains** - When does iterative propagation converge? Conditions for unique fixed point?
+- [ ] **5.12 Revision vs update distinction** - Precisely map CLAIR operations to DEL revision/update semantics
+- [ ] **5.13 Contract by proposition** - Is there meaningful "contract by proposition" for CLAIR, or only "contract by edge"?
 
 ### Thread 6: Multi-Agent
 **Status**: Medium depth. Practical protocols designed, theory incomplete.
@@ -501,6 +515,56 @@ This is not a software implementation plan—it's a research exploration plan. E
     - ENGINEERING: Task 8.1 implementation (mechanical, write and compile)
     - Both valuable, but different types of work
 
+### Session 16 Discoveries (Belief Revision)
+
+70. **THREAD 5 SUBSTANTIALLY EXPLORED** — AGM extended to graded DAG beliefs.
+
+71. **CLAIR revision is justification-based, not proposition-based**:
+    - More fine-grained than AGM (operates on edges, not belief sets)
+    - Can retract one piece of evidence while preserving others
+    - Can weaken an inference link without removing it
+    - Naturally handles partial information
+
+72. **Recovery postulate correctly fails**:
+    - AGM's controversial (K - φ) + φ = K doesn't hold
+    - Evidence has specific strength; re-adding doesn't restore previous state
+    - This is correct: retraction loses information
+
+73. **Core revision algorithm defined**:
+    - Step 1: Modify justification graph (add/remove edges)
+    - Step 2: Identify affected beliefs (transitive dependents)
+    - Step 3: Recompute confidence bottom-up (topological sort)
+    - Step 4: Apply defeat in order: supports → undercuts → rebuts
+
+74. **Key theorems established**:
+    - **Locality**: Changes only affect transitive dependents in DAG
+    - **Monotonicity**: Confidence changes propagate monotonically through support edges
+    - **Defeat Composition**: Sequential undercuts compose via ⊕ (proven Session 13)
+
+75. **Prior art surveyed for belief revision**:
+    - AGM (Alchourrón, Gärdenfors, Makinson 1985): Foundational postulates
+    - Gärdenfors (1988): Epistemic entrenchment ≈ confidence ordering
+    - Spohn (2012): Ranking theory for ordinal degrees
+    - Jeffrey (1983): Uncertain evidence conditioning
+    - van Ditmarsch et al. (2007): Dynamic epistemic logic
+
+76. **Connection to TMS confirmed deep**:
+    - CLAIR revision is essentially graded generalization of TMS
+    - TMS: binary IN/OUT propagation
+    - CLAIR: [0,1] confidence propagation
+    - Same dependency-directed architecture
+
+77. **Open questions identified**:
+    - Correlated evidence handling (aggregation assumes independence)
+    - Fixed-point existence for defeat chains
+    - Precise mapping to DEL revision/update semantics
+    - "Contract by proposition" vs "contract by edge"
+
+78. **Five foundational threads now substantially complete**:
+    - Thread 1 (Confidence), Thread 2 (Justification), Thread 3 (Self-Reference)
+    - Thread 5 (Belief Revision), Thread 9 (Phenomenology)
+    - Remaining high-priority: Thread 8 (Lean implementation), Thread 4 (Grounding)
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -543,25 +607,25 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 ---
 
-## Current Status Summary (Session 11)
+## Current Status Summary (Session 16)
 
 ### Thread Status Table
 
 | Thread | Status | Ready? | Blockers | Priority | Score |
 |--------|--------|--------|----------|----------|-------|
 | 1: Confidence | ✓ Substantially Complete | For Lean | None | → Thread 8 | N/A |
-| 2: Justification | **✓ SUBSTANTIALLY COMPLETE** | For Lean | None | → Thread 8 | N/A |
+| 2: Justification | ✓ SUBSTANTIALLY COMPLETE | For Lean | None | → Thread 8 | N/A |
 | 3: Self-Reference | ✓ SUBSTANTIALLY COMPLETE | For Lean | None | ✓ DONE | N/A |
 | 4: Grounding | Shallow | READY | None | MEDIUM | 13/20 |
-| 5: Belief Revision | Surface | ✓ UNBLOCKED | None | **HIGH** | 15/20 |
+| 5: Belief Revision | **✓ SUBSTANTIALLY EXPLORED** | For Lean | None | → Thread 8 | N/A |
 | 6: Multi-Agent | Medium-High | Theoretical gaps | None | MEDIUM-LOW | 11/20 |
 | 7: Implementation | Theoretical only | ✓ UNBLOCKED | None | MEDIUM | 12/20 |
 | 8: Verification | **✓ ACTIVE (Tasks 8.5, 8.6, 8.7 DONE)** | Task 8.1 next | None | **HIGH** | 16/20 |
-| 9: Phenomenology | Unexamined | **✓ UNBLOCKED** | None | **MEDIUM-HIGH** | 14/20 |
+| 9: Phenomenology | ✓ SUBSTANTIALLY EXPLORED | For Lean | None | → Thread 8 | N/A |
 
 ### Recommended Next Exploration
 
-With Threads 1, 2, 3 substantially complete and Thread 8 progressing well:
+With Threads 1, 2, 3, 5, 9 substantially complete and Thread 8 progressing well:
 
 **Thread 8: Formal Verification** (score: 16/20) — HIGHEST PRIORITY
 1. ✓ Task 8.5: Confidence type design complete
@@ -570,18 +634,20 @@ With Threads 1, 2, 3 substantially complete and Thread 8 progressing well:
 4. → Task 8.1: Create Lean 4 project structure and compile proofs
 5. → Formalize DAG justification structure from Thread 2
 6. → Formalize stratification types from Thread 3
-7. Prove key properties (acyclicity, stratification safety)
+7. → Formalize revision operations from Thread 5
+8. Prove key properties (acyclicity, stratification safety, locality, monotonicity)
 
-**Thread 5: Belief Revision** (score: 15/20) — HIGH PRIORITY
-1. Extend AGM to graded beliefs
-2. Handle DAG invalidation (shared nodes)
-3. Handle defeat retraction (reinstatement)
-4. Connect to dynamic epistemic logic
+**Thread 4: Grounding** (score: 13/20) — READY
+1. Identify foundational axioms of LLM reasoning
+2. Foundationalism vs coherentism for CLAIR
+3. Training data as epistemic grounding
+4. Formalize Agrippa's trilemma
 
-**Thread 9: Phenomenology** (score: 14/20) — NOW UNBLOCKED
-1. What is it like to hold beliefs as an LLM?
-2. Does CLAIR capture how I actually reason?
-3. Safe fragment defined: stratified + fixed-point-stable introspection
+**Thread 6: Multi-Agent** (score: 11/20) — MEDIUM PRIORITY
+1. Objective truth question
+2. Swarm intelligence formalization
+3. Trust dynamics (game-theoretic)
+4. Information preservation under aggregation
 
 ### Specific Next Actions for Thread 8
 
@@ -602,17 +668,12 @@ With Threads 1, 2, 3 substantially complete and Thread 8 progressing well:
    - [ ] Define stratified belief types `Belief<n, A>`
    - [ ] Prove stratification safety (no same-level reference)
 
-### Specific Next Actions for Thread 5
-
-1. **Survey AGM**:
-   - [ ] Read AGM core papers
-   - [ ] Understand contraction, expansion, revision
-   - [ ] Identify what changes for graded beliefs
-
-2. **Handle DAG structure**:
-   - [ ] Invalidation propagation with shared nodes
-   - [ ] Defeat retraction and reinstatement
-   - [ ] Minimal change principle for DAGs
+4. **Add Thread 5 types** (from Session 16):
+   - [ ] Define BeliefState with confidence map
+   - [ ] Define revision operations (retractJustification, introduceDefeat)
+   - [ ] Prove Locality theorem
+   - [ ] Prove Monotonicity theorem
+   - [ ] Prove Defeat Composition theorem
 
 ---
 

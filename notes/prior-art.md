@@ -410,10 +410,10 @@ See exploration/thread-3-self-reference.md for detailed engagement.
 - Infinitism (Klein)
 - Sellars on "the myth of the given"
 
-**Thread 5 (Belief Revision):**
-- AGM theory core papers (Alchourrón, Gärdenfors, Makinson)
-- Ranking theory (Spohn)
-- Dynamic epistemic logic (van Ditmarsch et al.)
+**Thread 5 (Belief Revision):** ✓ SURVEYED Session 16
+- AGM theory core papers — See below for detailed survey
+- Ranking theory (Spohn 2012) — See below
+- Dynamic epistemic logic (van Ditmarsch et al. 2007) — See below
 
 **Thread 9 (Phenomenology):** ✓ SURVEYED Session 15
 - Dennett on heterophenomenology — take subjective reports as data without assuming accuracy
@@ -545,3 +545,54 @@ See exploration/thread-2.10-defeat-confidence.md for detailed analysis.
 - Suggested extensions: affect/salience dimension, automaticity marker, training provenance
 
 See exploration/thread-9-phenomenology.md for detailed exploration.
+
+### ✓ SURVEYED (Session 16)
+
+**Thread 5 (Belief Revision):** ✓ SUBSTANTIALLY COMPLETE
+
+**AGM Theory (Alchourrón, Gärdenfors, Makinson 1985)**:
+- Foundational theory of rational belief change
+- Three operations: expansion (K + φ), contraction (K - φ), revision (K * φ)
+- Key postulates for contraction: closure, success, inclusion, vacuity, recovery, extensionality
+- Levi identity: K * φ = (K - ¬φ) + φ
+- **Recovery postulate controversy**: (K - φ) + φ = K doesn't make sense when contraction has reasons
+- **For CLAIR**: Recovery correctly fails—evidence removal loses information
+
+**Gärdenfors Epistemic Entrenchment (1988)**:
+- φ ≤ε ψ iff "giving up φ is at least as acceptable as giving up ψ"
+- Guides contraction: when contracting φ ∧ ψ, keep the more entrenched one
+- **For CLAIR**: Entrenchment = confidence ordering (natural mapping)
+
+**Spohn's Ranking Theory (2012)**:
+- Ordinal degrees of belief: κ : W → ℕ ∪ {∞}
+- κ(w) = 0 for most plausible worlds
+- Handles iterated revision well (where AGM struggles)
+- Belief = κ(¬A) > 0; degree of belief = κ(¬A)
+- **For CLAIR**: Potential ordinal alternative; translation c ↔ κ = -log(1-c)?
+
+**Jeffrey Conditioning (1965, 1983)**:
+- Extends Bayesian conditioning to uncertain evidence
+- P_new(A) = P_old(A|B)·P_new(B) + P_old(A|¬B)·P_new(¬B)
+- Preserves conditional probabilities through update
+- **For CLAIR**: Inspires "update confidence, preserve justification structure"
+
+**Dynamic Epistemic Logic (van Ditmarsch et al. 2007)**:
+- Modal logic with dynamic operators: [φ!]ψ (after announcing φ, ψ holds)
+- Action models for general epistemic actions
+- Multi-agent belief change
+- **For CLAIR**: Formal semantics for revision as logical action; connects to Thread 6
+
+**Hansson (1999) on Multiple Contraction**:
+- Various contraction operators beyond AGM
+- Kernel contraction, safe contraction
+- **For CLAIR**: CLAIR uses edge-based contraction, more fine-grained than proposition-based
+
+**Key findings for CLAIR (Session 16)**:
+- CLAIR revision is **justification-based, not proposition-based** (more fine-grained than AGM)
+- Essentially a **graded generalization of TMS** (Truth Maintenance Systems)
+- Core algorithm: modify graph → identify affected → recompute confidence (topological sort)
+- Recovery correctly fails: evidence has specific strength
+- Key theorems: Locality, Monotonicity, Defeat Composition
+- Open questions: correlated evidence, fixed-point for defeat chains, DEL mapping
+
+See exploration/thread-5-belief-revision.md for detailed exploration.
