@@ -41,7 +41,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **2.11 Aggregation confidence** - ANSWERED Session 19: Independent evidence combines via ⊕ (probabilistic OR): aggregate(c₁,...,cₙ) = 1 - ∏(1-cᵢ). "Survival of doubt" interpretation: combined confidence = probability at least one evidence succeeds. See exploration/thread-2.11-aggregation.md
 - [x] **2.12 Reinstatement** - ANSWERED Session 18: Reinstatement emerges compositionally from bottom-up evaluation. Formula: A_final = A_base × (1 - D_base × (1 - E_base)). Mutual defeat has fixed-point semantics. See exploration/thread-2.12-reinstatement.md
 - [x] **2.13 Correlated evidence** - ANSWERED Session 20: Dependency-adjusted aggregation: aggregate_δ(c₁,c₂) = (1-δ)(c₁⊕c₂) + δ·avg. δ=0 independent, δ=1 fully dependent. Can infer dependency from provenance overlap. See exploration/thread-2.13-correlated-evidence.md
-- [ ] **2.14 Update derivation-calculus.md** - Incorporate DAG structure, labeled edges, new constructors
+- [x] **2.14 Update derivation-calculus.md** - COMPLETED Session 37: Comprehensive update incorporating DAG structure (not trees), labeled edges (support/undercut/rebut), defeat confidence propagation (undercut: multiplicative discounting, rebut: probabilistic comparison), independent evidence aggregation via ⊕, correlated evidence via dependency-adjusted formula, non-deductive constructors (abduction, analogy, induction), DAG evaluation algorithm, and invalidation propagation. See formal/derivation-calculus.md.
 
 **Prior art surveyed (Session 9)**:
 - [x] Pollock (1987) - Rebutting vs undercutting defeaters

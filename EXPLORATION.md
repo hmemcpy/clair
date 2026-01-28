@@ -2034,9 +2034,57 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Dissertation fully complete" → NEW (confidence: 0.99)
   - "CLAIR exploration complete" → NEW (confidence: 0.95)
 
+### Session 47: Derivation Calculus Update (Task 2.14)
+- **COMPLETED TASK 2.14: Update derivation-calculus.md with DAG structure**
+- **Comprehensive rewrite of formal/derivation-calculus.md**:
+  - Replaced "derivation trees" with "DAG with labeled edges" throughout
+  - Added explicit Section 2: Justification Structure: DAGs, Not Trees
+    - Why DAGs (shared premises, proper invalidation)
+    - Why labeled edges (support/undercut/rebut distinction)
+  - Added Section 3.3: The JustificationGraph formal definition
+  - Added Section 4: Justification Node Types with full constructors
+    - Core: axiom, assumption, rule, choice
+    - Non-deductive: abduction, analogy, induction
+    - Aggregation: aggregate with CombinationRule
+  - Added Section 4.2: Labeled edge types (support, undercut, rebut)
+  - Added Section 6: Defeat (undercut and rebut) with:
+    - Undercut: multiplicative discounting c' = c × (1-d)
+    - Rebut: probabilistic comparison c' = c_for/(c_for + c_against)
+    - Multiple defeaters: aggregate via ⊕ then apply
+    - Mixed defeat evaluation order
+    - Full Lean 4 formalizations
+  - Added Section 7: Aggregation with:
+    - Independent evidence via ⊕
+    - Correlated evidence via aggregate_δ formula
+    - Dependency estimation from provenance
+    - CombinationRule type definition
+  - Added Section 8: DAG Evaluation Algorithm
+  - Added Section 9: Non-deductive Justification
+    - Abduction with AbductionData structure
+    - Analogy with AnalogyData structure
+    - Induction with InductionData structure
+    - Confidence propagation for each
+  - Added Section 12.4: DAG Invalidation (locality theorem)
+  - Added Section 16: Summary table of all confidence operations
+  - Added Section 17: References (prior art and CLAIR threads)
+- **Consolidates findings from**:
+  - Thread 2 (Session 9): DAGs with labeled edges
+  - Thread 2.10 (Session 12): Defeat confidence propagation
+  - Thread 2.11 (Session 19): Independent evidence aggregation
+  - Thread 2.12 (Session 18): Reinstatement
+  - Thread 2.13 (Session 20): Correlated evidence
+  - Thread 5 (Session 16): Belief revision and invalidation
+- **Output**: `formal/derivation-calculus.md` (completely rewritten)
+- **Status**: Task 2.14 COMPLETE
+- **Impact**: Derivation calculus document now accurately reflects CLAIR's actual design
+- **Beliefs updated**:
+  - "derivation-calculus.md up to date" → ESTABLISHED (confidence: 0.95)
+  - "DAG structure fully documented" → ESTABLISHED (confidence: 0.95)
+  - "Defeat semantics formally specified" → CONFIRMED (confidence: 0.95)
+
 ### CLAIR EXPLORATION COMPLETE
 
-The CLAIR exploration project has reached its conclusion after 46 sessions. Key accomplishments:
+The CLAIR exploration project has reached its conclusion after 47 sessions. Key accomplishments:
 
 1. **Theoretical Foundations**: Nine foundational threads explored to substantial completion
 2. **Novel Contributions**: CPL (first graded provability logic), confidence algebra (three monoids), DAG justification with defeat semantics
