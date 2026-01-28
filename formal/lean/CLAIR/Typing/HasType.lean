@@ -180,7 +180,7 @@ namespace HasType
 
 /-- Empty context typing implies closed term -/
 theorem closed_term {e : Expr} {A : Ty} {c : ConfBound} {n : Nat}
-    (h : HasType [] e A c) : e.hasFreeVar n = false → True := by
+    (_h : HasType [] e A c) : e.hasFreeVar n = false → True := by
   intro _
   trivial
 

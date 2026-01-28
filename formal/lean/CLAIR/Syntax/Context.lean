@@ -112,7 +112,7 @@ theorem validIndex_extend_zero (Γ : Ctx) (e : CtxEntry) :
 /-- Valid index in extended context at n+1 iff valid at n in original -/
 theorem validIndex_extend_succ (Γ : Ctx) (e : CtxEntry) (n : Nat) :
     n + 1 < (Γ ,, e).length ↔ n < Γ.length := by
-  simpa [length_extend] using (Nat.succ_lt_succ_iff : n + 1 < Γ.length + 1 ↔ n < Γ.length)
+  simp [length_extend, Nat.succ_lt_succ_iff]
 
 /-!
 ### Well-Formed Contexts

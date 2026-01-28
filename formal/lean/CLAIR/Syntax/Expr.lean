@@ -222,7 +222,7 @@ partial def toString : Expr → String
   | snd e           => s!"{e.toString}.2"
   | inl B e         => s!"inl@{B}({e.toString})"
   | inr A e         => s!"inr@{A}({e.toString})"
-  | case e e₁ e₂    => "case"
+  | case _e _e₁ _e₂ => "case"
   | litNat n        => s!"{n}"
   | litBool b       => s!"{b}"
   | litString s     => s!"\"{s}\""
