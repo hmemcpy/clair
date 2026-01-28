@@ -133,7 +133,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 **Suggested starting point**:
 - [x] **8.5** Define Confidence type as subtype of Real with [0,1] bounds - COMPLETED Session 10. Design: `{ c : ℝ // 0 ≤ c ∧ c ≤ 1 }` with layered algebraic abstraction. See exploration/thread-8-verification.md.
-- [ ] **8.6** Define confidence combination operations (×, min, ⊕)
+- [x] **8.6** Define confidence combination operations (×, min, ⊕) - COMPLETED Session 11. Three separate commutative monoids: (×, 1), (min, 1), (⊕, 0). **Key finding**: (⊕, ×) do NOT form a semiring—distributivity fails. See exploration/thread-8-verification.md §12.
 - [ ] **8.7** Prove boundedness preservation for each operation
 
 ### Thread 9: Phenomenology
@@ -360,6 +360,43 @@ This is not a software implementation plan—it's a research exploration plan. E
     - Non-independent derivations
     - Graded monad structure (separate theorem)
 
+### Session 11 Discoveries (Thread 8 Confidence Operations)
+
+49. **CONFIDENCE OPERATIONS FULLY CHARACTERIZED** — Three operations formalized as separate monoids.
+
+50. **Three distinct algebraic structures**:
+    - Multiplication (×): Commutative monoid ([0,1], ×, 1) for derivation
+    - Minimum (min): Bounded meet-semilattice ([0,1], min, 1) for conservative combination
+    - Probabilistic OR (⊕): Commutative monoid ([0,1], ⊕, 0) for aggregation
+
+51. **CRITICAL FINDING: (⊕, ×) do NOT form a semiring**:
+    - Distributivity fails: a × (b ⊕ c) ≠ (a × b) ⊕ (a × c)
+    - Counterexample: a=0.5, b=0.5, c=0.5 → 0.375 ≠ 0.4375
+    - This is mathematically fundamental (not a CLAIR limitation)
+    - Operations must be understood as separate monoids for different contexts
+
+52. **T-norm/T-conorm connection established**:
+    - × is the product t-norm
+    - min is the Gödel/minimum t-norm
+    - ⊕ is the algebraic sum t-conorm (dual to product)
+    - Prior art: Klement et al. (2000), Hájek (1998)
+
+53. **Cross-operation relationships proven**:
+    - min(a,b) ≥ a×b for all a,b ∈ [0,1] (min is more "optimistic")
+    - a ⊕ b ≥ max(a,b) (aggregation is confidence-increasing)
+    - De Morgan duality: a ⊕ b = 1 - (1-a) × (1-b)
+
+54. **Operation selection is semantic, not algebraic**:
+    - × for sequential/conjunctive derivation (both premises needed)
+    - min for conservative combination (pessimistic estimate)
+    - ⊕ for aggregation of independent evidence (multiple supports)
+    - Choice depends on justification structure (Thread 2)
+
+55. **Defeat operations remain the key open question**:
+    - How undercut/rebut edges affect confidence is NOT formalized
+    - Task 2.10 is now high priority
+    - Options: subtractive, multiplicative discounting, ranking theory
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -402,7 +439,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 ---
 
-## Current Status Summary (Session 9)
+## Current Status Summary (Session 11)
 
 ### Thread Status Table
 
@@ -415,16 +452,17 @@ This is not a software implementation plan—it's a research exploration plan. E
 | 5: Belief Revision | Surface | ✓ UNBLOCKED | None | **HIGH** | 15/20 |
 | 6: Multi-Agent | Medium-High | Theoretical gaps | None | MEDIUM-LOW | 11/20 |
 | 7: Implementation | Theoretical only | ✓ UNBLOCKED | None | MEDIUM | 12/20 |
-| 8: Verification | Path identified | **✓ UNBLOCKED** | None | **HIGH** | 16/20 |
+| 8: Verification | **✓ ACTIVE (Tasks 8.5, 8.6 DONE)** | Task 8.7 next | None | **HIGH** | 16/20 |
 | 9: Phenomenology | Unexamined | **✓ UNBLOCKED** | None | **MEDIUM-HIGH** | 14/20 |
 
 ### Recommended Next Exploration
 
-With Threads 1, 2, and 3 substantially complete, the next priorities are:
+With Threads 1, 2, 3 substantially complete and Thread 8 progressing well:
 
 **Thread 8: Formal Verification** (score: 16/20) — HIGHEST PRIORITY
-1. Begin Lean 4 formalization
-2. Formalize Confidence type from Thread 1
+1. ✓ Task 8.5: Confidence type design complete
+2. ✓ Task 8.6: Confidence operations (×, min, ⊕) characterized
+3. → Task 8.7: Prove boundedness preservation formally in Lean 4
 3. Formalize DAG justification structure from Thread 2
 4. Formalize stratification types from Thread 3
 5. Prove key properties (boundedness, acyclicity, stratification safety)

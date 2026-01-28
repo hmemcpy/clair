@@ -180,8 +180,8 @@ CLAIR can compute anything. But:
 ---
 
 ### Thread 8: Formal Verification Strategy
-**Status**: Active exploration (Session 10 - Confidence type designed)
-**Depth**: Design complete for Confidence type; ready for implementation
+**Status**: Active exploration (Session 11 - Confidence operations characterized)
+**Depth**: Design complete for Confidence type AND operations; ready for Lean implementation
 
 We want machine-checked proofs. But:
 - What exactly should we formalize first?
@@ -253,6 +253,10 @@ What I believe I know:
 | Thread 2 highly tractable | 0.85 | Crisp question, clear method | Find neither proof nor counterexample | ✓ Session 7 |
 | Confidence type formalizable in Lean | 0.95 | Session 10: layered design complete | Implementation failure | ✓ Session 10 |
 | Lean 4 + Mathlib right choice | 0.90 | Session 10: ℝ foundation, active development | Better alternative found | ✓ Session 10 |
+| (⊕, ×) form semiring | 0.05 | **REFUTED** Session 11: distributivity fails | Find alternative proof | ✗ False |
+| Three monoid structures work | 0.95 | Session 11: (×,1), (min,1), (⊕,0) | Implementation failure | ✓ Session 11 |
+| min(a,b) ≥ a×b | 0.99 | Session 11: algebraic proof | None (mathematical) | ✓ Proven |
+| Defeat propagation open | 1.0 | Session 11: not formalized | Formalization found | ⚠ Task 2.10 |
 
 ---
 
@@ -306,13 +310,13 @@ Based on Session 9 completion of Thread 2, the priorities are:
 - **Thread 2 (Justification)** - Substantially complete; remaining work moves to Threads 5, 8
 - **Thread 6 (Multi-Agent)** - Practical protocols complete; theory can wait
 
-### Session 10 Recommendation
-**Continue Thread 8 (Tasks 8.6, 8.7) or pivot to Thread 5 (Belief Revision).** Thread 8.5 (Confidence type design) is complete. Next steps are:
-- Task 8.6: Define confidence combination operations (×, min, ⊕) in Lean
-- Task 8.7: Prove boundedness preservation for each operation
+### Session 11 Recommendation
+**Continue Thread 8 (Task 8.7) or pivot to Thread 5 (Belief Revision) or Thread 2 (defeat propagation).** Tasks 8.5 and 8.6 are complete. Next steps are:
+- Task 8.7: Prove boundedness preservation formally in Lean 4
+- Or pivot to Task 2.10: Define how defeat (undercut/rebut) affects confidence
 - Or pivot to Thread 5 for AGM extension with DAG structure
 
-Thread 5 gains urgency since Thread 2 revealed DAG invalidation complexity. Thread 9 (Phenomenology) remains viable for philosophical exploration.
+Task 2.10 (defeat confidence propagation) is now recognized as a key open question—the largest gap in the confidence combination story.
 
 ---
 
@@ -529,3 +533,40 @@ Thread 5 gains urgency since Thread 2 revealed DAG invalidation complexity. Thre
 - **Output**: exploration/thread-8-verification.md
 - **Status**: Task 8.5 (Confidence type design) COMPLETE
 - **Next**: Tasks 8.6 (confidence operations) and 8.7 (boundedness proofs)
+
+### Session 11: Thread 8 Exploration (CONFIDENCE OPERATIONS)
+- **Explored Thread 8.6: Confidence combination operations (×, min, ⊕)**
+- **Three distinct algebraic structures characterized**:
+  1. Multiplication (×): Commutative monoid ([0,1], ×, 1) for conjunctive derivation
+  2. Minimum (min): Bounded meet-semilattice ([0,1], min, 1) for conservative combination
+  3. Probabilistic OR (⊕): Commutative monoid ([0,1], ⊕, 0) for aggregation
+- **CRITICAL FINDING**: (⊕, ×) do NOT form a semiring
+  - Distributivity fails: a × (b ⊕ c) ≠ (a × b) ⊕ (a × c)
+  - Counterexample: a=0.5, b=0.5, c=0.5 yields 0.375 vs 0.4375
+  - This is mathematically fundamental, not a CLAIR limitation
+  - Operations must be used as separate monoids in different contexts
+- **Prior art connection established**:
+  - × is the product t-norm (fuzzy logic)
+  - min is the Gödel/minimum t-norm
+  - ⊕ is the algebraic sum t-conorm (dual to product)
+  - References: Klement et al. (2000), Hájek (1998)
+- **Cross-operation relationships proven**:
+  - min(a,b) ≥ a×b for all a,b ∈ [0,1] — min is more "optimistic"
+  - a ⊕ b ≥ max(a,b) — aggregation increases confidence
+  - De Morgan duality: a ⊕ b = 1 - (1-a) × (1-b)
+- **Operation selection is semantic**:
+  - × for sequential/conjunctive derivation (both premises needed)
+  - min for conservative combination (pessimistic estimate)
+  - ⊕ for aggregation of independent evidence (multiple supports)
+  - Choice depends on justification structure (Thread 2)
+- **Key open question identified**: Defeat propagation (Task 2.10)
+  - How undercut/rebut edges affect confidence is NOT formalized
+  - Options: subtractive, multiplicative discounting, ranking theory
+  - This is the largest remaining gap in confidence combination
+- **Lean 4 formalization designed**:
+  - Layer 1: Abstract algebras (ConfidenceMulMonoid, ConfidenceMinSemilattice, ConfidenceOplusMonoid)
+  - Layer 2: Concrete implementation as subtype of ℝ
+  - Layer 3: Theorems (boundedness, associativity, commutativity, identity, monotonicity)
+- **Output**: exploration/thread-8-verification.md §12
+- **Status**: Task 8.6 (Confidence operations) COMPLETE
+- **Next**: Task 8.7 (prove boundedness preservation in Lean 4) or Task 2.10 (defeat propagation)

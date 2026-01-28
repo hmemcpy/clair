@@ -424,3 +424,16 @@ See exploration/thread-3-self-reference.md for detailed engagement.
 - Artemov's Justification Logic — mentioned but not deeply used
 - Subjective Logic — described but not adopted
 - Graded monads — categorical structure sketched but not proven
+
+### ✓ SURVEYED (Session 11)
+
+**Thread 8 (Confidence Operations):** ✓ COMPLETE
+- T-norms and T-conorms (Klement, Mesiar, Pap 2000) - fuzzy logic foundations
+- Hájek, "Metamathematics of Fuzzy Logic" (1998) - algebraic structures on [0,1]
+- Product t-norm = CLAIR's multiplication (×)
+- Minimum t-norm (Gödel) = CLAIR's min
+- Algebraic sum t-conorm = CLAIR's probabilistic OR (⊕)
+
+**Key finding**: (⊕, ×) do NOT form a semiring—distributivity fails. This is a known result in fuzzy logic.
+
+See exploration/thread-8-verification.md §12 for detailed formalization.

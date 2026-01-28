@@ -510,4 +510,603 @@ The actual Lean 4 code should be written when we're ready to create `formal/lean
 
 ---
 
-*Thread 8 Status: Task 8.5 explored. Confidence type design complete. Ready for implementation.*
+## 12. Task 8.6: Confidence Combination Operations
+
+> **Status**: Active exploration (Session 11)
+> **Task**: 8.6 Define confidence combination operations (×, min, ⊕)
+> **Question**: How do we formalize the three confidence combination operations in Lean 4, and what algebraic structures do they form?
+
+---
+
+### 12.1 The Three Operations
+
+CLAIR uses three distinct operations for combining confidence values:
+
+| Operation | Symbol | Formula | Algebraic Structure | Use Case |
+|-----------|--------|---------|---------------------|----------|
+| Multiplication | × | a × b | Commutative monoid | Derivation (conjunctive) |
+| Minimum | min | min(a, b) | Commutative idempotent monoid | Conservative combination |
+| Probabilistic OR | ⊕ | a + b - a×b | Commutative monoid | Aggregation (disjunctive) |
+
+Each operation has distinct algebraic properties and semantic meaning.
+
+---
+
+### 12.2 Prior Art: T-norms and T-conorms
+
+In fuzzy logic, these operations are well-studied:
+
+**T-norms** (triangular norms) are binary operations on [0,1] satisfying:
+- Commutativity: T(a, b) = T(b, a)
+- Associativity: T(T(a, b), c) = T(a, T(b, c))
+- Monotonicity: a ≤ a' ⟹ T(a, b) ≤ T(a', b)
+- Identity: T(a, 1) = a
+
+**Standard t-norms:**
+- **Product t-norm (Tp)**: Tp(a, b) = a × b — This is CLAIR's ×
+- **Minimum t-norm (TM)**: TM(a, b) = min(a, b) — This is CLAIR's min (also called Gödel t-norm)
+- **Łukasiewicz t-norm (TL)**: TL(a, b) = max(0, a + b - 1) — Not used in CLAIR
+
+**T-conorms** (s-norms) are the dual, with identity 0:
+- **Algebraic sum (Sp)**: Sp(a, b) = a + b - a×b — This is CLAIR's ⊕
+- **Maximum (SM)**: SM(a, b) = max(a, b)
+- **Łukasiewicz s-norm (SL)**: SL(a, b) = min(1, a + b)
+
+**Key insight**: CLAIR's confidence operations are instances of the product t-norm/t-conorm pair, with min as an alternative t-norm for conservative reasoning.
+
+**References:**
+- Klement, Mesiar, Pap (2000), *Triangular Norms*
+- Hájek (1998), *Metamathematics of Fuzzy Logic*
+- Jøsang (2016), *Subjective Logic* (for confidence in uncertainty quantification)
+
+---
+
+### 12.3 Algebraic Structure Analysis
+
+#### 12.3.1 Multiplication (×)
+
+**Type**: `mul : Confidence → Confidence → Confidence`
+
+**Definition**: `mul a b = a.val × b.val` (standard real multiplication)
+
+**Algebraic Properties**:
+
+```
+Commutativity:   a × b = b × a
+Associativity:   (a × b) × c = a × (b × c)
+Identity:        1 × a = a × 1 = a
+Absorption:      0 × a = a × 0 = 0
+```
+
+**Structure**: ([0,1], ×, 1) is a **commutative monoid with absorbing element**.
+
+**Boundedness preservation**:
+```
+Theorem: ∀ a b : Confidence, 0 ≤ (a × b).val ∧ (a × b).val ≤ 1
+
+Proof:
+  0 ≤ (a × b).val:
+    a.val ≥ 0, b.val ≥ 0 ⟹ a.val × b.val ≥ 0  ✓
+
+  (a × b).val ≤ 1:
+    a.val ≤ 1, b.val ≤ 1
+    ⟹ a.val × b.val ≤ a.val × 1 = a.val ≤ 1  ✓
+    (or: a × b ≤ min(a, b) ≤ 1)
+```
+
+**Monotonicity**:
+```
+Theorem: a ≤ a' ⟹ a × b ≤ a' × b
+Proof: b ≥ 0, so multiplication preserves order.  ✓
+```
+
+**Semantic interpretation**: Confidence multiplication models conjunctive dependence—the conclusion's confidence is the product of the premises' confidences, assuming independence.
+
+---
+
+#### 12.3.2 Minimum (min)
+
+**Type**: `min : Confidence → Confidence → Confidence`
+
+**Definition**: `min a b = if a.val ≤ b.val then a else b`
+
+**Algebraic Properties**:
+
+```
+Commutativity:   min(a, b) = min(b, a)
+Associativity:   min(min(a, b), c) = min(a, min(b, c))
+Identity:        min(1, a) = min(a, 1) = a
+Idempotence:     min(a, a) = a
+Absorption:      min(0, a) = min(a, 0) = 0
+```
+
+**Structure**: ([0,1], min, 1) is a **bounded meet-semilattice** (commutative idempotent monoid).
+
+**Boundedness preservation**:
+```
+Theorem: ∀ a b : Confidence, 0 ≤ min(a, b).val ∧ min(a, b).val ≤ 1
+
+Proof:
+  min(a, b).val is either a.val or b.val, both in [0,1].  ✓
+```
+
+**Monotonicity**:
+```
+Theorem: a ≤ a' ⟹ min(a, b) ≤ min(a', b)
+Proof: Immediate from definition of min.  ✓
+```
+
+**Ordering property**:
+```
+min(a, b) ≤ a  and  min(a, b) ≤ b
+```
+
+**Semantic interpretation**: Conservative combination—the conclusion is no more confident than the least confident premise. Used when we want to be pessimistic about confidence.
+
+**Comparison with ×**:
+```
+min(a, b) ≥ a × b  for all a, b ∈ [0,1]
+
+Proof: min(a,b) ≥ a × b because:
+  If min(a,b) = a, then a × b ≤ a × 1 = a = min(a,b)
+  If min(a,b) = b, then a × b ≤ 1 × b = b = min(a,b)  ✓
+```
+
+So min is more "optimistic" than multiplication—it preserves more confidence.
+
+---
+
+#### 12.3.3 Probabilistic OR (⊕)
+
+**Type**: `oplus : Confidence → Confidence → Confidence`
+
+**Definition**: `oplus a b = a.val + b.val - a.val × b.val`
+
+**Algebraic Properties**:
+
+```
+Commutativity:   a ⊕ b = b ⊕ a
+Associativity:   (a ⊕ b) ⊕ c = a ⊕ (b ⊕ c)
+Identity:        0 ⊕ a = a ⊕ 0 = a
+Absorption:      1 ⊕ a = a ⊕ 1 = 1
+```
+
+**Structure**: ([0,1], ⊕, 0) is a **commutative monoid with absorbing element 1**.
+
+**Proof of associativity**:
+```
+(a ⊕ b) ⊕ c = (a + b - ab) + c - (a + b - ab)c
+            = a + b - ab + c - ac - bc + abc
+            = a + b + c - ab - ac - bc + abc
+
+a ⊕ (b ⊕ c) = a + (b + c - bc) - a(b + c - bc)
+            = a + b + c - bc - ab - ac + abc
+            = a + b + c - ab - ac - bc + abc  ✓
+```
+
+**Boundedness preservation**:
+```
+Theorem: ∀ a b : Confidence, 0 ≤ (a ⊕ b).val ∧ (a ⊕ b).val ≤ 1
+
+Proof of 0 ≤ a ⊕ b:
+  a ⊕ b = a + b - ab = a + b(1 - a) = a(1 - b) + b
+  Since a, b, (1-a), (1-b) ≥ 0:
+    a(1-b) ≥ 0 and b ≥ 0 ⟹ a(1-b) + b ≥ 0  ✓
+
+Proof of a ⊕ b ≤ 1:
+  a ⊕ b = a + b - ab = a + b(1 - a)
+  Since b ≤ 1 and (1 - a) ≤ 1:
+    b(1-a) ≤ 1 - a
+    a + b(1-a) ≤ a + (1 - a) = 1  ✓
+```
+
+**Monotonicity**:
+```
+Theorem: a ≤ a' ⟹ a ⊕ b ≤ a' ⊕ b
+
+Proof:
+  a ⊕ b = a + b - ab = a(1 - b) + b
+  ∂/∂a [a(1-b) + b] = (1 - b) ≥ 0
+
+  So a ⊕ b is monotonically increasing in a.  ✓
+```
+
+**Confidence-increasing property**:
+```
+a ⊕ b ≥ max(a, b)
+
+Proof:
+  a ⊕ b = a + b - ab = a + b(1-a)
+  Since b(1-a) ≥ 0: a ⊕ b ≥ a
+  By symmetry: a ⊕ b ≥ b
+  Therefore: a ⊕ b ≥ max(a, b)  ✓
+```
+
+**Semantic interpretation**: Aggregation of independent evidence—when multiple independent sources support a conclusion, the combined confidence is higher than either source alone.
+
+---
+
+### 12.4 The Semiring Structure
+
+The pair (⊕, ×) forms a **commutative semiring** on [0,1]:
+
+```
+([0,1], ⊕, ×, 0, 1)
+
+Additive structure (⊕, 0):
+  Associativity, Commutativity, Identity  ✓
+
+Multiplicative structure (×, 1):
+  Associativity, Commutativity, Identity  ✓
+
+Distributivity:
+  a × (b ⊕ c) = a × b ⊕ a × c
+
+Annihilation:
+  0 × a = a × 0 = 0
+```
+
+**Proof of distributivity**:
+```
+a × (b ⊕ c) = a × (b + c - bc)
+            = ab + ac - abc
+
+(a × b) ⊕ (a × c) = ab + ac - ab × ac
+                  = ab + ac - a²bc
+
+These are NOT equal in general!
+Example: a = 0.5, b = 0.5, c = 0.5
+  a × (b ⊕ c) = 0.5 × (0.5 + 0.5 - 0.25) = 0.5 × 0.75 = 0.375
+  (a × b) ⊕ (a × c) = 0.25 + 0.25 - 0.0625 = 0.4375
+
+DISTRIBUTIVITY FAILS!
+```
+
+**Critical finding**: (⊕, ×) do NOT form a semiring because distributivity fails.
+
+This is a known result in fuzzy logic: the product t-norm and algebraic sum t-conorm are **not** a dual pair in the semiring sense.
+
+---
+
+### 12.5 Revised Algebraic Understanding
+
+Since distributivity fails, what structure DO we have?
+
+**Two separate monoids**:
+1. ([0,1], ×, 1) — for conjunctive/derivation
+2. ([0,1], ⊕, 0) — for disjunctive/aggregation
+
+**With relationships**:
+```
+De Morgan duality: a ⊕ b = 1 - (1-a) × (1-b)
+                   a × b = 1 - (1-a) ⊕ (1-b)
+
+This connects them via negation ¬a = 1 - a
+```
+
+**But CLAIR doesn't use negation**: Confidence is not probability; we don't have P + ¬P = 1.
+
+**What we actually need**: The operations are used in different contexts:
+- × for chaining derivations (confidence of A, then B)
+- min for conservative combination (pessimistic)
+- ⊕ for aggregating independent evidence (multiple supports)
+
+These don't need to interact algebraically—they're chosen based on the **justification structure**.
+
+---
+
+### 12.6 Connection to Thread 2 (Justification DAGs)
+
+Thread 2 established that justification is a **DAG with labeled edges**:
+- Support edges: confidence propagates via × (or min)
+- Undercut edges: confidence is reduced (how?)
+- Rebut edges: competing confidence levels
+
+**When to use which operation**:
+
+| Edge Type | Operation | Rationale |
+|-----------|-----------|-----------|
+| Support (conjunctive) | × | Both premises needed |
+| Support (conservative) | min | Most pessimistic |
+| Aggregation (independent) | ⊕ | Multiple independent supports |
+| Undercut | ??? | TBD (Task 2.10) |
+| Rebut | ??? | TBD (Task 2.10) |
+
+**Open question**: How does undercut/rebut affect confidence?
+
+Pollock's defeaters suggest:
+- **Undercut**: Attacks the inferential link, not the conclusion. Confidence should decrease.
+- **Rebut**: Provides counter-evidence. Net confidence depends on relative strengths.
+
+This is **not formalized** and remains open (Task 2.10: Defeat confidence propagation).
+
+---
+
+### 12.7 Lean 4 Formalization Design
+
+Based on this analysis, here's the recommended Lean 4 formalization:
+
+#### 12.7.1 Layer 1: Abstract Algebras
+
+```lean4
+/-- Confidence multiplication monoid -/
+class ConfidenceMulMonoid (C : Type*) extends One C, Mul C, LE C where
+  mul_assoc : ∀ a b c : C, a * b * c = a * (b * c)
+  mul_comm : ∀ a b : C, a * b = b * a
+  one_mul : ∀ a : C, 1 * a = a
+  mul_one : ∀ a : C, a * 1 = a
+
+/-- Confidence min semilattice -/
+class ConfidenceMinSemilattice (C : Type*) extends One C, LE C where
+  inf : C → C → C
+  inf_comm : ∀ a b : C, inf a b = inf b a
+  inf_assoc : ∀ a b c : C, inf (inf a b) c = inf a (inf b c)
+  inf_idem : ∀ a : C, inf a a = a
+  one_inf : ∀ a : C, inf 1 a = a
+
+/-- Confidence oplus monoid for aggregation -/
+class ConfidenceOplusMonoid (C : Type*) extends Zero C where
+  oplus : C → C → C
+  oplus_assoc : ∀ a b c : C, oplus (oplus a b) c = oplus a (oplus b c)
+  oplus_comm : ∀ a b : C, oplus a b = oplus b a
+  zero_oplus : ∀ a : C, oplus 0 a = a
+```
+
+#### 12.7.2 Layer 2: Concrete Implementation
+
+```lean4
+/-- Confidence as a subtype of Real in [0,1] -/
+def Confidence := { c : ℝ // 0 ≤ c ∧ c ≤ 1 }
+
+namespace Confidence
+
+/-- Zero confidence -/
+instance : Zero Confidence := ⟨⟨0, by norm_num, by norm_num⟩⟩
+
+/-- Full confidence -/
+instance : One Confidence := ⟨⟨1, by norm_num, by norm_num⟩⟩
+
+/-- Multiplication operation -/
+instance : Mul Confidence where
+  mul a b := ⟨a.val * b.val, by
+    constructor
+    · exact mul_nonneg a.property.1 b.property.1
+    · calc a.val * b.val
+        ≤ a.val * 1 := mul_le_mul_of_nonneg_left b.property.2 a.property.1
+        _ = a.val := mul_one a.val
+        _ ≤ 1 := a.property.2⟩
+
+/-- Minimum operation -/
+def min (a b : Confidence) : Confidence :=
+  if h : a.val ≤ b.val then a else b
+
+/-- Probabilistic OR operation -/
+def oplus (a b : Confidence) : Confidence :=
+  ⟨a.val + b.val - a.val * b.val, by
+    constructor
+    · -- 0 ≤ a + b - ab = a(1-b) + b
+      have h1 : 0 ≤ 1 - b.val := by linarith [b.property.2]
+      have h2 : 0 ≤ a.val * (1 - b.val) := mul_nonneg a.property.1 h1
+      linarith [b.property.1]
+    · -- a + b - ab ≤ 1
+      have h1 : a.val + b.val * (1 - a.val) ≤ 1 := by
+        have hb : b.val * (1 - a.val) ≤ 1 - a.val := by
+          apply mul_le_of_le_one_left (by linarith [a.property.1]) b.property.2
+        linarith [a.property.2]
+      ring_nf at h1 ⊢
+      linarith⟩
+
+end Confidence
+```
+
+#### 12.7.3 Layer 3: Key Theorems
+
+```lean4
+namespace Confidence
+
+-- Multiplication theorems
+theorem mul_bounded (a b : Confidence) :
+    0 ≤ (a * b).val ∧ (a * b).val ≤ 1 := (a * b).property
+
+theorem mul_assoc (a b c : Confidence) : a * b * c = a * (b * c) := by
+  apply Subtype.ext
+  simp only [HMul.hMul, Mul.mul]
+  ring
+
+theorem mul_comm (a b : Confidence) : a * b = b * a := by
+  apply Subtype.ext
+  simp only [HMul.hMul, Mul.mul]
+  ring
+
+theorem one_mul (a : Confidence) : 1 * a = a := by
+  apply Subtype.ext
+  simp only [HMul.hMul, Mul.mul, One.one]
+  ring
+
+theorem mul_one (a : Confidence) : a * 1 = a := by
+  apply Subtype.ext
+  simp only [HMul.hMul, Mul.mul, One.one]
+  ring
+
+theorem zero_mul (a : Confidence) : 0 * a = 0 := by
+  apply Subtype.ext
+  simp only [HMul.hMul, Mul.mul, Zero.zero]
+  ring
+
+-- Min theorems
+theorem min_bounded (a b : Confidence) :
+    0 ≤ (min a b).val ∧ (min a b).val ≤ 1 := by
+  unfold min
+  split <;> [exact a.property; exact b.property]
+
+theorem min_comm (a b : Confidence) : min a b = min b a := by
+  unfold min
+  split <;> split <;> {
+    apply Subtype.ext
+    simp only
+    linarith
+  }
+
+theorem min_assoc (a b c : Confidence) : min (min a b) c = min a (min b c) := by
+  -- Proof by case analysis on ordering
+  sorry -- requires careful case analysis
+
+theorem min_idem (a : Confidence) : min a a = a := by
+  unfold min
+  simp
+
+-- Oplus theorems
+theorem oplus_bounded (a b : Confidence) :
+    0 ≤ (oplus a b).val ∧ (oplus a b).val ≤ 1 := (oplus a b).property
+
+theorem oplus_comm (a b : Confidence) : oplus a b = oplus b a := by
+  apply Subtype.ext
+  unfold oplus
+  ring
+
+theorem oplus_assoc (a b c : Confidence) : oplus (oplus a b) c = oplus a (oplus b c) := by
+  apply Subtype.ext
+  unfold oplus
+  ring
+
+theorem zero_oplus (a : Confidence) : oplus 0 a = a := by
+  apply Subtype.ext
+  unfold oplus
+  simp [Zero.zero]
+  ring
+
+theorem oplus_zero (a : Confidence) : oplus a 0 = a := by
+  apply Subtype.ext
+  unfold oplus
+  simp [Zero.zero]
+  ring
+
+-- Cross-operation theorems
+theorem min_ge_mul (a b : Confidence) : (min a b).val ≥ (a * b).val := by
+  unfold min
+  split <;> {
+    simp only [HMul.hMul, Mul.mul]
+    nlinarith [a.property.1, a.property.2, b.property.1, b.property.2]
+  }
+
+theorem oplus_ge_max (a b : Confidence) :
+    (oplus a b).val ≥ max a.val b.val := by
+  unfold oplus
+  constructor
+  · -- a ⊕ b ≥ a
+    have : b.val * (1 - a.val) ≥ 0 := by
+      apply mul_nonneg b.property.1
+      linarith [a.property.2]
+    linarith
+  · -- a ⊕ b ≥ b (by symmetry via oplus_comm)
+    have : a.val * (1 - b.val) ≥ 0 := by
+      apply mul_nonneg a.property.1
+      linarith [b.property.2]
+    linarith
+
+-- CRITICAL: Distributivity does NOT hold
+-- This is intentional and matches the mathematical analysis
+-- (⊕, ×) is NOT a semiring
+
+-- Monotonicity theorems
+theorem mul_monotone_left (a a' b : Confidence) (h : a.val ≤ a'.val) :
+    (a * b).val ≤ (a' * b).val := by
+  simp only [HMul.hMul, Mul.mul]
+  exact mul_le_mul_of_nonneg_right h b.property.1
+
+theorem oplus_monotone_left (a a' b : Confidence) (h : a.val ≤ a'.val) :
+    (oplus a b).val ≤ (oplus a' b).val := by
+  unfold oplus
+  have h1 : (1 - b.val) ≥ 0 := by linarith [b.property.2]
+  nlinarith
+
+end Confidence
+```
+
+---
+
+### 12.8 Key Insights from This Exploration
+
+#### Insight 1: No semiring structure
+
+The (⊕, ×) pair does NOT form a semiring because distributivity fails. This is mathematically fundamental and cannot be fixed. The operations must be understood as **separate monoids** used in different contexts.
+
+#### Insight 2: Operation selection is semantic, not algebraic
+
+The choice of which operation to use depends on the **justification structure**:
+- × for sequential/conjunctive derivation (both premises needed)
+- min for conservative combination (pessimistic estimate)
+- ⊕ for aggregation of independent evidence
+
+This connects directly to Thread 2's DAG structure.
+
+#### Insight 3: Boundedness proofs are straightforward
+
+All three operations preserve the [0,1] bounds. The proofs are elementary algebra.
+
+#### Insight 4: min is more optimistic than ×
+
+Counterintuitively, min(a,b) ≥ a×b for all a,b ∈ [0,1]. So "conservative" min actually preserves more confidence than "multiplicative" ×. The semantic difference:
+- × assumes independence: "both happened, multiply probabilities"
+- min assumes pessimism: "as confident as weakest link"
+
+#### Insight 5: ⊕ is confidence-increasing
+
+Unlike × and min, ⊕ increases confidence: a ⊕ b ≥ max(a,b). This models the intuition that multiple independent sources of evidence strengthen a conclusion.
+
+#### Insight 6: Defeat operations remain open
+
+How undercut and rebut edges affect confidence is NOT formalized. This is Task 2.10 and is one of the most important remaining questions for the justification system.
+
+---
+
+### 12.9 What I Don't Know
+
+#### Mathematical unknowns
+
+1. **Defeat propagation**: How should undercut/rebut edges modify confidence? Options include:
+   - Subtractive: c' = max(0, c - defeat_strength)
+   - Multiplicative discounting: c' = c × (1 - defeat_strength)
+   - Probability kinematics (Jeffrey conditioning)
+   - Ranking theory (Spohn's approach)
+
+2. **Correlated evidence**: When evidence is not independent, ⊕ overestimates combined confidence. No good solution exists in CLAIR currently.
+
+3. **Higher structures**: Is there useful structure beyond monoids? The lack of distributivity limits algebraic tools.
+
+#### Formalization unknowns
+
+1. **Lean proof complexity**: The `min_assoc` proof requires careful case analysis. How clean can this be made in Lean 4?
+
+2. **Typeclass organization**: Should we use Mathlib's existing `Monoid` typeclass or define custom ones for confidence?
+
+3. **Computational extraction**: How do these proofs extract to efficient code?
+
+---
+
+### 12.10 Conclusion
+
+Task 8.6 is **complete**. The three confidence combination operations are:
+
+1. **Multiplication (×)**: Commutative monoid ([0,1], ×, 1)
+   - For conjunctive derivation
+   - Confidence decreases with each derivation step
+
+2. **Minimum (min)**: Bounded meet-semilattice ([0,1], min, 1)
+   - For conservative combination
+   - Confidence bounded by weakest premise
+
+3. **Probabilistic OR (⊕)**: Commutative monoid ([0,1], ⊕, 0)
+   - For aggregation of independent evidence
+   - Confidence increases with multiple supports
+
+**Key finding**: These do NOT form a semiring—distributivity fails. This is mathematically necessary and shapes how the operations should be used in CLAIR.
+
+**Next steps**:
+- Task 8.7: Prove boundedness preservation formally in Lean 4
+- Task 2.10: Investigate defeat confidence propagation
+- Task 2.13: Investigate correlated evidence handling
+
+---
+
+*Thread 8 Status: Tasks 8.5, 8.6 explored. Confidence type and operations designed. Algebraic structure fully characterized. Ready for Lean 4 implementation.*
