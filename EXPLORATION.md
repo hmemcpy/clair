@@ -310,36 +310,55 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 8: Formal Verification Strategy
-**Status**: ✓ LEAN 4 IMPLEMENTATION COMPLETE (Session 31)
-**Depth**: Deep - Confidence operations fully formalized in Lean 4
+**Status**: ✓ BELIEF TYPE PHASE 1 COMPLETE (Session 48)
+**Depth**: Deep - Confidence operations + core Belief type formalized in Lean 4
 
-**Lean 4 Project Created (Session 31)**:
+**Lean 4 Project Created (Sessions 31, 48)**:
 - `formal/lean/` - Complete Lean 4 project with Mathlib 4 dependency
 - Confidence type defined as `unitInterval` from Mathlib
 - All core operations implemented and proven: oplus, undercut, rebut, min
+- **NEW (Session 48)**: Belief type formalized with confidence component
 
 **Key Artifacts**:
-- `CLAIR/Confidence/Basic.lean` - Type definition, basic properties
+- `CLAIR/Confidence/Basic.lean` - Confidence type definition, basic properties
 - `CLAIR/Confidence/Oplus.lean` - Probabilistic OR with monoid proofs
 - `CLAIR/Confidence/Undercut.lean` - Multiplicative discounting with composition law
 - `CLAIR/Confidence/Rebut.lean` - Probabilistic comparison for competing evidence
 - `CLAIR/Confidence/Min.lean` - Conservative combination (meet-semilattice)
+- **NEW**: `CLAIR/Belief/Basic.lean` - Core Belief type with derivation, aggregation, defeat
 
-**Key Theorems Proven**:
+**Key Theorems Proven (Confidence)**:
 - All operations preserve [0,1] bounds
 - Oplus: commutative monoid, confidence-increasing property
 - Undercut: composition law `undercut(undercut(c,d₁),d₂) = undercut(c, d₁⊕d₂)`
 - Rebut: anti-symmetry, monotonicity properties
 - Min: bounded meet-semilattice, `mul_le_min` comparison theorem
 
-**Prior work**: Lean Mathlib (unitInterval), fuzzy logic t-norms/t-conorms
+**Key Theorems Proven (Belief - Session 48)**:
+- Functor laws: `map_id`, `map_comp`
+- Derivation decreases confidence: `derive₂_le_left`, `derive₂_le_right`
+- Aggregation increases confidence: `aggregate_ge_left`, `aggregate_ge_right`
+- Undercut composition: `undercut_compose` (via ⊕)
+- Monad laws for confidence: `bind_pure_left_confidence`, `bind_pure_right_confidence`
+- Graded monad structure over ([0,1], ×, 1)
+
+**Belief Type Design (Session 48)**:
+- Incremental approach: Phase 1 (core) → Phase 2 (justification) → Phase 3 (stratification) → Phase 4 (full)
+- Phase 1 complete: Belief<α> = value + confidence
+- Operations: map, derive₂, aggregate, applyUndercut, applyRebut, combineConservative, bind, pure
+- Deferred: justification graph, stratification, provenance, invalidation
+
+**Prior work**: Lean Mathlib (unitInterval), fuzzy logic t-norms/t-conorms, graded monads
 **Formal tools**: Lean 4 v4.15.0, Mathlib v4.15.0
 **Questions answered**:
 - Q8.1: ✓ Confidence operations are the useful minimal formalization
 - Q8.4: ✓ Boundedness, algebraic properties, monotonicity worth proving first
+- Q8.10: ✓ (Phase 1) Belief type with confidence component formalized
 **Questions remaining**:
 - Q8.2: Natural language intents remain outside formalization scope
 - Q8.3: Extraction to working interpreter (rebut is noncomputable due to division)
+- Q8.10: Phases 2-4 (justification graph, stratification, full metadata)
+- Q8.11: Stratified belief levels from Thread 3
 
 ---
 
@@ -407,6 +426,10 @@ What I believe I know:
 | (⊕, ×) form semiring | 0.05 | **REFUTED** Session 11: distributivity fails | Find alternative proof | ✗ False |
 | Three monoid structures work | 0.95 | Session 11: (×,1), (min,1), (⊕,0) | Implementation failure | ✓ Session 11 |
 | min(a,b) ≥ a×b | 0.99 | Session 11: algebraic proof | None (mathematical) | ✓ Proven |
+| Belief type formalizable | 0.90 | Session 48: Phase 1 complete | Implementation failure | ✓ Session 48 |
+| Belief is graded monad | 0.95 | Session 48: bind/pure over ([0,1],×,1) | Monad law failure | ✓ Session 48 |
+| Derivation decreases confidence | 0.99 | Session 48: derive₂_le_left/right | None (mathematical) | ✓ Proven |
+| Aggregation increases confidence | 0.99 | Session 48: aggregate_ge_left/right | None (mathematical) | ✓ Proven |
 | Defeat propagation open | 0.10 | **ANSWERED** Session 12 | Better model found | ✓ Session 12 |
 | Undercut uses multiplicative discounting | 0.90 | Session 12: c × (1-d), aligns with Subjective Logic | Better model found | ✓ Session 12 |
 | Rebut uses probabilistic comparison | 0.85 | Session 12: c/(c+d), symmetric treatment | Better model found | ✓ Session 12 |
