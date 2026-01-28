@@ -178,8 +178,8 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 5: Invalidation and Belief Revision
-**Status**: ✓ SUBSTANTIALLY EXPLORED (Session 16)
-**Depth**: Deep (see exploration/thread-5-belief-revision.md)
+**Status**: ✓ SUBSTANTIALLY EXPLORED (Sessions 16, 36)
+**Depth**: Deep (see exploration/thread-5-belief-revision.md, exploration/thread-5.11-defeat-fixedpoints.md)
 
 **Core questions answered (Session 16)**:
 - Q5.1: Does AGM apply to graded beliefs? → **YES, with modifications**
@@ -196,17 +196,26 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
   - Core algorithm: modify graph → identify affected → recompute
   - Key theorems: Locality, Monotonicity, Defeat Composition
 
-**Key findings (Session 16)**:
+**Fixed-point convergence answered (Session 36)**:
+- Q5.6: When does defeat chain iteration converge? → **FULLY CHARACTERIZED**
+  - Existence always holds (Brouwer's Fixed-Point Theorem)
+  - Uniqueness guaranteed when b_max × d_max < 1 (contraction condition)
+  - Mutual undercut formula: a* = a(1-b)/(1-ab)
+  - Infinite chains converge to d/(1+d)
+  - See exploration/thread-5.11-defeat-fixedpoints.md
+
+**Key findings (Sessions 16, 36)**:
 - CLAIR revision is essentially **graded generalization of TMS**
 - Recovery postulate correctly fails: evidence has specific strength
 - Defeat enables non-monotonic revision: undercut decreases, rebut compares
 - DAG structure makes revision compositional (automatic propagation)
+- Defeat cycles always have well-defined fixed points (mathematical guarantee)
 
-**Prior work surveyed**: AGM (1985), Gärdenfors (1988), Spohn (2012), Jeffrey (1983), van Ditmarsch et al. (2007)
-**Formal tools**: Justification DAGs, confidence propagation, topological sort
+**Prior work surveyed**: AGM (1985), Gärdenfors (1988), Spohn (2012), Jeffrey (1983), van Ditmarsch et al. (2007), Banach (1922), Brouwer (1911)
+**Formal tools**: Justification DAGs, confidence propagation, topological sort, contraction mapping theory
 **Questions remaining**:
 - Q5.5: How to handle correlated (non-independent) evidence?
-- Q5.6: Fixed-point existence for defeat chains?
+- ~~Q5.6: Fixed-point existence for defeat chains?~~ → **ANSWERED Session 36**
 - Q5.7: Mapping to DEL revision/update semantics?
 
 ---
@@ -471,6 +480,11 @@ What I believe I know:
 | FiniteConfidence enables decidable checks | 0.90 | Session 29: compile-time anti-bootstrapping | Find undecidable case | ✓ Session 29 |
 | Graded Löb axiom semantically sound | 0.90 | Session 27: g(c) = c² ensures anti-bootstrapping | Find counterexample | ✓ Session 27 |
 | Bou et al. (2011) key framework | 0.95 | Session 27: many-valued modal completeness | Find better framework | ✓ Session 27 |
+| Defeat cycles have fixed points | 0.99 | Session 36: Brouwer's theorem | None (mathematical) | ✓ Proven |
+| Fixed-point unique when b×d < 1 | 0.95 | Session 36: Banach contraction | Find non-contractive unique case | ✓ Session 36 |
+| Mutual undercut: a* = a(1-b)/(1-ab) | 0.99 | Session 36: algebraic derivation | None (mathematical) | ✓ Proven |
+| Contraction condition realistic | 0.85 | Session 36: fallibilism + sparse defeat | Find counterexample network | ✓ Session 36 |
+| Damped iteration handles borderline | 0.80 | Session 36: convergence acceleration | Find failing case | ⚠ Practical |
 | Dissertation structure established | 0.95 | Session 30: LaTeX infrastructure + Chapter 1 | Find structural flaw | ✓ Session 30 |
 | Chapter 1 captures correct framing | 0.90 | Session 30: tracking vs proving, contributions | Find missing element | ✓ Session 30 |
 | Chapter 2 prior art survey adequate | 0.90 | Session 34: 5 major traditions surveyed, gap identified | Find significant omission | ✓ Session 34 |

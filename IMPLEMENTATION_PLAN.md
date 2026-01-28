@@ -140,7 +140,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 **New questions discovered (Session 16)**:
 - [ ] **5.10 Correlated evidence** - How to detect/handle non-independent evidence sources? Aggregation assumes independence.
-- [ ] **5.11 Fixed-point for defeat chains** - When does iterative propagation converge? Conditions for unique fixed point?
+- [x] **5.11 Fixed-point for defeat chains** - ANSWERED Session 36: Existence always holds (Brouwer). Uniqueness and convergence guaranteed when b_max × d_max < 1 (contraction condition). Mutual undercut formula: a* = a(1-b)/(1-ab). Infinite chains converge to d/(1+d). See exploration/thread-5.11-defeat-fixedpoints.md
 - [ ] **5.12 Revision vs update distinction** - Precisely map CLAIR operations to DEL revision/update semantics
 - [ ] **5.13 Contract by proposition** - Is there meaningful "contract by proposition" for CLAIR, or only "contract by edge"?
 
@@ -1218,6 +1218,33 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - CPL-finite: Decidable AND preserves semantics (via rounding)
 
 184. **Recommendation confirmed**: CPL-finite remains the appropriate decidable fragment for CLAIR. CPL-Gödel is theoretically interesting but not practically useful.
+
+### Session 36 Discoveries (Task 5.11 Fixed-Point Convergence)
+
+185. **DEFEAT CHAIN FIXED-POINTS FULLY CHARACTERIZED** — Mathematical foundations for belief revision convergence established.
+
+186. **Existence always holds**:
+    - Brouwer's Fixed-Point Theorem applies: continuous F on compact convex [0,1]^|V|
+    - Every CLAIR defeat graph has at least one fixed-point confidence assignment
+    - No risk of "undefined" or "infinite loop" behavior
+
+187. **Contraction condition for uniqueness and convergence**:
+    - If b_max × d_max < 1 (max base confidence × max undercut in-degree)
+    - Then fixed point is unique and iteration converges geometrically
+    - Rate is L = b_max × d_max
+    - Proof via Banach Fixed-Point Theorem
+
+188. **Special case formulas derived**:
+    - Mutual undercut: a* = a(1-b)/(1-ab), b* = b(1-a)/(1-ab)
+    - Infinite chain: converges to d/(1+d)
+    - Pure rebut: normalized partition a/(a+b), b/(a+b)
+
+189. **Practical implications**:
+    - Realistic belief networks satisfy contraction condition (fallibilism + sparse defeat)
+    - Implementation: topological pass for supports, then iterate within defeat SCCs
+    - Damped iteration for borderline cases
+
+190. **Non-uniqueness is rare**: Multiple fixed points only arise with degenerate confidences (0 or 1) which violate CLAIR's fallibilism principle.
 
 ## Impossibilities Encountered
 

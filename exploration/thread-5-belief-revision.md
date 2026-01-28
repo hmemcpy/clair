@@ -491,11 +491,12 @@ where ⊕ is probabilistic OR.
   - Aggregation formula assumes independence; correlation causes overconfidence
   - Need: correlation tracking or conservative aggregation
 
-- **Q5.6**: **Cyclic defeat**
-  - DAG is acyclic, but defeat chains can have semantic cycles:
-    - A defeats B, B defeats C, C indirectly affects A's premises
-  - Current proposal: Fixed-point semantics (iterate until stable)
-  - Question: Does fixed point always exist? Converge?
+- **Q5.6**: **Cyclic defeat** → **ANSWERED (Session 36)**
+  - DAG is acyclic, but defeat chains can have semantic cycles
+  - **Existence**: Fixed point always exists (Brouwer's theorem)
+  - **Uniqueness**: Guaranteed when b_max × d_max < 1 (contraction condition)
+  - **Convergence**: Geometric rate under contraction; damped iteration otherwise
+  - See exploration/thread-5.11-defeat-fixedpoints.md for full analysis
 
 - **Q5.7**: **Revision vs. update distinction**
   - AGM distinguishes belief *revision* (new information about static world) from *update* (world changed)
@@ -631,9 +632,9 @@ CLAIR revision is essentially a graded generalization of TMS:
    - Track correlation structure
    - Conservative aggregation when correlation unknown
 
-2. **Prove fixed-point existence for defeat chains** (Task 5.6)
-   - When does iterative confidence propagation converge?
-   - Conditions for unique fixed point
+2. ~~**Prove fixed-point existence for defeat chains** (Task 5.6)~~ → **COMPLETED (Session 36)**
+   - See exploration/thread-5.11-defeat-fixedpoints.md
+   - Existence via Brouwer; uniqueness via contraction condition b_max × d_max < 1
 
 3. **Clarify revision vs. update** (Task 5.7)
    - Map CLAIR operations to DEL semantics
@@ -674,11 +675,13 @@ Key theorems established:
 - **Locality**: Changes only affect transitive dependents
 - **Monotonicity**: Confidence changes propagate monotonically
 - **Defeat Composition**: Sequential undercuts compose via ⊕
+- **Fixed-Point Existence**: Defeat cycles always have at least one fixed point (Brouwer)
+- **Unique Convergence**: Condition b_max × d_max < 1 guarantees unique fixed point with geometric convergence
 
 Open questions remain around:
-- Correlated evidence handling
-- Fixed-point existence for defeat chains
-- Precise mapping to DEL semantics
+- Correlated evidence handling (Task 5.10)
+- ~~Fixed-point existence for defeat chains~~ → **ANSWERED Session 36**
+- Precise mapping to DEL semantics (Task 5.4)
 
 **Next steps**: Formalize in Lean (Thread 8), handle correlations (Task 5.5), connect to dynamic epistemic logic (Task 5.4).
 
