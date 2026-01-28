@@ -78,7 +78,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **New tasks discovered (Session 22)**:
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
 - [ ] **3.17 CPL soundness/completeness** - Formulate and prove for CPL (or decidable fragments)
-- [ ] **3.18 Graded Löb discount function** - Choose the right g(c) function: g(c) = c², c×(1-c), or other?
+- [x] **3.18 Graded Löb discount function** - ANSWERED Session 26: g(c) = c² (quadratic) is the recommended choice. Supported by: (1) all mathematical desiderata satisfied, (2) derivation from first principles (penalty = c(1-c), so g(c) = c - c(1-c) = c²), (3) alignment with CLAIR's multiplicative structure. Alternative g(c) = c×d (product discount) also acceptable for tunable systems. See exploration/thread-3.18-loeb-discount.md
 - [ ] **3.19 Type-level anti-bootstrapping** - Implement Löb constraints in CLAIR's type checker (use stratification, not full CPL)
 
 **New tasks discovered (Session 25)**:
@@ -949,6 +949,51 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - CPL-finite decidable: 0.90 (follows from finite lattice theorem)
     - CPL-0 decidable: 0.85 (no self-reference removes encodings)
     - Quasimodel approach works: 0.40 (unproven, non-trivial)
+
+### Session 26 Discoveries (Task 3.18 Graded Löb Discount)
+
+136. **GRADED LÖB DISCOUNT FUNCTION ANSWERED** — g(c) = c² (quadratic) is the recommended choice.
+
+137. **Six candidates analyzed mathematically**:
+    - g(c) = c (identity): ✗ Too weak, no self-reference cost
+    - g(c) = c²: ✓ **RECOMMENDED** — all desiderata satisfied
+    - g(c) = c(1-c): ✗ Fails monotonicity and anchoring
+    - g(c) = c - ε: ⚠ Acceptable but arbitrary constant
+    - g(c) = c × d: ✓ Alternative for tunable systems
+    - g(c) = c × c_claim: Reduces to c² when applied to Löb axiom
+
+138. **Derivation from first principles**:
+    - Self-reference penalty should be proportional to uncertainty: (1-c)
+    - And proportional to confidence: c
+    - Combined penalty: c × (1-c)
+    - Therefore: g(c) = c - c(1-c) = c²
+
+139. **Alignment with CLAIR's algebraic structure**:
+    - c² = c × c matches multiplicative derivation
+    - Self-referential claims require "justifying both the claim AND the self-reference"
+    - Forms monoid homomorphism from ([0,1], ×, 1) to itself
+
+140. **Anti-bootstrapping via quadratic discount**:
+    - Iterated self-soundness: c → c² → c⁴ → c⁸ → ... → 0 (for c < 1)
+    - Cannot bootstrap to certainty via self-soundness claims
+    - Each layer of self-reference costs multiplicative penalty
+
+141. **Integration with CPL**:
+    - Graded Löb axiom (final form): B_c(B_c φ → φ) → B_{c²} φ
+    - Anti-bootstrapping constraint: conf(φ) ≤ conf(self-soundness)²
+    - Type-level implementation: SelfSoundnessGuard caps derived confidences
+
+142. **Prior art surveyed**:
+    - Jøsang (2016): Subjective Logic discounting operator (multiplicative: b' = b_t × b)
+    - Xue et al. (2024): Löb-Safe Logics (no graded extension)
+    - Fuzzy modal logic: complement-based discounting (1 - R(w,w'))
+    - Spohn (2012): Ranking theory (additive in rank domain = multiplicative in probability)
+
+143. **Confidence assessment**:
+    - g(c) = c² is mathematically suitable: 0.95
+    - g(c) = c² captures anti-bootstrapping semantics: 0.85
+    - g(c) = c² aligns with CLAIR operations: 0.90
+    - Task 3.18 substantially answered: 0.90
 
 ## Impossibilities Encountered
 
