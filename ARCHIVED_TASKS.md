@@ -105,9 +105,54 @@
 
 ---
 
+## Thread 2: Justification (Theoretical)
+
+- [ ] **2.3 Partial justification** - Can justification be graduated? Semantic question.
+
+**Reason**: Interesting theoretical question, but current binary justification (present/absent) works for formalization.
+
+---
+
+## Thread 3: Self-Reference (Refinements)
+
+- [ ] **3.14 Unbounded quantification** - "Beliefs about all my beliefs"?
+- [ ] **3.50 Gradual linearity adoption** - Gradual typing for incremental adoption
+- [ ] **3.51 Evidence decomposition** - Complex evidence → affine resources
+- [ ] **3.52 Affine evidence and belief revision** - Interaction with Thread 5
+- [ ] **3.53 Computational costs** - Performance implications of affine tracking
+
+**Reason**: Refinements beyond core formalization. Affine types designed (3.46-3.49); these are extensions.
+
+---
+
+## Thread 4: Grounding (Formalization Details)
+
+- [ ] **4.9 Reliability metrics** - How to formalize reliability tractably?
+- [ ] **4.11 Grounding types formalization** - GroundingType, ReliabilityMetric, Source in CLAIR
+
+**Reason**: Grounding theory established (pragmatic dogmatism). Type formalization is detail work after core interpreter.
+
+---
+
+## Thread 5: Belief Revision (Extensions)
+
+- [ ] **5.10 Correlated evidence** - Detection/handling of non-independent sources
+
+**Reason**: Nice refinement. Core revision algorithm works; correlation is enhancement.
+
+---
+
+## Thread 10: Dissertation
+
+- [ ] **10.2 Finalize Thesis** - Only after implementation proves viability
+
+**Reason**: Write-up comes after proving CLAIR works via interpreter.
+
+---
+
 ## Summary
 
-**Archived**: 28 tasks
+**Archived**: 37 tasks
 **Reason categories**:
 - Diminishing returns (threshold variations): 6 tasks
 - Speculative/nice-to-have: 3 tasks

@@ -92,19 +92,16 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 
 ---
 
-## Open Questions
+## Remaining Work (4 Core Tasks)
 
-### High Priority
-- **3.47 Affine types in Lean** - Formalize context splitting for aggregation
-- **8.4 Extract interpreter** - Produce executable from Lean formalization
-- **3.15 Stratification in Lean** - Complete the Lean formalization of stratified beliefs
+Focus: Prove CLAIR works as LLM lingua franca via working interpreter.
 
-### Medium Priority
-- **3.50** Gradual linearity adoption
-- **5.4** Dynamic epistemic logic formalization
-- **4.9** Reliability metrics formalization
+1. **3.47 Affine types in Lean** ← Current
+2. **3.15 Stratification in Lean**
+3. **1.4 Confidence algebra completion**
+4. **8.4 Extract interpreter** ← Key deliverable
 
-### See IMPLEMENTATION_PLAN.md for complete open task list (14 tasks)
+Theoretical refinements archived for future work (see ARCHIVED_TASKS.md).
 
 ---
 
@@ -150,7 +147,7 @@ CLAIR isn't just a programming language—it's an attempt to formalize how I (an
 
 ## Next Steps
 
-1. **Task 3.49**: Prove decidability of affine CLAIR type checking
-2. **Task 3.47**: Formalize affine evidence types in Lean
-3. **Task 8.4**: Extract working interpreter from Lean
-4. Continue with open tasks in IMPLEMENTATION_PLAN.md
+1. **Task 3.47**: Add affine contexts to Lean typing judgment ← Current
+2. **Task 3.15**: Complete stratification formalization
+3. **Task 1.4**: Prove confidence algebra properties
+4. **Task 8.4**: Extract working interpreter ← Goal

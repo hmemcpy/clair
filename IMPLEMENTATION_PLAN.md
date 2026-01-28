@@ -1,87 +1,90 @@
-# CLAIR Exploration Plan (Focused)
+# CLAIR Implementation Plan (Focused)
 
-> **Mode**: Exploratory Research | **Driver**: Claude
-> **Archived tasks**: See `ARCHIVED_TASKS.md` for deferred research directions
-
----
-
-## Priority Tasks (22 remaining)
-
-### Thread 1: Confidence
-- [ ] **1.4 Formalize confidence algebra** - Complete Lean formalization. → Thread 8
-
-### Thread 2: Justification
-- [ ] **2.3 Partial justification** - Can justification be graduated? Core semantic question.
-
-### Thread 3: Self-Reference (Core)
-
-**Formalization**:
-- [ ] **3.14 Unbounded quantification** - How to handle "beliefs about all my beliefs"?
-- [ ] **3.15 Formalize stratification in Lean** - Complete the Lean formalization
-
-**Affine Evidence Types** (HIGH PRIORITY):
-- [ ] **3.47 Affine evidence types in Lean** - Full formalization with context splitting ← **NEXT**
-- [x] **3.49 Decidability of affine CLAIR** - Proven decidable in O(n²) time
-- [ ] **3.50 Gradual linearity adoption** - Gradual typing for incremental adoption
-- [ ] **3.51 Evidence decomposition** - Complex evidence → affine resources
-- [ ] **3.52 Affine evidence and belief revision** - Interaction with Thread 5
-- [ ] **3.53 Computational costs** - Performance implications of affine tracking
-
-### Thread 4: Grounding
-- [ ] **4.9 Reliability metrics** - How to formalize reliability tractably?
-- [ ] **4.11 Grounding types formalization** - GroundingType, ReliabilityMetric, Source in CLAIR
-
-### Thread 5: Belief Revision
-- [ ] **5.10 Correlated evidence** - Detection/handling of non-independent sources
-
-### Thread 8: Formal Verification (HIGH PRIORITY)
-- [ ] **8.4 Extract interpreter** - Extract runnable interpreter from Lean ← **KEY DELIVERABLE**
-
-### Thread 10: Dissertation
-- [ ] **10.2 Finalize Thesis (FINAL)** - Only after all above complete
+> **Goal**: Prove CLAIR works as LLM lingua franca
+> **Method**: Complete Lean formalization → Extract working interpreter
+> **Deferred**: Theoretical explorations archived for future work
 
 ---
 
-## Completed Threads
+## Core Formalization Tasks (4 remaining)
 
-See `exploration/completed/` for all finished exploration documents (51 files).
+These directly prove CLAIR is viable:
 
-| Thread | Key Achievement |
-|--------|-----------------|
-| 1. Confidence | De Morgan bimonoid algebra formalized |
-| 2. Justification | DAG structure, sequent calculus, cut elimination |
-| 3. Self-Reference | Stratification, Löb discount, affine types designed |
-| 4. Grounding | Pragmatic dogmatism + stratified coherentism |
-| 5. Belief Revision | Justification-based algorithm |
-| 6. Multi-Agent | Pragmatic internal realism foundation |
-| 7. Implementation | Haskell interpreter design |
-| 8. Verification | Full Lean 4 syntax formalization |
-| 9. Phenomenology | Honest uncertainty stance |
+### 1. Complete Type System in Lean
+- [ ] **3.47 Affine evidence types** - Context splitting, usage tracking ← **CURRENT**
+- [ ] **3.15 Stratification** - Level-indexed beliefs, introspection rules
+
+### 2. Complete Semantics in Lean
+- [ ] **1.4 Confidence algebra** - Prove monad laws, defeat composition
+
+### 3. Produce Working Artifact
+- [ ] **8.4 Extract interpreter** - Runnable code from Lean ← **KEY DELIVERABLE**
 
 ---
 
 ## Execution Order
 
-**Phase 1: Core Type System**
-1. ~~3.46 Epistemic linearity~~ ✓
-2. ~~3.48 Linearity × defeat~~ ✓
-3. ~~3.49 Decidability of affine CLAIR~~ ✓
-4. **3.47 Affine types in Lean** ← Current
+1. **3.47 Affine types in Lean** ← Current
+   - Add affine context `Δ` to typing judgment
+   - Implement context splitting for aggregation
+   - Prove resource safety (no double-counting)
 
-**Phase 2: Complete Formalization**
-5. 3.15 Stratification in Lean
-6. 1.4 Confidence algebra completion
-7. 8.4 Extract interpreter
+2. **3.15 Stratification in Lean**
+   - Complete level-indexed belief types
+   - Prove anti-bootstrapping (no self-reference)
 
-**Phase 3: Refinements**
-8. Remaining Thread 3 tasks (3.50-3.53)
-9. Thread 4-5 formalization tasks
-10. 10.2 Finalize thesis
+3. **1.4 Confidence algebra**
+   - Prove graded monad laws
+   - Prove defeat composition theorems
+
+4. **8.4 Extract interpreter**
+   - Use Lean's code extraction
+   - Produce runnable CLAIR evaluator
+   - Demonstrate with examples
+
+---
+
+## What We're Proving
+
+The interpreter demonstrates:
+1. **Beliefs track confidence** - Not just true/false
+2. **Evidence is affine** - No double-counting
+3. **Introspection is safe** - Stratification prevents paradox
+4. **Defeat works** - Undercut/rebut modify confidence correctly
+5. **Type checking is decidable** - ✓ Proven (Session 74)
+
+If the interpreter runs and type-checks CLAIR programs correctly, we've shown CLAIR could work as a practical epistemic language for LLMs.
+
+---
+
+## Deferred to ARCHIVED_TASKS.md
+
+Moved for future theoretical exploration:
+- 2.3 Partial justification (graduated justification)
+- 3.14 Unbounded quantification
+- 3.50-3.53 Affine refinements (gradual adoption, decomposition, costs)
+- 4.9, 4.11 Grounding formalization
+- 5.10 Correlated evidence detection
+- 10.2 Dissertation (after implementation proves viability)
+
+---
+
+## Completed
+
+| Task | Result |
+|------|--------|
+| 3.46 Epistemic linearity | Affine types designed |
+| 3.48 Linearity × defeat | Consumption permanent |
+| 3.49 Decidability | O(n²) type checking |
+| Lean syntax | Complete (Types, Expr, Context) |
+| Lean confidence | Complete (⊕, ×, undercut, rebut) |
+| Lean beliefs | Complete (basic + stratified) |
+| Lean semantics | Complete (small-step) |
 
 ---
 
 ## Statistics
 
-- **Active tasks**: 14
-- **Archived tasks**: 28 (see ARCHIVED_TASKS.md)
+- **Core tasks remaining**: 4
+- **Theoretical tasks archived**: 9
 - **Completed explorations**: 52 files
