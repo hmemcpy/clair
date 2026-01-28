@@ -515,8 +515,18 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - All CLAIR-specific rules implemented: derive, aggregate, undercut, rebut, introspect
 - Type safety theorems stated (proofs are Tasks 8.2-8.3)
 
+**Type Safety Design (Session 65)**:
+- **Task 8.2 exploration complete** - see exploration/thread-8.2-type-safety.md
+- Proof strategy: Canonical Forms → Progress by case analysis → Preservation via Substitution Lemma
+- **Key finding**: `introspect` lacks beta reduction rule, causing stuck terms
+- Proposed `introspectBeta` rule: `introspect(belief v c j) --> belief(belief v c j) (c^2) j'`
+- Two confidence levels: object-level (in types) vs meta-level (in judgments)
+- Preservation allows confidence changes: defeat decreases, substitution may increase
+- Recommended simplifications: ignore judgment confidence initially, defer introspection
+- Estimated proof effort: 40-60 lines progress, 100-150 lines preservation + lemmas
+
 **Questions remaining**:
-- Q8.2: Type safety proofs (progress, preservation) - Task 8.2
+- Q8.2: Type safety proofs (progress, preservation) - Task 8.2 (strategy designed, Lean impl remains)
 - Q8.3: Confidence soundness (connect syntax to semantics) - Task 8.3
 - Q8.4: Extraction to working interpreter - Task 8.4
 - Q8.10: Phases 2, 4 (justification graph, full metadata)
@@ -728,6 +738,11 @@ What I believe I know:
 | Aggregative contraction compatible with cut elim | 0.90 | Session 52: premise duplication maintains termination | Find non-terminating reduction | ✓ Session 52 |
 | Subformula property holds for CLAIR | 0.90 | Session 52: follows from cut elimination | Find non-subformula | ✓ Session 52 |
 | CLAIR consistency follows from cut elimination | 0.95 | Session 52: no cut-free proof of ⊥ | Find inconsistency | ✓ Session 52 |
+| Type safety proof strategy identified | 0.85 | Session 65: Canonical Forms + Substitution Lemma | Find proof failure | ✓ Session 65 |
+| Introspect needs beta rule | 0.90 | Session 65: otherwise stuck terms in progress proof | Find alternative handling | ✓ Session 65 |
+| Progress/Preservation standard for CLAIR | 0.80 | Session 65: graded types don't change proof structure | Find grading-specific issue | ✓ Session 65 |
+| Two confidence levels (object/meta) | 0.85 | Session 65: types vs judgments carry different confidences | Find unification | ✓ Session 65 |
+| Preservation allows confidence change | 0.90 | Session 65: defeat decreases, substitution may increase | Find direction constraint | ✓ Session 65 |
 
 ---
 
