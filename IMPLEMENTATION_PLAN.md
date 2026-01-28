@@ -1304,6 +1304,44 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 
 200. **Dissertation progress**: Chapters 1-6 complete (Introduction, Background, Confidence, Justification, Self-Reference, Grounding). Remaining: Chapters 7-13 and appendices.
 
+### Session 39 Discoveries (Task 10.1g Dissertation Chapter 7 Complete)
+
+201. **DISSERTATION CHAPTER 7 COMPLETE** — Belief Revision (~25 pages) written.
+
+202. **Chapter structure**:
+    - The revision problem for CLAIR: beyond propositional belief sets
+    - Classical AGM theory: postulates, epistemic entrenchment
+    - CLAIR belief revision: justification-based (not proposition-based)
+    - Revision operations: evidence update, justification retraction, premise change, defeat introduction
+    - Confidence recomputation algorithm with topological sort
+    - Key properties: Locality, Monotonicity, Defeat Composition theorems
+    - Recovery postulate correctly fails (and why this is right)
+    - Defeat dynamics and fixed points: existence (Brouwer), uniqueness (Banach)
+    - Special cases: mutual undercut, infinite chains, pure rebut
+    - Reinstatement as compositional emergence
+    - Implementation with SCC-based efficient evaluation
+    - Open questions: correlated evidence, revision vs update, contraction by proposition
+
+203. **Key formalizations included**:
+    - Definition: CLAIR Belief State (B, G, C, I)
+    - Definition: Confidence Update Function F_v
+    - Algorithm: RecomputeConfidence with topological sort
+    - Theorem: Existence (Brouwer's Fixed-Point Theorem)
+    - Theorem: Unique Convergence (Banach contraction when b_max × d_max < 1)
+    - Theorem: Locality (changes only affect transitive dependents)
+    - Theorem: Monotonicity (confidence changes propagate monotonically)
+    - Theorem: Defeat Composition (undercuts compose via ⊕)
+    - Theorem: No Recovery (philosophically correct)
+    - Theorem: Mutual Undercut Fixed Point: a* = a(1-b)/(1-ab)
+    - Theorem: Chain Limit: x* = d/(1+d)
+    - Theorem: Pure Rebut Equilibrium: normalized partition
+
+204. **Key insight**: CLAIR revision is essentially a graded generalization of Truth Maintenance Systems (TMS). The key differences: TMS is binary (IN/OUT) while CLAIR uses confidence [0,1]; TMS has IN-lists/OUT-lists while CLAIR has DAGs with typed edges; TMS uses label switching while CLAIR uses confidence recomputation.
+
+205. **Recovery correctly fails**: This is philosophically appropriate because evidence has specific strength. Removing evidence and re-adding it should not restore the original state if the epistemic context has changed. AGM's Recovery postulate is controversial precisely because it ignores the reason for contraction.
+
+206. **Dissertation progress**: Chapters 1-7 complete (Introduction, Background, Confidence, Justification, Self-Reference, Grounding, Belief Revision). Remaining: Chapters 8-13 and appendices.
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -1564,7 +1602,8 @@ With Threads 1, 2, 3 complete, priority shifts to:
 - [x] **10.1d Write Chapter 4: Justification as Labeled DAGs** — COMPLETED Session 36. Established structural foundation: DAG necessity (shared premises), acyclicity requirement (well-foundedness), labeled edges (support/undercut/rebut). Confidence propagation algorithm with bottom-up evaluation. Reinstatement emerges compositionally (boost = a×d×e). Infinite chain convergence to d/(1+d). Mutual defeat fixed points with existence (Brouwer) and uniqueness (Banach contraction when b_max×d_max<1). Correlated evidence with dependency-adjusted aggregation interpolating between ⊕ and average. Connection to TMS, argumentation, Subjective Logic, Justification Logic. ~25 pages. See `formal/dissertation/chapters/04-justification.tex`.
 - [x] **10.1e Write Chapter 5: Self-Reference and the Gödelian Limits** — COMPLETED Session 37. Full treatment of self-reference: Löb's theorem and anti-bootstrapping, Tarski's stratification hierarchy, Kripke's fixed points for safe self-reference, CPL (Confidence-Bounded Provability Logic) as novel extension of GL with graded Löb axiom g(c)=c², anti-bootstrapping theorem, decidability analysis (CPL undecidable, CPL-finite decidable, CPL-Gödel semantically inappropriate). Two-layer design recommendation: stratification by default, Kripke fixed points as escape hatch. ~25 pages. See `formal/dissertation/chapters/05-self-reference.tex`.
 - [x] **10.1f Write Chapter 6: Epistemological Grounding** — COMPLETED Session 38. Full treatment of grounding: Agrippa's trilemma and the regress problem, classical responses (foundationalism, coherentism, infinitism), Sellars's Myth of the Given applied to LLMs, pragmatic dogmatism as CLAIR's stance, stratified coherentism architecture. Formalized GroundingType, ReliabilityMetric, Source types. Training as pragmatic grounding (not epistemic justification). Honest uncertainty as appropriate stance. Connection to self-reference and belief revision. ~20 pages. See `formal/dissertation/chapters/06-grounding.tex`.
-- [ ] **10.1 Complete remaining dissertation chapters** — IN PROGRESS. Chapters 7-13 and appendices remain.
+- [x] **10.1g Write Chapter 7: Belief Revision** — COMPLETED Session 39. Full treatment of CLAIR belief revision: extending AGM to graded DAG-structured beliefs, justification-based revision (not proposition-based), confidence recomputation algorithm with topological sort, locality/monotonicity/defeat-composition theorems, Recovery postulate correctly fails. Defeat dynamics: fixed-point existence via Brouwer, uniqueness via Banach contraction (condition b_max×d_max<1), special cases (mutual undercut, infinite chains, pure rebut). Reinstatement emerges compositionally. Implementation sketch with efficient SCC-based evaluation. Connection to TMS, ranking theory, DEL. ~25 pages. See `formal/dissertation/chapters/07-belief-revision.tex`.
+- [ ] **10.1 Complete remaining dissertation chapters** — IN PROGRESS. Chapters 8-13 and appendices remain.
 
   **Objective**: Synthesize all exploration findings into a coherent, PhD-level academic document that formalizes CLAIR as a novel contribution to the intersection of programming language theory, epistemology, and AI reasoning.
 

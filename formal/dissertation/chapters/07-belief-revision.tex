@@ -1,0 +1,930 @@
+% Chapter 7: Belief Revision
+% Extends AGM to graded DAG-structured beliefs with defeat semantics
+
+\chapter{Belief Revision}
+\label{ch:revision}
+
+\epigraph{%
+  ``If we are uncritical we shall always find what we want: we shall look for,
+  and find, confirmations, and we shall look away from, and not see, whatever
+  might be dangerous to our pet theories.''
+}{Karl Popper}
+
+Rational belief systems must change in response to new evidence. Classical
+belief revision theory, most notably the AGM framework, addresses how
+propositional belief sets should contract and expand while maintaining
+consistency. CLAIR faces a richer problem: beliefs carry continuous confidence
+values, justifications form directed acyclic graphs with labeled edges, and
+defeat relationships create non-monotonic dependencies. This chapter develops
+CLAIR's theory of belief revision, extending AGM to handle these complexities
+while preserving the intuition of minimal change.
+
+\section{The Revision Problem for CLAIR}
+\label{sec:revision-problem}
+
+\subsection{Beyond Propositional Belief Sets}
+
+Classical AGM theory operates on \emph{belief sets}---logically closed sets of
+propositions representing what an agent believes. Revision operations modify
+these sets:
+
+\begin{itemize}
+  \item \textbf{Expansion} ($K + \varphi$): Adding a belief
+  \item \textbf{Contraction} ($K - \varphi$): Removing a belief
+  \item \textbf{Revision} ($K * \varphi$): Adding a belief while maintaining
+        consistency
+\end{itemize}
+
+CLAIR's epistemic states are fundamentally different:
+
+\begin{enumerate}
+  \item \textbf{Graded beliefs}: Confidence values in $[0,1]$, not binary
+        membership
+  \item \textbf{Structured justification}: DAGs with labeled edges, not flat sets
+  \item \textbf{Explicit defeat}: Undercut and rebut relationships, not just
+        logical inconsistency
+  \item \textbf{Compositional confidence}: Algebraic operations propagating
+        through the graph
+\end{enumerate}
+
+\begin{definition}[CLAIR Belief State]
+\label{def:belief-state}
+A \emph{CLAIR belief state} is a tuple $\Sigma = (B, G, C, I)$ where:
+\begin{itemize}
+  \item $B$ is a set of belief identifiers
+  \item $G : B \to \mathsf{JustificationGraph}$ maps each belief to its
+        justification DAG
+  \item $C : B \to [0,1]$ assigns confidence values
+  \item $I : B \to \mathcal{P}(\mathsf{InvalidationCondition})$ specifies
+        conditions for reconsideration
+\end{itemize}
+\end{definition}
+
+\subsection{What Triggers Revision?}
+
+In AGM, revision is triggered by new information that conflicts with existing
+beliefs. In CLAIR, revision triggers are more varied:
+
+\begin{enumerate}
+  \item \textbf{Evidence update}: New evidence supporting or opposing a belief
+  \item \textbf{Confidence change}: A premise's confidence increases or decreases
+  \item \textbf{Justification removal}: An inference link is invalidated
+  \item \textbf{Defeat introduction}: A new undercutter or rebuttal appears
+  \item \textbf{Defeat retraction}: A defeater is itself defeated or removed
+\end{enumerate}
+
+The key insight is that CLAIR revision operates on \emph{justifications}, not
+propositions. One can revise a belief's support without changing whether the
+proposition is ``believed''---the confidence may change, but the belief remains
+in the system.
+
+\section{Classical AGM Theory}
+\label{sec:agm}
+
+We first review classical AGM to establish the baseline that CLAIR extends.
+
+\subsection{The AGM Postulates}
+
+Alchourr\'{o}n, G\"{a}rdenfors, and Makinson \citep{alchourron1985logic}
+proposed eight postulates for rational contraction:
+
+\begin{definition}[AGM Contraction Postulates]
+\label{def:agm-contraction}
+For a belief set $K$ and proposition $\varphi$, contraction $K - \varphi$
+satisfies:
+\begin{enumerate}
+  \item \textbf{Closure}: $K - \varphi = \mathsf{Cn}(K - \varphi)$
+  \item \textbf{Success}: If $\not\vdash \varphi$, then $\varphi \notin K - \varphi$
+  \item \textbf{Inclusion}: $K - \varphi \subseteq K$
+  \item \textbf{Vacuity}: If $\varphi \notin K$, then $K - \varphi = K$
+  \item \textbf{Recovery}: $K \subseteq (K - \varphi) + \varphi$
+  \item \textbf{Extensionality}: If $\varphi \equiv \psi$, then $K - \varphi = K - \psi$
+\end{enumerate}
+\end{definition}
+
+The \textbf{Recovery postulate} is especially significant---and controversial.
+It says that if you contract by $\varphi$ and then add $\varphi$ back, you
+recover the original belief set.
+
+\begin{example}[Recovery Problem]
+Suppose I believe ``Tweety flies'' based on ``Tweety is a bird.'' I learn
+Tweety is a penguin and contract ``Tweety flies.'' Recovery says that simply
+re-adding ``Tweety flies'' restores my original belief state. But this ignores
+the \emph{reason} for contraction---I shouldn't recover the old confidence if
+the penguin evidence remains.
+\end{example}
+
+\subsection{Epistemic Entrenchment}
+
+G\"{a}rdenfors \citep{gardenfors1988knowledge} introduced \emph{epistemic
+entrenchment} to guide contraction decisions:
+
+\begin{definition}[Epistemic Entrenchment]
+\label{def:entrenchment}
+A relation $\leq_\varepsilon$ on propositions expresses relative entrenchment:
+$\varphi \leq_\varepsilon \psi$ means ``giving up $\varphi$ is at least as
+acceptable as giving up $\psi$.''
+\end{definition}
+
+When contracting by $\varphi \land \psi$, entrenchment determines which
+conjunct to keep:
+\begin{itemize}
+  \item If $\varphi <_\varepsilon \psi$, keep $\psi$
+  \item If $\psi <_\varepsilon \varphi$, keep $\varphi$
+  \item If $\varphi =_\varepsilon \psi$, give up both
+\end{itemize}
+
+\begin{observation}[Confidence as Entrenchment]
+\label{obs:conf-entrench}
+CLAIR's confidence values provide a natural entrenchment ordering: higher
+confidence implies greater entrenchment. This is more fine-grained than AGM's
+qualitative ordering---CLAIR has a total order on $[0,1]$.
+\end{observation}
+
+\section{CLAIR Belief Revision}
+\label{sec:clair-revision}
+
+We now develop CLAIR's revision theory, adapting AGM insights to graded,
+structured beliefs.
+
+\subsection{The Fundamental Principle}
+
+\begin{principle}[Justification-Based Revision]
+\label{prin:just-revision}
+CLAIR revision operates on justification structures, not propositions. A belief
+is revised by modifying its justification graph; the confidence is then
+recomputed compositionally.
+\end{principle}
+
+This principle has several important consequences:
+
+\begin{enumerate}
+  \item Revision is more fine-grained than AGM (can change one piece of evidence
+        without affecting others)
+  \item Revision is compositional (changes propagate automatically through the
+        DAG)
+  \item The ``what'' of revision (final confidence) is determined by the
+        ``how'' (justification structure)
+\end{enumerate}
+
+\subsection{Revision Operations}
+
+\subsubsection{Evidence Update}
+
+When new evidence $E$ arrives supporting belief $B$:
+
+\begin{definition}[Evidence Update]
+\label{def:evidence-update}
+\[
+\mathsf{update\_evidence}(\Sigma, B, E, s) =
+  \text{let } G' = \mathsf{add\_support\_edge}(G[B], E, s)
+  \text{ in } (B, G', \mathsf{recompute}(G', C), I)
+\]
+\end{definition}
+
+The strength $s \in [0,1]$ represents the evidential weight of this new
+support. The confidence is recomputed from the updated graph.
+
+\subsubsection{Justification Retraction}
+
+When justification $J$ for belief $B$ is retracted:
+
+\begin{definition}[Justification Retraction]
+\label{def:just-retract}
+\[
+\mathsf{retract}(\Sigma, B, J) =
+  \text{let } G' = \mathsf{remove\_edge}(G[B], J)
+  \text{ in } (B, G', \mathsf{recompute}(G', C), I)
+\]
+\end{definition}
+
+If $B$ has no remaining justifications after removal, its confidence drops to
+the base level (typically 0 for derived beliefs, or the prior for grounded
+beliefs).
+
+\subsubsection{Premise Confidence Change}
+
+When premise $P$'s confidence changes:
+
+\begin{definition}[Premise Update]
+\label{def:premise-update}
+\[
+\mathsf{update\_premise}(\Sigma, P, c') =
+  \text{let } A = \mathsf{affected}(G, P)
+  \text{ in } (B, G, \mathsf{propagate}(A, G, C[P \mapsto c']), I)
+\]
+where $\mathsf{affected}(G, P)$ returns all beliefs transitively depending on
+$P$.
+\end{definition}
+
+\subsubsection{Defeat Introduction}
+
+When defeater $D$ with strength $d$ undercuts belief $B$:
+
+\begin{definition}[Defeat Introduction]
+\label{def:defeat-intro}
+\[
+\mathsf{introduce\_defeat}(\Sigma, B, D, d, \mathsf{undercut}) =
+  \text{let } G' = \mathsf{add\_undercut\_edge}(G[B], D, d)
+  \text{ in } (B, G', \mathsf{recompute}(G', C), I)
+\]
+\end{definition}
+
+Rebut introduction is analogous, using $\mathsf{add\_rebut\_edge}$.
+
+\subsection{The Confidence Recomputation Algorithm}
+
+Central to CLAIR revision is the algorithm that propagates confidence changes
+through the justification DAG.
+
+\begin{algorithm}[H]
+\caption{Confidence Recomputation}
+\label{alg:recompute}
+\begin{algorithmic}[1]
+\Function{RecomputeConfidence}{$G$, $C$}
+  \State $\mathit{order} \gets \Call{TopologicalSort}{G.\mathit{nodes}}$
+  \For{each node $n$ in $\mathit{order}$}
+    \State $C[n] \gets \Call{ComputeNodeConfidence}{n, G, C}$
+  \EndFor
+  \State \Return $C$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Node Confidence Computation}
+\label{alg:node-conf}
+\begin{algorithmic}[1]
+\Function{ComputeNodeConfidence}{$n$, $G$, $C$}
+  \State $\mathit{supports} \gets \Call{GetSupportEdges}{G, n}$
+  \State $\mathit{undercuts} \gets \Call{GetUndercutEdges}{G, n}$
+  \State $\mathit{rebuts} \gets \Call{GetRebutEdges}{G, n}$
+  \State
+  \State \Comment{Step 1: Base confidence from supports}
+  \State $\mathit{base} \gets \Call{ComputeBaseConfidence}{n, G, C}$
+  \State
+  \State \Comment{Step 2: Apply undercuts}
+  \State $\mathit{undercut\_total} \gets \Call{AggregateUndercuts}{\mathit{undercuts}, C}$
+  \State $\mathit{after\_undercut} \gets \mathit{base} \times (1 - \mathit{undercut\_total})$
+  \State
+  \State \Comment{Step 3: Apply rebuts}
+  \State $\mathit{rebut\_total} \gets \Call{AggregateRebuts}{\mathit{rebuts}, C}$
+  \If{$\mathit{rebut\_total} = 0$}
+    \State \Return $\mathit{after\_undercut}$
+  \Else
+    \State \Return $\frac{\mathit{after\_undercut}}{\mathit{after\_undercut} + \mathit{rebut\_total}}$
+  \EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}[Recomputation Preserves Bounds]
+\label{thm:recompute-bounds}
+If all confidence values in $C$ are in $[0,1]$, then $\mathsf{RecomputeConfidence}(G, C)$
+returns confidence values in $[0,1]$.
+\end{theorem}
+
+\begin{proof}
+By induction on the topological order. The base case (foundational beliefs)
+trivially preserves bounds. For the inductive case, each operation
+(multiplication, probabilistic OR, undercut, rebut) preserves $[0,1]$ bounds
+as proven in Chapter~\ref{ch:confidence}.
+\end{proof}
+
+\subsection{Key Properties}
+
+\begin{theorem}[Locality]
+\label{thm:locality}
+If premise $P$'s confidence changes and there is no path from $P$ to $B$ in
+the justification DAG, then $C[B]$ is unchanged.
+\end{theorem}
+
+\begin{proof}
+The recomputation algorithm only traverses edges in the DAG. The affected set
+$\mathsf{affected}(G, P)$ contains only nodes reachable from $P$. Since $B$ is
+not reachable, it is not in the affected set and its confidence is not
+recomputed.
+\end{proof}
+
+\begin{theorem}[Monotonicity]
+\label{thm:monotonicity}
+If premise $P$'s confidence increases and $P$ supports $B$ transitively via
+only support edges (no defeat edges), then $C[B]$ increases or stays the same.
+\end{theorem}
+
+\begin{proof}
+All confidence operations in the support path ($\times$, $\min$,
+$\mathsf{aggregate}$) are monotone in their inputs. Therefore, an increase in
+any input propagates as a non-decrease in the output.
+\end{proof}
+
+\begin{theorem}[Defeat Composition]
+\label{thm:defeat-composition}
+For undercuts $D_1, D_2$ targeting the same belief:
+\[
+\undercut(\undercut(c, d_1), d_2) = \undercut(c, d_1 \oplus d_2)
+\]
+where $\oplus$ is probabilistic OR.
+\end{theorem}
+
+\begin{proof}
+By algebraic computation:
+\begin{align*}
+\undercut(\undercut(c, d_1), d_2) &= (c \times (1 - d_1)) \times (1 - d_2) \\
+&= c \times (1 - d_1) \times (1 - d_2) \\
+&= c \times (1 - (d_1 + d_2 - d_1 d_2)) \\
+&= c \times (1 - (d_1 \oplus d_2)) \\
+&= \undercut(c, d_1 \oplus d_2) \qedhere
+\end{align*}
+\end{proof}
+
+\section{CLAIR vs.\ AGM: A Comparison}
+\label{sec:agm-comparison}
+
+\subsection{How CLAIR Extends AGM}
+
+\begin{table}[htbp]
+\centering
+\caption{AGM vs.\ CLAIR Revision}
+\label{tab:agm-clair}
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{AGM} & \textbf{CLAIR} \\
+\midrule
+Belief representation & Binary (in/out) & Graded $[0,1]$ \\
+Structure & Flat set & DAG with labeled edges \\
+Operations & Set union/intersection & Graph modification \\
+Entrenchment & Qualitative ordering & Confidence values \\
+Defeat & Logical inconsistency & Explicit undercut/rebut edges \\
+Closure & Logical closure required & No closure; explicit edges only \\
+Recovery & Required (postulate 5) & Correctly fails \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Recovery Postulate Fails---Correctly}
+
+Recovery states that $(K - \varphi) + \varphi \supseteq K$: after contracting
+and re-adding, you get at least your original beliefs back.
+
+In CLAIR, recovery \emph{fails}, and this is the correct behavior:
+
+\begin{example}[Recovery Failure in CLAIR]
+\label{ex:recovery-fail}
+Consider belief $B$ with confidence 0.9, supported by evidence $E$ with
+strength 0.9. The justification graph is:
+\[
+E \xrightarrow{0.9} B
+\]
+Now contract by removing the $E \to B$ edge:
+\[
+C[B] = 0 \quad \text{(no remaining justification)}
+\]
+Re-add evidence $E$ with its original strength 0.9:
+\[
+C[B] = 0.9 \times 0.9 = 0.81
+\]
+The new confidence is $0.81 \neq 0.9$. Recovery fails.
+\end{example}
+
+\begin{theorem}[No Recovery for CLAIR]
+\label{thm:no-recovery}
+For CLAIR belief states, the recovery postulate does not hold in general:
+\[
+\mathsf{update\_evidence}(\mathsf{retract}(\Sigma, B, E), B, E, s) \neq \Sigma
+\]
+\end{theorem}
+
+\begin{proof}
+The retraction loses information about the original confidence computation.
+Re-adding with the same strength recomputes from scratch, potentially yielding
+a different result if other factors (decay, intermediate processing) have
+changed the context.
+\end{proof}
+
+This is \emph{philosophically correct}. Evidence has specific strength.
+Removing evidence and re-adding it should not magically restore the original
+state if the epistemic context has changed.
+
+\subsection{What AGM Gets Right}
+
+Despite extending AGM significantly, CLAIR preserves its core insights:
+
+\begin{itemize}
+  \item \textbf{Minimal change}: Revision should preserve as much as possible.
+        CLAIR's locality theorem embodies this.
+  \item \textbf{Entrenchment matters}: More confident beliefs resist revision.
+        CLAIR makes this explicit with numerical confidence.
+  \item \textbf{Consistency}: Contradictions should be avoided. CLAIR allows
+        paraconsistent states but tracks defeats explicitly.
+\end{itemize}
+
+\section{Defeat Dynamics and Fixed Points}
+\label{sec:defeat-dynamics}
+
+Defeat introduces non-monotonic dynamics into belief revision. This section
+analyzes when defeat interactions converge to well-defined fixed points.
+
+\subsection{The Defeat Graph}
+
+\begin{definition}[Defeat Graph]
+\label{def:defeat-graph}
+A \emph{defeat graph} is $G = (V, E_s, E_u, E_r, b)$ where:
+\begin{itemize}
+  \item $V$ = set of belief nodes
+  \item $E_s \subseteq V \times V$ = support edges (acyclic DAG)
+  \item $E_u \subseteq V \times V$ = undercut edges (may form cycles)
+  \item $E_r \subseteq V \times V$ = rebut edges (may form cycles)
+  \item $b : V \to [0,1]$ = base confidence after support evaluation
+\end{itemize}
+\end{definition}
+
+While the support graph must be acyclic (no circular justification), defeat
+edges may form cycles. A defeats B which defeats C which defeats A is
+semantically meaningful---mutual opposition.
+
+\subsection{The Confidence Update Function}
+
+For each node $v$, define the update function:
+
+\begin{definition}[Confidence Update Function]
+\label{def:conf-update}
+\[
+F_v(c) = \frac{b(v) \cdot \prod_{(u,v) \in E_u} (1 - c(u))}{1 + \sum_{(r,v) \in E_r} c(r) \cdot \prod_{(u,v) \in E_u} (1 - c(u))}
+\]
+when rebuts are present, or simply
+\[
+F_v(c) = b(v) \cdot \prod_{(u,v) \in E_u} (1 - c(u))
+\]
+for pure undercut.
+\end{definition}
+
+The full system is $F : [0,1]^{|V|} \to [0,1]^{|V|}$.
+
+\subsection{Existence of Fixed Points}
+
+\begin{theorem}[Existence]
+\label{thm:existence}
+Every defeat graph has at least one fixed-point confidence assignment.
+\end{theorem}
+
+\begin{proof}
+By Brouwer's Fixed-Point Theorem. The function $F$ is continuous on the
+compact convex set $[0,1]^{|V|}$. Continuity follows from the fact that $F$ is
+composed of products, sums, and quotients (with bounded denominator). Therefore,
+$F$ has at least one fixed point.
+\end{proof}
+
+\begin{remark}
+Existence is always guaranteed. The interesting questions are uniqueness
+(is there exactly one fixed point?) and convergence (does iterative
+computation reach it?).
+\end{remark}
+
+\subsection{Uniqueness via Contraction}
+
+\begin{definition}[Contraction Condition]
+\label{def:contraction}
+Let $b_{\max} = \max_v b(v)$ be the maximum base confidence and $d_{\max} =
+\max_v |\{u : (u,v) \in E_u\}|$ be the maximum undercut in-degree. The
+\emph{contraction condition} is:
+\[
+b_{\max} \cdot d_{\max} < 1
+\]
+\end{definition}
+
+\begin{theorem}[Unique Convergence]
+\label{thm:unique-convergence}
+If the contraction condition holds, then:
+\begin{enumerate}
+  \item The fixed point is unique
+  \item Iterative propagation $c_{n+1} = F(c_n)$ converges from any initial
+        $c_0$
+  \item Convergence is geometric with rate $L = b_{\max} \cdot d_{\max}$
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+We show $F$ is a contraction mapping with Lipschitz constant $L = b_{\max}
+\cdot d_{\max} < 1$.
+
+For pure undercut, each component satisfies:
+\[
+|F_v(x) - F_v(y)| = b(v) \cdot \left| \prod_{(u,v) \in E_u}(1-x(u)) -
+                                        \prod_{(u,v) \in E_u}(1-y(u)) \right|
+\]
+
+Using the product difference identity and the fact that each factor $(1-x(u))
+\in [0,1]$, we get:
+\[
+|F_v(x) - F_v(y)| \leq b(v) \cdot d_v \cdot \|x - y\|_\infty
+\]
+where $d_v$ is $v$'s undercut in-degree.
+
+Taking the maximum over $v$:
+\[
+\|F(x) - F(y)\|_\infty \leq b_{\max} \cdot d_{\max} \cdot \|x - y\|_\infty
+\]
+
+By Banach's Fixed-Point Theorem, $F$ has a unique fixed point and iteration
+converges geometrically.
+\end{proof}
+
+\subsection{Special Cases}
+
+\subsubsection{Mutual Undercut}
+
+Two beliefs $A$ and $B$ that undercut each other:
+\begin{align*}
+c_A &= b_A \cdot (1 - c_B) \\
+c_B &= b_B \cdot (1 - c_A)
+\end{align*}
+
+\begin{theorem}[Mutual Undercut Fixed Point]
+\label{thm:mutual-undercut}
+The unique fixed point is:
+\begin{align*}
+c_A^* &= \frac{b_A(1 - b_B)}{1 - b_A b_B} \\
+c_B^* &= \frac{b_B(1 - b_A)}{1 - b_A b_B}
+\end{align*}
+Convergence rate is $|b_A b_B| < 1$.
+\end{theorem}
+
+\begin{proof}
+Substituting the first equation into the second:
+\begin{align*}
+c_B &= b_B \cdot (1 - b_A(1 - c_B)) \\
+c_B &= b_B - b_A b_B + b_A b_B c_B \\
+c_B(1 - b_A b_B) &= b_B(1 - b_A) \\
+c_B^* &= \frac{b_B(1 - b_A)}{1 - b_A b_B}
+\end{align*}
+Symmetrically for $c_A^*$.
+\end{proof}
+
+\begin{corollary}[Symmetric Mutual Undercut]
+If $b_A = b_B = d$, then $c_A^* = c_B^* = \frac{d}{1+d}$.
+\end{corollary}
+
+\begin{example}
+If two beliefs each have base confidence 0.6 and undercut each other:
+\[
+c^* = \frac{0.6}{1 + 0.6} = 0.375
+\]
+Each belief's confidence is reduced from 0.6 to 0.375 by the mutual opposition.
+\end{example}
+
+\subsubsection{Infinite Alternating Chain}
+
+An infinite chain of undercuts with constant strength $d$:
+\[
+\cdots \leftarrow D_3 \leftarrow D_2 \leftarrow D_1 \leftarrow A
+\]
+
+\begin{theorem}[Chain Limit]
+\label{thm:chain-limit}
+The effective defeat strength converges to $x^* = \frac{d}{1+d}$.
+\end{theorem}
+
+\begin{proof}
+By self-similarity at the fixed point:
+\[
+x = d \cdot (1 - x) \implies x(1 + d) = d \implies x^* = \frac{d}{1+d}
+\]
+\end{proof}
+
+\begin{observation}
+The infinite chain behaves like a single defeater of strength $d/(1+d)$. This
+emergent simplicity reflects the ``defense of defense of defense...'' pattern
+stabilizing.
+\end{observation}
+
+\subsubsection{Pure Mutual Rebut}
+
+Two beliefs $A$ and $B$ that mutually rebut:
+\begin{align*}
+c_A &= \frac{b_A}{b_A + c_B} \\
+c_B &= \frac{b_B}{b_B + c_A}
+\end{align*}
+
+\begin{theorem}[Pure Rebut Equilibrium]
+\label{thm:pure-rebut}
+The fixed point is:
+\begin{align*}
+c_A^* &= \frac{b_A}{b_A + b_B} \\
+c_B^* &= \frac{b_B}{b_A + b_B}
+\end{align*}
+This is an immediate fixed point (no iteration needed).
+\end{theorem}
+
+\begin{proof}
+Direct substitution verifies these values satisfy both equations. The fixed
+point is reached in one step from any initial state where both beliefs have
+their base confidences.
+\end{proof}
+
+\begin{observation}
+Pure rebut creates a \emph{normalized partition}---each belief gets a share
+proportional to its base confidence. This reflects the ``probabilistic
+comparison'' interpretation of rebut.
+\end{observation}
+
+\subsection{When Contraction Fails}
+
+The contraction condition $b_{\max} \cdot d_{\max} < 1$ can fail when:
+\begin{enumerate}
+  \item Base confidences approach 1 (near-certainty)
+  \item Undercut in-degrees are high (many attackers)
+\end{enumerate}
+
+\begin{example}[Oscillation]
+Consider a ring of $n$ beliefs, each undercutting the next with $b = 1$:
+\[
+A_1 \leftarrow A_2 \leftarrow \cdots \leftarrow A_n \leftarrow A_1
+\]
+Starting with all confidences at 1: in one step, all become 0 (each is fully
+undercut). In the next step, all become 1 (no undercutters have any strength).
+The system oscillates.
+\end{example}
+
+However, this pathological case requires $b = 1$ (absolute certainty), which
+CLAIR's fallibilism rejects. In practice, realistic belief networks satisfy
+the contraction condition.
+
+\begin{proposition}[Practical Safety]
+\label{prop:practical-safety}
+If CLAIR enforces $b < 1$ for all beliefs (fallibilism) and defeat structures
+are sparse ($d_{\max}$ is small), the contraction condition is satisfied.
+\end{proposition}
+
+\section{Reinstatement}
+\label{sec:reinstatement}
+
+A crucial phenomenon in non-monotonic reasoning is \emph{reinstatement}: when
+a defeater is itself defeated, the original belief may be restored.
+
+\subsection{The Reinstatement Pattern}
+
+Consider:
+\begin{itemize}
+  \item $A$ supports $B$ with base confidence 0.8
+  \item $D$ undercuts $B$ with strength 0.6
+  \item $E$ undercuts $D$ with strength 0.5
+\end{itemize}
+
+\begin{example}[Reinstatement Calculation]
+\label{ex:reinstatement}
+Without $E$:
+\[
+c_B = 0.8 \times (1 - 0.6) = 0.32
+\]
+With $E$ undercutting $D$:
+\begin{align*}
+c_D' &= 0.6 \times (1 - 0.5) = 0.3 \\
+c_B' &= 0.8 \times (1 - 0.3) = 0.56
+\end{align*}
+$B$'s confidence is partially reinstated from 0.32 to 0.56.
+\end{example}
+
+\begin{theorem}[Reinstatement Emergence]
+\label{thm:reinstatement}
+Reinstatement emerges compositionally from CLAIR's defeat semantics. No special
+``reinstatement rule'' is needed---it follows from bottom-up evaluation.
+\end{theorem}
+
+\begin{proof}
+When $E$ undercuts $D$, $D$'s effective strength decreases. When $D$'s strength
+is used in computing $B$'s confidence, the reduced strength means less
+undercutting of $B$. The compositional structure automatically propagates this.
+\end{proof}
+
+\subsection{The General Reinstatement Formula}
+
+For a simple defense chain $A \leftarrow D \leftarrow E$:
+
+\begin{proposition}[Defense Formula]
+\label{prop:defense}
+\[
+c_A^{\text{final}} = c_A^{\text{base}} \times (1 - c_D^{\text{base}} \times (1 - c_E^{\text{base}}))
+\]
+\end{proposition}
+
+This can be expanded for longer chains, always with the same compositional
+structure.
+
+\section{Implementation}
+\label{sec:revision-impl}
+
+\subsection{Data Structures}
+
+\begin{lstlisting}[language=Lean,caption={Belief State in Lean}]
+structure BeliefState where
+  beliefs : HashMap BeliefId Belief
+  graphs : HashMap BeliefId JustificationGraph
+  confidence : HashMap BeliefId Confidence
+  invalidation : HashMap BeliefId (Set InvalidationCondition)
+
+def affectedBeliefs (state : BeliefState) (changed : BeliefId)
+    : Set BeliefId :=
+  transitiveClosure (dependencyGraph state.graphs) changed
+\end{lstlisting}
+
+\subsection{Revision Operations}
+
+\begin{lstlisting}[language=Lean,caption={Justification Retraction}]
+def retractJustification (state : BeliefState)
+    (beliefId : BeliefId) (edge : EdgeId) : BeliefState :=
+  let graph' := state.graphs[beliefId].removeEdge edge
+  let affected := affectedBeliefs state beliefId
+  let conf' := recomputeConfidence graph' state.confidence
+  { state with
+    graphs := state.graphs.insert beliefId graph',
+    confidence := conf' }
+\end{lstlisting}
+
+\begin{lstlisting}[language=Lean,caption={Defeat Introduction}]
+def introduceDefeat (state : BeliefState) (target : BeliefId)
+    (defeater : BeliefId) (strength : Confidence)
+    (defeatType : DefeatType) : BeliefState :=
+  let edge := match defeatType with
+    | .undercut => Edge.undercut defeater strength
+    | .rebut => Edge.rebut defeater strength
+  let graph' := state.graphs[target].addEdge edge
+  let conf' := recomputeConfidence graph' state.confidence
+  { state with
+    graphs := state.graphs.insert target graph',
+    confidence := conf' }
+\end{lstlisting}
+
+\subsection{Efficient Evaluation Strategy}
+
+For practical implementation:
+
+\begin{enumerate}
+  \item \textbf{Topological pass}: Evaluate the support DAG in topological
+        order, computing base confidences
+  \item \textbf{Detect defeat cycles}: Find strongly connected components of
+        the defeat graph
+  \item \textbf{Iterate within cycles}: For each SCC, iterate until convergence
+        (bounded by contraction analysis)
+  \item \textbf{Propagate outward}: Evaluate nodes depending on resolved cycles
+\end{enumerate}
+
+This minimizes iteration by isolating cyclic dependencies.
+
+\subsection{Diagnostic Warnings}
+
+When the contraction condition fails:
+
+\begin{enumerate}
+  \item Attempt bounded iteration (e.g., 100 steps)
+  \item Check for convergence ($|c_{n+1} - c_n| < \varepsilon$)
+  \item If not converged, report values with warning about potential
+        non-uniqueness
+\end{enumerate}
+
+\section{Connections to Related Work}
+\label{sec:revision-related}
+
+\subsection{Truth Maintenance Systems}
+
+CLAIR's revision mechanism is essentially a \emph{graded generalization of TMS}:
+
+\begin{table}[htbp]
+\centering
+\caption{TMS vs.\ CLAIR}
+\label{tab:tms-clair}
+\begin{tabular}{lll}
+\toprule
+\textbf{Feature} & \textbf{TMS} & \textbf{CLAIR} \\
+\midrule
+Belief status & Binary (IN/OUT) & Confidence $[0,1]$ \\
+Justification & IN-list, OUT-list & DAG with typed edges \\
+Propagation & Label switching & Confidence recomputation \\
+Defeat & Binary override & Graded undercut/rebut \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The key insight from TMS is \emph{dependency-directed} processing: only
+recompute what depends on what changed. CLAIR inherits this efficiency.
+
+\subsection{Ranking Theory}
+
+Spohn's ranking functions \citep{spohn2012laws} provide ordinal degrees of
+belief. CLAIR's confidence is cardinal (numerical), which is more expressive
+but harder to manage. The key shared insight is that iterated revision requires
+tracking degrees, not just binary status.
+
+\subsection{Dynamic Epistemic Logic}
+
+DEL \citep{ditmarsch2007dynamic} provides modal operators for epistemic
+change. CLAIR's invalidation conditions can be viewed as DEL ``action models''
+specifying when world-state changes trigger belief revision. The precise
+mapping remains an open question.
+
+\section{Open Questions}
+\label{sec:revision-open}
+
+\subsection{Correlated Evidence}
+
+CLAIR's aggregation formula assumes independence:
+\[
+\mathsf{aggregate}(c_1, \ldots, c_n) = 1 - \prod_i (1 - c_i)
+\]
+
+When evidence sources are correlated, this overcounts support. Questions:
+\begin{enumerate}
+  \item How do we detect correlation from provenance?
+  \item What is the correct aggregation formula for correlated evidence?
+  \item Can we infer correlation structure from the justification DAG?
+\end{enumerate}
+
+\subsection{Revision vs.\ Update}
+
+AGM distinguishes:
+\begin{itemize}
+  \item \textbf{Revision}: New information about a static world
+  \item \textbf{Update}: The world has changed
+\end{itemize}
+
+CLAIR's invalidation conditions handle the update case, but the precise
+mapping to DEL semantics is not yet formalized.
+
+\subsection{Contraction by Proposition}
+
+AGM contracts \emph{by a proposition}. CLAIR contracts \emph{by a justification
+edge}. Is there a meaningful ``contract belief $B$'' operation that removes all
+justifications for $B$? This may be useful for ``complete retraction'' scenarios.
+
+\section{Conclusion}
+\label{sec:revision-conclusion}
+
+CLAIR belief revision extends AGM in principled ways:
+
+\begin{enumerate}
+  \item \textbf{Graded confidence} replaces binary belief, with entrenchment
+        emerging naturally from confidence ordering
+  \item \textbf{DAG justification} replaces flat belief sets, enabling
+        compositional revision with automatic propagation
+  \item \textbf{Explicit defeat} provides undercut and rebut semantics with
+        well-defined fixed-point behavior
+  \item \textbf{Recovery correctly fails}---evidence removal loses information,
+        and this is philosophically appropriate
+  \item \textbf{Minimal change} is embodied in locality: only transitive
+        dependents are affected by local changes
+\end{enumerate}
+
+The core algorithm is:
+\begin{enumerate}
+  \item Modify justification graph (add/remove edges)
+  \item Identify affected beliefs (transitive dependents)
+  \item Recompute confidence bottom-up (topological order)
+  \item Apply defeat in order: supports $\to$ undercuts $\to$ rebuts
+\end{enumerate}
+
+Key mathematical results:
+\begin{itemize}
+  \item \textbf{Existence}: Fixed points always exist (Brouwer)
+  \item \textbf{Uniqueness}: Condition $b_{\max} \cdot d_{\max} < 1$ guarantees
+        unique convergence (Banach)
+  \item \textbf{Special cases}: Mutual undercut, infinite chains, and pure
+        rebut have closed-form solutions
+\end{itemize}
+
+CLAIR's belief revision provides the dynamic foundation for rational epistemic
+agents---systems that can learn, correct mistakes, and update in response to
+a changing evidential landscape.
+
+%% ============================================================================
+%% BIBLIOGRAPHY ENTRIES (to be added to main .bib file)
+%% ============================================================================
+% @article{alchourron1985logic,
+%   author = {Alchourr{\'o}n, Carlos E. and G{\"a}rdenfors, Peter and Makinson, David},
+%   title = {On the Logic of Theory Change: Partial Meet Contraction and Revision Functions},
+%   journal = {Journal of Symbolic Logic},
+%   volume = {50},
+%   number = {2},
+%   pages = {510--530},
+%   year = {1985}
+% }
+%
+% @book{gardenfors1988knowledge,
+%   author = {G{\"a}rdenfors, Peter},
+%   title = {Knowledge in Flux: Modeling the Dynamics of Epistemic States},
+%   publisher = {MIT Press},
+%   year = {1988}
+% }
+%
+% @book{spohn2012laws,
+%   author = {Spohn, Wolfgang},
+%   title = {The Laws of Belief: Ranking Theory and Its Philosophical Applications},
+%   publisher = {Oxford University Press},
+%   year = {2012}
+% }
+%
+% @book{ditmarsch2007dynamic,
+%   author = {van Ditmarsch, Hans and van der Hoek, Wiebe and Kooi, Barteld},
+%   title = {Dynamic Epistemic Logic},
+%   publisher = {Springer},
+%   year = {2007}
+% }
