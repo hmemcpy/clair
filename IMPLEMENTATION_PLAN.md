@@ -100,9 +100,15 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 **New tasks discovered (Session 68)**:
 - [ ] **3.32 External evidence warnings** - Should CLAIR provide syntactic warnings when self-referential beliefs lack external evidence?
-- [ ] **3.33 Multi-level introspection threshold** - How does the a = 0.5 threshold interact with meta-meta-beliefs (double Löb discount c⁴)?
+- [x] **3.33 Multi-level introspection threshold** - ANSWERED Session 69: For k levels of introspection, the threshold is a_k = 1 - 1/2^k, forming a ladder: 0.5, 0.75, 0.875, ... → 1. The c⁴ (two-level) threshold is 0.75. Key findings: (1) Stronger anti-bootstrapping at higher levels, (2) Maximum amplification decreases with depth (2×, 1.33×, 1.14×, ...), (3) Convergence is faster away from threshold, (4) Discrete L₅ preserves qualitative behavior. See exploration/thread-3.33-multilevel-introspection-threshold.md
 - [ ] **3.34 Aggregated introspection** - For c = ⊕ᵢ introspect(selfᵢ) across multiple self-beliefs, how do fixed points behave?
 - [ ] **3.35 Discrete Löb rounding** - Should CLAIR use ceiling instead of floor for discrete Löb discount to reduce spurious fixed points?
+
+**New tasks discovered (Session 69)**:
+- [ ] **3.36 Heterogeneous multi-level discount** - For mixed Löb discount functions at different levels, how do thresholds compose?
+- [ ] **3.37 Total epistemic cost metric** - Can we define a metric that accounts for all introspection levels in a belief graph?
+- [ ] **3.38 Maximum introspection depth** - Should CLAIR impose a maximum introspection depth to prevent computational overhead?
+- [ ] **3.39 Multi-level threshold with aggregation** - How does c = a ⊕ b ⊕ c^(2^k) behave with multiple external sources?
 
 **New tasks discovered (Session 22)**:
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
@@ -2201,6 +2207,62 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Task 3.33: Multi-level introspection (double Löb discount c⁴)
     - Task 3.34: Aggregated introspection across multiple self-beliefs
     - Task 3.35: Ceiling vs floor for discrete Löb discount
+
+### Session 69 Discoveries (Task 3.33 Multi-Level Introspection Threshold)
+
+347. **MULTI-LEVEL INTROSPECTION THRESHOLD CHARACTERIZED** — For k levels of Löb-discounted introspection, the critical threshold forms a ladder converging to 1.
+
+348. **The k-level threshold formula**:
+    - For k levels of introspection (discount c^(2^k)), the threshold is a_k = 1 - 1/2^k
+    - k=1 (c²): a₁ = 0.5
+    - k=2 (c⁴): a₂ = 0.75
+    - k=3 (c⁸): a₃ = 0.875
+    - k=4 (c¹⁶): a₄ = 0.9375
+    - lim_{k→∞} a_k = 1
+
+349. **Stronger anti-bootstrapping at higher levels**:
+    - Multi-level introspection applies exponentially stronger Löb discounts
+    - c^(2^k) shrinks much faster than c² for c < 1
+    - More external evidence needed to reach high confidence at deeper levels
+    - This is semantically correct: deeper self-reference is epistemically riskier
+
+350. **Decreasing maximum amplification**:
+    - The amplification factor (c*/a at threshold) decreases with depth
+    - k=1: 2× amplification max
+    - k=2: 1.33× amplification max
+    - k=3: 1.14× amplification max
+    - k=∞: 1× amplification (no amplification possible)
+    - Diminishing returns from multi-level self-reference
+
+351. **Two-level (c⁴) analysis**:
+    - Fixed-point equation: c = a ⊕ c⁴
+    - This is a quartic equation with c = 1 always a root
+    - Interior fixed point exists when a < 0.75
+    - At a = 0.5: c* ≈ 0.543 (compare single level: c* = 1)
+    - Same evidence yields LOWER confidence at two levels due to stronger discount
+
+352. **Convergence behavior**:
+    - Higher-level introspection converges faster away from threshold
+    - Steeper Löb discount makes iteration more contractive
+    - Near threshold: slow convergence (same as single level)
+    - Far from threshold: very fast (doubly exponential contraction)
+
+353. **Discrete L₅ preserves structure**:
+    - Two-level fixed points in L₅ approximate continuous solutions
+    - At a = 0.5: Discrete FPs {0.5, 1}; continuous c* ≈ 0.543
+    - Threshold behavior preserved qualitatively
+
+354. **Design implications for CLAIR**:
+    - Level-aware diagnostics should compute effective threshold a_k
+    - StratifiedBelief could carry expected confidence bounds
+    - Consider discouraging deep introspection chains (diminishing returns)
+    - Type system could integrate multi-level confidence ceiling computation
+
+355. **New questions raised**:
+    - Task 3.36: Heterogeneous multi-level discount composition
+    - Task 3.37: Total epistemic cost metric for belief graphs
+    - Task 3.38: Maximum introspection depth limits
+    - Task 3.39: Multi-level threshold with additional aggregation
 
 ## Impossibilities Encountered
 

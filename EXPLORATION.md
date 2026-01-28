@@ -176,8 +176,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 3: Self-Reference and Introspection
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27, 29, 32, 33, 63, 67, 68)
-**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md, thread-3.20-cpl-finite-formalization.md, thread-3.21-cpl-godel-variant.md, thread-3.22-cpl-undecidability.md, thread-3.27-optimal-lattice-choice.md, thread-3.12-fixedpoint-complexity.md, thread-3.30-loeb-fixedpoint-interaction.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 8, 22, 25, 26, 27, 29, 32, 33, 63, 67, 68, 69)
+**Depth**: Deep (see exploration/thread-3-self-reference.md, thread-3.13-graded-provability-logic.md, thread-3.16-cpl-decidability.md, thread-3.17-cpl-soundness-completeness.md, thread-3.18-loeb-discount.md, thread-3.20-cpl-finite-formalization.md, thread-3.21-cpl-godel-variant.md, thread-3.22-cpl-undecidability.md, thread-3.27-optimal-lattice-choice.md, thread-3.12-fixedpoint-complexity.md, thread-3.30-loeb-fixedpoint-interaction.md, thread-3.33-multilevel-introspection-threshold.md)
 
 CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 
@@ -322,6 +322,22 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - **Discretization effects in L₅**: Floor rounding can create spurious fixed points
 - **Design implications**: Require external evidence; warn near threshold; warn on defeat + introspection
 - See exploration/thread-3.30-loeb-fixedpoint-interaction.md
+
+**Multi-Level Introspection Threshold (Session 69)**:
+- **Task 3.33 answered**: How do thresholds interact with meta-meta-beliefs?
+- **The k-level threshold formula**: For k levels of introspection (discount c^(2^k)), threshold is a_k = 1 - 1/2^k
+  - k=1: threshold 0.5; k=2: threshold 0.75; k=3: threshold 0.875; ... → 1
+- **Stronger anti-bootstrapping at higher levels**: Exponentially stronger Löb discounts
+  - c^(2^k) shrinks much faster than c² for c < 1
+  - More external evidence needed to achieve high confidence at deeper levels
+- **Decreasing maximum amplification**: Max amplification factor decreases with depth
+  - k=1: 2×; k=2: 1.33×; k=3: 1.14×; k=∞: 1× (no amplification possible)
+  - Diminishing returns from multi-level self-reference
+- **Two-level (c⁴) analysis**:
+  - At a = 0.5: c* ≈ 0.543 (compare single level: c* = 1)
+  - Same evidence yields LOWER confidence at two levels due to stronger discount
+- **Design implications**: Level-aware diagnostics; confidence ceiling computation; discourage deep introspection chains
+- See exploration/thread-3.33-multilevel-introspection-threshold.md
 
 ---
 
@@ -805,6 +821,13 @@ What I believe I know:
 | Compile-time fixed-point for special cases | 0.85 | Session 67: constant, linear, monotone, finite | Find compile-time failure | ✓ Session 67 |
 | Stratification always compile-time checkable | 0.95 | Session 67: type-level, no runtime | Find dynamic stratification need | ✓ Session 67 |
 | Runtime timeout needed for general case | 0.90 | Session 67: bounded iteration + timeout | Find better termination proof | ✓ Session 67 |
+| Multi-level threshold a_k = 1 - 1/2^k | 0.95 | Session 69: derived from stability analysis | Find counterexample | ✓ Session 69 |
+| Threshold increases with introspection depth | 0.98 | Session 69: a₁=0.5, a₂=0.75, a₃=0.875, ... | None (mathematical) | ✓ Proven |
+| Max amplification decreases with depth | 0.90 | Session 69: 2×, 1.33×, 1.14×, ... → 1× | Find increasing amplification | ✓ Session 69 |
+| Two-level (c⁴) threshold is 0.75 | 0.95 | Session 69: quartic analysis | Find computational error | ✓ Session 69 |
+| Same evidence → lower confidence at higher levels | 0.90 | Session 69: stronger Löb discount | Find level-increasing confidence | ✓ Session 69 |
+| Deeper introspection has diminishing returns | 0.95 | Session 69: amplification ceiling drops | Find increasing returns | ✓ Session 69 |
+| L₅ preserves multi-level threshold behavior | 0.85 | Session 69: discrete approximation | Find qualitative deviation | ✓ Session 69 |
 
 ---
 
