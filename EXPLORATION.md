@@ -360,6 +360,16 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
   - Validates Thread 2.13's correlation handling as essential, not optional
 - See exploration/thread-3.34-aggregated-introspection.md
 
+**Correlation-Aware Aggregation Enforcement (Session 71)**:
+- **Task 3.40 answered**: Should CLAIR enforce correlation-aware aggregation for introspective sources by default?
+- **Answer**: **YES**, with default enforcement (δ = 1) and explicit override (`@independent`)
+- **Semantic justification**: Same-self introspections are deterministic, provide zero new information, and should not compound
+- **Recommended design (Alternative B)**: Default to full correlation (collapses to single introspection); `@independent` annotation to override with warning
+- **Detection**: Syntactic identity (static) + reference identity (dynamic) for two-layer coverage
+- **Prior art**: Linear types (evidence as resource), information theory (no new info), Dempster-Shafer cautious rule (idempotence)
+- **Impact**: Closes bootstrap vulnerability, ensures defeat works as intended
+- See exploration/thread-3.40-correlation-aware-introspection-enforcement.md
+
 ---
 
 ### Thread 4: The Grounding Problem
@@ -2570,9 +2580,57 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Correlation-aware aggregation essential" → ESTABLISHED (confidence: 0.95)
   - "Bistability for n ≥ 2" → ESTABLISHED (confidence: 0.85)
 
+### Session 71: Correlation-Aware Aggregation Enforcement (Task 3.40)
+
+- **COMPLETED TASK 3.40**: Should CLAIR enforce correlation-aware aggregation for introspective sources by default?
+- **Key finding**: **YES, CLAIR should enforce correlation-aware aggregation by default** for same-self introspections
+- **Core semantic argument**:
+  - Identical self-introspections reference the same underlying belief
+  - Deterministic outcome: same confidence c² every time
+  - Zero new information from second, third, ... nth introspection
+  - Treating as independent "overcounts" exactly the same evidence n times
+  - This matches TMS semantics: same justification used multiple times doesn't count multiple times
+- **Design recommendation**: Alternative B (Default Enforcement with Override)
+  - Default: δ = 1 (full correlation) for same-self introspections → collapses to single introspection
+  - Override: `@independent` annotation to explicitly opt out (with warning)
+  - Rationale: Balances soundness (closes vulnerability), expressiveness (override available), and ergonomics (correct behavior is automatic)
+- **Detection strategy**:
+  - Static: Syntactic identity + simple alias tracking in type checker
+  - Dynamic: Reference identity at evaluation time
+  - Two-layer approach handles common cases statically and edge cases dynamically
+- **Interaction with other features**:
+  - Stratification: Orthogonal; enforcement applies regardless of level
+  - Aggregate node: Add `auto_correlated` combination rule that infers δ from source identity
+  - Defeat: Without enforcement, defeat is less effective against "inflated" confidence (another argument FOR enforcement)
+- **Implementation design outlined**:
+  - IntrospectionContext in type checker to track same-self groups
+  - Collapsing reduction rule in operational semantics
+  - Warning message and documentation
+- **Prior art connections**:
+  - Linear types (Girard 1987): Epistemic evidence as resource that can't be freely duplicated
+  - Information theory (Shannon): Repeated identical messages carry zero additional information
+  - Dempster-Shafer cautious rule (Smets 1993): Idempotent combination for potentially dependent sources
+  - Bayesian networks: D-separation prevents double-counting evidence
+- **Confidence table**:
+  - Same-self introspections semantically correlated: 0.95
+  - δ = 1 correct for same-self: 0.90
+  - Bootstrap vulnerability is real: 0.95
+  - Enforcement closes the vulnerability: 0.95
+  - Alternative B is best design: 0.80
+- **New questions raised**:
+  - Should `@independent` be error or warning?
+  - How should correlation inference extend to non-introspective sources?
+  - Can we formalize "epistemic linearity" as general principle?
+- **Output**: exploration/thread-3.40-correlation-aware-introspection-enforcement.md
+- **Beliefs updated**:
+  - "CLAIR should enforce correlation for same-self introspection" → ESTABLISHED (confidence: 0.90)
+  - "Default + override is optimal design pattern" → ESTABLISHED (confidence: 0.80)
+  - "Detection is tractable" → ESTABLISHED (confidence: 0.90)
+  - "Enforcement closes bootstrap vulnerability" → ESTABLISHED (confidence: 0.95)
+
 ### CLAIR EXPLORATION CONTINUES
 
-The CLAIR exploration project continues with 40 remaining tasks. Key accomplishments so far:
+The CLAIR exploration project continues with 43 remaining tasks. Key accomplishments so far:
 
 1. **Theoretical Foundations**: Nine foundational threads explored to substantial completion
 2. **Novel Contributions**: CPL (first graded provability logic), confidence algebra (three monoids), DAG justification with defeat semantics

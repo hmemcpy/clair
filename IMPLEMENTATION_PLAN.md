@@ -68,7 +68,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [x] **2.25 Dual-monoid grading formalization** - SUBSTANTIALLY COMPLETE Session 55: CLAIR's confidence algebra is a De Morgan bimonoid—two commutative monoids connected by an involution (symm) but without distributivity. Key findings: (1) Non-distributivity is mathematically fundamental (t-norm/t-conorm pairs don't distribute), (2) Double Residuated Lattices (Orłowska & Radzikowska 2002) and Linearly Distributive Categories (Cockett & Seely 1997) address similar structures, (3) CLAIR's type system naturally separates × (derivation) and ⊕ (aggregation) so distributivity is never needed, (4) Standard graded type theory assumes semiring grades but CLAIR requires weaker bimonoid structure, (5) Lean formalization should add DeMorganBimonoid typeclass. See exploration/thread-2.25-dual-monoid-grading.md
 
 ### Thread 3: Self-Reference
-**Status**: ✓ SUBSTANTIALLY EXPLORED. Safe fragment characterized. Design proposal ready. See exploration/thread-3-self-reference.md
+**Status**: ✓ SUBSTANTIALLY EXPLORED. Safe fragment characterized. Design proposal ready. Correlation enforcement designed (Session 71). See exploration/thread-3-self-reference.md, exploration/thread-3.40-correlation-aware-introspection-enforcement.md
 
 - [x] **3.1 Characterize the Gödelian limits** - DONE: Löb's theorem rules out self-soundness. Gödel limits characterized in context of belief.
 - [x] **3.2 Safe introspection** - DONE: Safe fragment = stratified introspection + fixed-point stable self-reference. Dangerous = Liar-like, Curry-like, Löbian.
@@ -111,10 +111,15 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [ ] **3.39 Multi-level threshold with aggregation** - How does c = a ⊕ b ⊕ c^(2^k) behave with multiple external sources?
 
 **New tasks discovered (Session 70)**:
-- [ ] **3.40 Correlation-aware aggregation enforcement** - Should CLAIR enforce correlation-aware aggregation for introspective sources by default?
+- [x] **3.40 Correlation-aware aggregation enforcement** - ANSWERED Session 71: YES, CLAIR should enforce correlation-aware aggregation for same-self introspections by default. Recommended design: Alternative B (default δ = 1 enforcement with `@independent` override annotation). Semantic justification: same-self introspections are deterministic, provide zero new information, and treating as independent overcounts identical evidence. Detection: syntactic identity (static) + reference identity (dynamic). Prior art: linear types, information theory, Dempster-Shafer cautious rule. Impact: closes bootstrap vulnerability, ensures defeat works as intended. See exploration/thread-3.40-correlation-aware-introspection-enforcement.md
 - [ ] **3.41 Heterogeneous aggregation thresholds** - For aggregation mixing c² ⊕ c⁴ ⊕ c⁸, what is the effective threshold?
 - [ ] **3.42 Bootstrap vulnerability analysis** - Can the bootstrap vulnerability from uncorrelated aggregation be exploited maliciously?
 - [ ] **3.43 Defense by redundancy** - How does aggregated introspection interact with defeat? Is there a "defense by redundancy" mechanism?
+
+**New tasks discovered (Session 71)**:
+- [ ] **3.44 `@independent` enforcement level** - Should `@independent` on same-self introspection be an error (hard enforcement) or warning (soft enforcement)?
+- [ ] **3.45 Correlation inference for non-introspective sources** - How should CLAIR extend automatic δ inference to non-introspective (general) aggregation?
+- [ ] **3.46 Epistemic linearity formalization** - Can we formalize "epistemic evidence as non-duplicable resource" as a general type-theoretic principle?
 
 **New tasks discovered (Session 22)**:
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
