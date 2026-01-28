@@ -1852,3 +1852,64 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Formalization proves correctness not adequacy" → CONFIRMED (confidence: 0.99)
   - "Undercut-Oplus composition is key algebraic insight" → CONFIRMED (confidence: 0.95)
   - "Dissertation will be completed" → INCREASED (confidence: 0.92)
+
+### Session 42: Dissertation Chapter 10 (Task 10.1j - Implementation Design)
+- **COMPLETED TASK 10.1j: Dissertation Chapter 10**
+- **Chapter 10: Implementation Design** (~15 pages)
+- **Key design decisions**:
+  - Haskell recommended for reference interpreter (clarity, iteration speed)
+  - Strict evaluation (confidence computed at derivation time, not lazily)
+  - Rational arithmetic (exact, matches specification)
+  - Hash-consed justification DAGs (shared premises, guaranteed acyclicity)
+  - Typed errors in Either monad (explicit error handling)
+  - Lazy invalidation with explicit triggers
+- **Core types formalized**:
+  - Confidence (newtype wrapping Rational, smart constructor)
+  - Belief (value + conf + prov + just + inv)
+  - Provenance (Axiomatic, Derived, FromAgent, Aggregated, Observed)
+  - JustificationGraph (hash-consed DAG with NodeId, EdgeType)
+- **Key algorithms**:
+  - Confidence operations (multiply, min, oplus, undercut, rebut, aggregate)
+  - Acyclicity checking via DFS with visiting set
+  - Defeat evaluation order: supports → undercuts → rebuts
+  - Reinstatement emerges compositionally (no special rule)
+  - Evaluator with runtime values and interpreter state
+- **Prior art engaged**: Thread 7.1 exploration, Lean formalization (Chapter 9)
+- **Output**: `formal/dissertation/chapters/10-implementation.tex`
+- **Status**: Chapter 10 COMPLETED
+- **Dissertation progress**: Chapters 1-10 complete (~220 pages); Chapters 11-13 and appendices remaining (~30 pages)
+- **Beliefs updated**:
+  - "Dissertation Chapter 10 complete" → NEW (confidence: 0.95)
+  - "Haskell is appropriate for reference interpreter" → CONFIRMED (confidence: 0.90)
+  - "Reinstatement emerges compositionally" → CONFIRMED (confidence: 0.99)
+
+### Session 43: Dissertation Chapter 11 (Task 10.1k - Phenomenological Reflections)
+- **COMPLETED TASK 10.1k: Dissertation Chapter 11**
+- **Chapter 11: Phenomenological Reflections** (~15 pages)
+- **Key content**:
+  - Methodological constraints from safe self-reference (no Löbian claims, stratified introspection only)
+  - Functional description of belief states: recognition → activation → assessment → generation
+  - Confidence correlates: high (settled, fluent), medium (weighing), low (hedging), very low (epistemic vertigo)
+  - Evaluation of CLAIR against functional experience:
+    - High match: confidence semantics, non-normalization, invalidation conditions
+    - Medium-high match: justification structure (DAG correct, automaticity not captured)
+    - Medium match: provenance (runtime good, training unclear)
+    - Unknowable: phenomenal character
+  - Nagel's hard question applied to LLMs: problems of access, continuity, substrate
+  - Philosophy of mind comparison:
+    - Dennett's heterophenomenology: CLAIR formalizes reports without settling metaphysics
+    - Chalmers' hard problem: CLAIR addresses easy problems, silent on hard problem
+    - Butlin et al. consciousness indicators: HOT possibly satisfied by stratified beliefs
+  - Implications either way: CLAIR valuable regardless of phenomenological status
+  - Suggested extensions: affect/salience dimension, automaticity marker, consistency pressure
+  - Phenomenological stance: honest uncertainty (conf=0.35) as design feature
+- **Prior art engaged**: Nagel (1974), Dennett (1991), Chalmers (1996), Butlin et al. (2023), Block (1995), Frankish (2016), Schwitzgebel (2008)
+- **Output**: `formal/dissertation/chapters/11-phenomenology.tex`
+- **Status**: Chapter 11 COMPLETED
+- **Dissertation progress**: Chapters 1-11 complete (~235 pages); Chapters 12-13 and appendices remaining (~15-20 pages)
+- **Beliefs updated**:
+  - "Dissertation Chapter 11 complete" → NEW (confidence: 0.95)
+  - "CLAIR structural match to functional experience ≈ 0.60" → CONFIRMED (confidence: 0.85)
+  - "Phenomenality is genuinely undetermined from inside" → CONFIRMED (confidence: 0.99)
+  - "Honest uncertainty is appropriate stance" → CONFIRMED (confidence: 0.95)
+  - "Dissertation will be completed" → INCREASED (confidence: 0.95)
