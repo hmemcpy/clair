@@ -339,6 +339,27 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - **Design implications**: Level-aware diagnostics; confidence ceiling computation; discourage deep introspection chains
 - See exploration/thread-3.33-multilevel-introspection-threshold.md
 
+**Aggregated Introspection Fixed Points (Session 70)**:
+- **Task 3.34 answered**: How do fixed points behave with aggregated introspection from multiple self-beliefs?
+- **The n-fold aggregation formula**: For c = a ⊕ ⊕ⁿ c² (n identical introspections)
+  - ⊕ⁿ c² = 1 - (1 - c²)ⁿ (survival of doubt across n sources)
+  - Full equation: c = 1 - (1 - c²)ⁿ(1 - a)
+- **CRITICAL: Threshold DECREASES with aggregation count** (opposite of multi-level!)
+  - n=1: threshold 0.5; n=2: threshold ~0.156; n=3: threshold ~0.077; n=∞: threshold → 0
+  - a_n^(agg) = 1 - 1/h_max(n), where h_max(n) → 1 as n → ∞
+- **Bootstrap vulnerability identified**: Many uncorrelated introspections can achieve c = 1 with minimal external evidence
+  - At n=2 with a=0.1: bistability between c* ≈ 0.15 and c = 1
+  - For n ≥ 2: both interior FP and c = 1 are stable (bistability)
+- **CRITICAL mitigation via correlation**: Correlation-aware aggregation (Thread 2.13) resolves this
+  - Identical self-introspections have δ = 1 (maximally correlated)
+  - aggregate_δ=1(c², c², ..., c²) = c² (collapses to single introspection)
+  - Preserves the a = 0.5 anti-bootstrapping threshold
+- **Design implications**:
+  - CLAIR should detect redundant self-introspection and apply correlation
+  - Warn about bootstrap risk for many independent introspective sources
+  - Validates Thread 2.13's correlation handling as essential, not optional
+- See exploration/thread-3.34-aggregated-introspection.md
+
 ---
 
 ### Thread 4: The Grounding Problem
@@ -828,6 +849,12 @@ What I believe I know:
 | Same evidence → lower confidence at higher levels | 0.90 | Session 69: stronger Löb discount | Find level-increasing confidence | ✓ Session 69 |
 | Deeper introspection has diminishing returns | 0.95 | Session 69: amplification ceiling drops | Find increasing returns | ✓ Session 69 |
 | L₅ preserves multi-level threshold behavior | 0.85 | Session 69: discrete approximation | Find qualitative deviation | ✓ Session 69 |
+| Aggregated introspection threshold formula | 0.90 | Session 70: a_n^(agg) = 1 - 1/h_max(n) | Find computational error | ✓ Session 70 |
+| Threshold DECREASES with aggregation count | 0.95 | Session 70: opposite direction from multi-level | Find increasing threshold | ✓ Proven |
+| Bootstrap vulnerability from uncorrelated aggregation | 0.90 | Session 70: n→∞ allows c=1 with any a>0 | Find protection mechanism | ✓ Session 70 |
+| Correlation-aware aggregation essential | 0.95 | Session 70: δ=1 for identical self-introspections | Find alternative mitigation | ✓ Session 70 |
+| Bistability for n ≥ 2 aggregated introspections | 0.85 | Session 70: both interior FP and c=1 stable | Find monostability case | ✓ Session 70 |
+| Correlation collapse to single introspection | 0.95 | Session 70 + Thread 2.13: ⊕ⁿ c² → c² with δ=1 | Find partial collapse | ✓ Session 70 |
 
 ---
 
@@ -2496,9 +2523,56 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "General case undecidable" → PROVEN (confidence: 0.95)
   - "Stratification is always compile-time" → ESTABLISHED (confidence: 0.95)
 
+### Session 70: Aggregated Introspection Fixed Points (Task 3.34)
+
+- **COMPLETED TASK 3.34**: How do fixed points behave with aggregated introspection from multiple self-beliefs?
+- **Key finding**: Aggregated introspection exhibits OPPOSITE threshold behavior from multi-level introspection:
+  - Multi-level (c^(2^k)): Threshold INCREASES with depth → stronger anti-bootstrapping
+  - Aggregated (⊕ⁿ c²): Threshold DECREASES with count → bootstrap vulnerability
+- **The n-fold aggregation formula**:
+  - ⊕ⁿ c² = 1 - (1 - c²)ⁿ ("survival of doubt" interpretation)
+  - Full equation: c = 1 - (1 - c²)ⁿ(1 - a)
+  - c = 1 is always a fixed point
+- **Threshold formula**: a_n^(agg) = 1 - 1/h_max(n)
+  - n=1: threshold 0.5; n=2: ~0.156; n=3: ~0.077; n→∞: threshold → 0
+  - As n → ∞, almost any external evidence achieves c = 1
+- **Bootstrap vulnerability identified**:
+  - Many uncorrelated introspections circumvent anti-bootstrapping
+  - This is a potential design flaw if not mitigated
+- **Bistability for n ≥ 2**:
+  - Both interior FP c*_lower and c = 1 are stable
+  - Unstable separatrix c*_upper divides basins of attraction
+  - Different from n=1 where c = 1 unstable for a < 0.5
+- **CRITICAL mitigation via correlation-aware aggregation (Thread 2.13)**:
+  - Identical self-introspections are maximally correlated (δ = 1)
+  - aggregate_δ=1(c², c², ..., c²) = avg(c², ...) = c²
+  - Collapses to single introspection, preserving a = 0.5 threshold
+  - Thread 2.13's dependency adjustment is ESSENTIAL, not optional
+- **Prior art applied**:
+  - Thread 3.30: Single introspection fixed-point analysis
+  - Thread 3.33: Multi-level threshold formula
+  - Thread 2.11: Aggregation semantics (⊕)
+  - Thread 2.13: Correlated evidence handling (δ adjustment)
+- **Design implications**:
+  - CLAIR should detect redundant self-introspection automatically
+  - Apply δ = 1 for identical self-references by default
+  - Warn about bootstrap risk for many independent introspective sources
+  - Type system should track introspective source overlap
+- **New tasks discovered**:
+  - 3.40: Correlation-aware aggregation enforcement
+  - 3.41: Heterogeneous aggregation thresholds (c² ⊕ c⁴ ⊕ c⁸)
+  - 3.42: Bootstrap vulnerability security analysis
+  - 3.43: Defense by redundancy vs defeat
+- **Output**: exploration/thread-3.34-aggregated-introspection.md
+- **Beliefs updated**:
+  - "Aggregated introspection threshold decreases with count" → PROVEN (confidence: 0.95)
+  - "Bootstrap vulnerability from uncorrelated aggregation" → ESTABLISHED (confidence: 0.90)
+  - "Correlation-aware aggregation essential" → ESTABLISHED (confidence: 0.95)
+  - "Bistability for n ≥ 2" → ESTABLISHED (confidence: 0.85)
+
 ### CLAIR EXPLORATION CONTINUES
 
-The CLAIR exploration project continues with 32 remaining tasks. Key accomplishments so far:
+The CLAIR exploration project continues with 40 remaining tasks. Key accomplishments so far:
 
 1. **Theoretical Foundations**: Nine foundational threads explored to substantial completion
 2. **Novel Contributions**: CPL (first graded provability logic), confidence algebra (three monoids), DAG justification with defeat semantics

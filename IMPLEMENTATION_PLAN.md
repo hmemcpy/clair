@@ -101,7 +101,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 **New tasks discovered (Session 68)**:
 - [ ] **3.32 External evidence warnings** - Should CLAIR provide syntactic warnings when self-referential beliefs lack external evidence?
 - [x] **3.33 Multi-level introspection threshold** - ANSWERED Session 69: For k levels of introspection, the threshold is a_k = 1 - 1/2^k, forming a ladder: 0.5, 0.75, 0.875, ... → 1. The c⁴ (two-level) threshold is 0.75. Key findings: (1) Stronger anti-bootstrapping at higher levels, (2) Maximum amplification decreases with depth (2×, 1.33×, 1.14×, ...), (3) Convergence is faster away from threshold, (4) Discrete L₅ preserves qualitative behavior. See exploration/thread-3.33-multilevel-introspection-threshold.md
-- [ ] **3.34 Aggregated introspection** - For c = ⊕ᵢ introspect(selfᵢ) across multiple self-beliefs, how do fixed points behave?
+- [x] **3.34 Aggregated introspection** - ANSWERED Session 70: Aggregating n introspections (⊕ⁿ c²) has fixed-point equation c = 1 - (1-c²)ⁿ(1-a). Key findings: (1) Threshold DECREASES with aggregation count: a_n^(agg) = 1 - 1/h_max(n), where h_max(n) → 1 as n → ∞, (2) Bootstrap vulnerability: many uncorrelated introspections can achieve c = 1 with minimal external evidence, (3) Bistability for n ≥ 2: both interior FP and c = 1 are stable, (4) CRITICAL mitigation: correlation-aware aggregation (Thread 2.13) with δ = 1 for identical self-introspections reduces to single introspection, preserving a = 0.5 threshold. See exploration/thread-3.34-aggregated-introspection.md
 - [ ] **3.35 Discrete Löb rounding** - Should CLAIR use ceiling instead of floor for discrete Löb discount to reduce spurious fixed points?
 
 **New tasks discovered (Session 69)**:
@@ -109,6 +109,12 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [ ] **3.37 Total epistemic cost metric** - Can we define a metric that accounts for all introspection levels in a belief graph?
 - [ ] **3.38 Maximum introspection depth** - Should CLAIR impose a maximum introspection depth to prevent computational overhead?
 - [ ] **3.39 Multi-level threshold with aggregation** - How does c = a ⊕ b ⊕ c^(2^k) behave with multiple external sources?
+
+**New tasks discovered (Session 70)**:
+- [ ] **3.40 Correlation-aware aggregation enforcement** - Should CLAIR enforce correlation-aware aggregation for introspective sources by default?
+- [ ] **3.41 Heterogeneous aggregation thresholds** - For aggregation mixing c² ⊕ c⁴ ⊕ c⁸, what is the effective threshold?
+- [ ] **3.42 Bootstrap vulnerability analysis** - Can the bootstrap vulnerability from uncorrelated aggregation be exploited maliciously?
+- [ ] **3.43 Defense by redundancy** - How does aggregated introspection interact with defeat? Is there a "defense by redundancy" mechanism?
 
 **New tasks discovered (Session 22)**:
 - [x] **3.16 CPL decidability** - ANSWERED Session 25: CPL is **likely undecidable** due to transitivity + continuous values (Vidal 2019). Decidable fragments: CPL-finite (finite confidence), CPL-0 (stratified). See exploration/thread-3.16-cpl-decidability.md
