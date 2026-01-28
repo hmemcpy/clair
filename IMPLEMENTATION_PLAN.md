@@ -82,7 +82,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [ ] **3.19 Type-level anti-bootstrapping** - Implement Löb constraints in CLAIR's type checker (use stratification, not full CPL)
 
 **New tasks discovered (Session 25)**:
-- [ ] **3.20 CPL-finite formalization** - Formalize CPL with finite confidence values {0, 0.25, 0.5, 0.75, 1.0}; prove decidability
+- [x] **3.20 CPL-finite formalization** - ANSWERED Session 29: CPL-finite fully formalized with L₅ = {0, 0.25, 0.5, 0.75, 1}. Key finding: no finite lattice is closed under c², requiring floor rounding for g_L(c) = floor_L(c²). Decidability established via finite model property (Bou et al. 2011). PSPACE-completeness conjectured. See exploration/thread-3.20-cpl-finite-formalization.md
 - [ ] **3.21 CPL-Gödel variant** - Investigate CPL using Gödel algebra (min/max) instead of product; may be decidable
 - [ ] **3.22 Undecidability proof** - Formally prove CPL undecidability via reduction from known undecidable problem
 
@@ -1031,6 +1031,53 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - CPL-finite completeness: 0.80
     - CPL-0 soundness and completeness: 0.85
     - Full CPL completeness: 0.25
+
+### Session 29 Discoveries (Task 3.20 CPL-finite Formalization)
+
+151. **CPL-FINITE FULLY FORMALIZED** — Complete specification with L₅ = {0, 0.25, 0.5, 0.75, 1} as the finite confidence lattice.
+
+152. **c² CLOSURE IMPOSSIBILITY DISCOVERED**:
+    - **Theorem**: No non-trivial finite sublattice of [0,1] is closed under g(c) = c²
+    - The only fixed points of c² in [0,1] are 0 and 1
+    - Intermediate values: 0.25² = 0.0625, 0.5² = 0.25, 0.75² = 0.5625
+    - Requires floor rounding: g_L(c) = floor_L(c²)
+
+153. **Rounding strategy established**:
+    - **Floor rounding** preserves anti-bootstrapping: g_L(c) ≤ c² ≤ c
+    - Ceiling would violate the semantic constraint
+    - Explicit table: g_L(0)=0, g_L(0.25)=0, g_L(0.5)=0.25, g_L(0.75)=0.5, g_L(1)=1
+
+154. **Explicit operation tables derived**:
+    - Multiplication ⊗: floor_L(a × b) — for graded conjunction
+    - Probabilistic OR ⊕: ceiling_L(a + b - ab) — for aggregation
+    - Residual →: max{c ∈ L₅ : a ⊗ c ≤ b} — computable by finite search
+
+155. **CPL-finite semantics formalized**:
+    - Frames: F = (W, R, ≺) with graded accessibility R : W × W → L₅
+    - Converse well-foundedness: R(w,w') > 0 ⟹ w' ≺ w
+    - Box semantics: V_w(□φ) = min_{w'} max{1 - R(w,w'), V_{w'}(φ)}
+
+156. **Decidability established**:
+    - Finite model property follows from Bou et al. (2011) framework
+    - Computable bound on countermodel size
+    - Decision procedure: enumerate and check finite models
+
+157. **PSPACE-completeness conjectured**:
+    - Upper bound: CPL-finite ⊆ finite-valued K4 ⊆ PSPACE (Bou, Cerami, Esteva 2011)
+    - Lower bound: Classical GL (PSPACE-hard) embeds in CPL-finite
+    - Löb constraint restricts (doesn't expand) frame class
+
+158. **CLAIR integration designed**:
+    - Type: `FiniteConfidence = None | Low | Medium | High | Certain`
+    - Operations: ⊗, ⊕, loebDiscount implemented as finite case analysis
+    - Type-level constraint: `SelfSoundnessGuard<c>` with maxDerived ≤ loebDiscount(c)
+    - Enables decidable compile-time anti-bootstrapping checks
+
+159. **Confidence assessment**:
+    - CPL-finite well-defined: 0.90
+    - CPL-finite decidable: 0.85
+    - CPL-finite PSPACE-complete: 0.75
+    - g_L floor rounding preserves semantics: 0.90
 
 ## Impossibilities Encountered
 

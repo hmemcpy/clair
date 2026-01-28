@@ -116,6 +116,15 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - Full CPL: completeness uncertain due to undecidability
 - Key insight: graded Löb axiom with g(c) = c² is semantically sound
 
+**CPL-finite Formalization (Session 29)**:
+- CPL-finite fully formalized with L₅ = {0, 0.25, 0.5, 0.75, 1}
+- **Key discovery**: No finite sublattice is closed under c²; floor rounding required
+- Löb discount: g_L(c) = floor_L(c²) preserves anti-bootstrapping
+- Decidability: Finite model property ensures decidability (Bou et al. 2011)
+- Complexity: PSPACE-complete conjectured
+- CLAIR integration: FiniteConfidence type with decidable compile-time checks
+- See exploration/thread-3.20-cpl-finite-formalization.md
+
 ---
 
 ### Thread 4: The Grounding Problem
@@ -418,6 +427,11 @@ What I believe I know:
 | CPL-finite completeness | 0.80 | Session 27: canonical model + finite lattice | Find countermodel | ⚠ Session 27 |
 | CPL-0 soundness/completeness | 0.85 | Session 27: stratification simplifies | Find same-level issue | ✓ Session 27 |
 | Full CPL completeness | 0.25 | Session 27: undecidability suggests failure | Prove via novel methods | ⚠ Unlikely |
+| CPL-finite fully formalized | 0.90 | Session 29: L₅, operations, semantics complete | Find formalization gap | ✓ Session 29 |
+| No finite lattice closed under c² | 0.99 | Session 29: only 0,1 are fixed points | Find closure counter-proof | ✓ Proven |
+| Floor rounding for g_L(c) = floor_L(c²) | 0.90 | Session 29: preserves g_L(c) ≤ c | Find rounding issue | ✓ Session 29 |
+| CPL-finite PSPACE-complete | 0.75 | Session 29: upper/lower bounds | Find exact complexity | ⚠ Conjectured |
+| FiniteConfidence enables decidable checks | 0.90 | Session 29: compile-time anti-bootstrapping | Find undecidable case | ✓ Session 29 |
 | Graded Löb axiom semantically sound | 0.90 | Session 27: g(c) = c² ensures anti-bootstrapping | Find counterexample | ✓ Session 27 |
 | Bou et al. (2011) key framework | 0.95 | Session 27: many-valued modal completeness | Find better framework | ✓ Session 27 |
 
