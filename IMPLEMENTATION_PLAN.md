@@ -38,7 +38,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 **New tasks discovered (Session 9)**:
 - [x] **2.10 Defeat confidence propagation** - ANSWERED Session 12: Undercut = multiplicative discounting c×(1-d); Rebut = probabilistic comparison c/(c+d). See exploration/thread-2.10-defeat-confidence.md
-- [ ] **2.11 Aggregation confidence** - How do independent lines of evidence combine? (Subjective Logic fusion?)
+- [x] **2.11 Aggregation confidence** - ANSWERED Session 19: Independent evidence combines via ⊕ (probabilistic OR): aggregate(c₁,...,cₙ) = 1 - ∏(1-cᵢ). "Survival of doubt" interpretation: combined confidence = probability at least one evidence succeeds. See exploration/thread-2.11-aggregation.md
 - [x] **2.12 Reinstatement** - ANSWERED Session 18: Reinstatement emerges compositionally from bottom-up evaluation. Formula: A_final = A_base × (1 - D_base × (1 - E_base)). Mutual defeat has fixed-point semantics. See exploration/thread-2.12-reinstatement.md
 - [ ] **2.13 Correlated evidence** - How does aggregation handle correlated (not independent) evidence?
 - [ ] **2.14 Update derivation-calculus.md** - Incorporate DAG structure, labeled edges, new constructors
@@ -683,6 +683,54 @@ This is not a software implementation plan—it's a research exploration plan. E
     - Temporal dynamics / hysteresis in reinstatement
     - Correlated counter-defeaters (connects to Task 2.13)
 
+### Session 19 Discoveries (Task 2.11 Aggregation)
+
+96. **TASK 2.11 AGGREGATION ANSWERED** — Independent evidence combines via probabilistic OR (⊕).
+
+97. **The aggregation formula**:
+    ```
+    aggregate(c₁, c₂, ..., cₙ) = 1 - ∏ᵢ(1 - cᵢ) = c₁ ⊕ c₂ ⊕ ... ⊕ cₙ
+    ```
+    - "Survival of doubt" interpretation: combined confidence = probability at least one evidence succeeds
+    - Each piece has independent chance of "successfully supporting" the conclusion
+
+98. **Key desiderata verified for ⊕**:
+    - D1 Boundedness: ✓ (stays in [0,1])
+    - D2 Identity: ✓ (c ⊕ 0 = c)
+    - D3 Monotonicity: ✓ (adding evidence never decreases confidence)
+    - D4 Commutativity: ✓ (order doesn't matter)
+    - D5 Associativity: ✓ (grouping doesn't matter)
+    - D6 Convergence: ✓ (approaches 1 as evidence accumulates)
+    - D7 Diminishing returns: ✓ (marginal gain = a(1-c) decreases as c grows)
+
+99. **Aggregation differs from conjunction**:
+    - Conjunction (×): "Both premises needed" — confidence can only decrease
+    - Aggregation (⊕): "Multiple independent supports" — confidence increases
+    - Ten weak (0.3) independent witnesses → 97% combined confidence
+
+100. **Independence assumption is CRITICAL**:
+    - ⊕ assumes evidence sources are genuinely independent
+    - Correlated evidence overcounts if treated as independent
+    - This motivates Task 2.13 (correlated evidence handling)
+
+101. **Comparison with Subjective Logic**:
+    - CLAIR's ⊕ is NOT identical to SL cumulative fusion
+    - SL: b_combined = (c₁ + c₂ - 2c₁c₂) / (1 - c₁c₂)
+    - CLAIR: c₁ ⊕ c₂ = c₁ + c₂ - c₁c₂
+    - Different formulas! CLAIR's is simpler but assumes no disbelief mass
+
+102. **Prior art surveyed for aggregation**:
+    - Jøsang (2016): Subjective Logic cumulative fusion
+    - Shafer (1976): Dempster-Shafer combination rule
+    - Klement et al. (2000): T-norms/t-conorms in fuzzy logic
+    - Pearl (1988): Bayesian independence and combination
+    - Condorcet jury theorem: Independence requirement
+
+103. **Integration with CLAIR DAG**:
+    - `aggregate` node type combines support edges using ⊕
+    - `CombinationRule.independent` explicitly marks independent aggregation
+    - Future: `CombinationRule.correlated` for non-independent case (Task 2.13)
+
 ## Impossibilities Encountered
 
 *Record proven impossibilities and their precise characterization.*
@@ -725,7 +773,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 
 ---
 
-## Current Status Summary (Session 18)
+## Current Status Summary (Session 19)
 
 ### Thread Status Table
 

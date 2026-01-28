@@ -318,6 +318,10 @@ What I believe I know:
 | Mutual defeat has fixed point | 0.99 | Session 18: Banach theorem | None (mathematical) | ✓ Proven |
 | CLAIR handles reinstatement | 0.95 | Session 18: bottom-up evaluation | Find counterexample | ✓ Session 18 |
 | Reinstatement boost = A×D×E | 0.99 | Session 18: algebraic derivation | None (mathematical) | ✓ Proven |
+| ⊕ correct for independent aggregation | 0.95 | Session 19: survival of doubt interpretation | Find better alternative | ✓ Session 19 |
+| Independence critical for ⊕ | 0.95 | Session 19: correlated evidence overcounts | Prove independence optional | ✓ Session 19 |
+| Aggregation increases confidence | 0.99 | Session 19: a ⊕ b ≥ max(a,b) | None (mathematical) | ✓ Proven |
+| Diminishing returns for aggregation | 0.99 | Session 19: marginal gain = a(1-c) | None (mathematical) | ✓ Proven |
 
 ---
 
@@ -969,3 +973,64 @@ The theoretical foundations are solid. Six of nine threads substantially explore
   - "Chain convergence to d/(1+d)" → PROVEN (0.99)
   - "Mutual defeat has fixed point" → PROVEN (0.99)
   - "CLAIR architecture already handles reinstatement" → ESTABLISHED (0.95)
+
+### Session 19: Task 2.11 Exploration (AGGREGATION)
+- **COMPLETED TASK 2.11: Aggregation — How do independent lines of evidence combine?**
+- **Core question answered**: Independent evidence combines via **probabilistic OR (⊕)**:
+  ```
+  aggregate(c₁, c₂, ..., cₙ) = 1 - ∏ᵢ(1 - cᵢ) = c₁ ⊕ c₂ ⊕ ... ⊕ cₙ
+  ```
+- **"Survival of doubt" interpretation established**:
+  - Each piece of evidence has independent chance of successfully supporting conclusion
+  - Combined confidence = probability at least one evidence succeeds
+  - (1 - cᵢ) = probability evidence i fails to convince
+  - ∏(1 - cᵢ) = probability ALL evidence fails
+  - 1 - ∏(1 - cᵢ) = probability at least one succeeds
+- **Seven desiderata verified for ⊕**:
+  - D1 Boundedness: ✓ (stays in [0,1])
+  - D2 Identity: ✓ (c ⊕ 0 = c)
+  - D3 Monotonicity: ✓ (adding evidence never decreases confidence)
+  - D4 Commutativity: ✓ (order doesn't matter)
+  - D5 Associativity: ✓ (grouping doesn't matter)
+  - D6 Convergence: ✓ (approaches 1 as evidence accumulates)
+  - D7 Diminishing returns: ✓ (marginal gain = a(1-c) decreases as c grows)
+- **Aggregation vs conjunction clarified**:
+  - Conjunction (×): "Both premises needed" — confidence can decrease
+  - Aggregation (⊕): "Multiple independent supports" — confidence increases
+  - Example: Ten weak (0.3) independent witnesses → 1 - 0.7^10 ≈ 97% combined confidence
+- **Independence assumption identified as CRITICAL**:
+  - ⊕ formula assumes evidence sources are genuinely independent
+  - Correlated evidence overcounts if treated as independent
+  - This motivates Task 2.13 (correlated evidence handling)
+- **Alternative aggregation rules compared**:
+  - Maximum: Not suitable (adding evidence doesn't help, fails D6/D7)
+  - Bounded sum: Too aggressive (reaches certainty too easily)
+  - Averaging: Not suitable for supporting evidence (fails D3/D6)
+  - Geometric mean: Not suitable (penalizes too harshly, fails D3)
+  - **⊕ is uniquely appropriate** for independent evidence aggregation
+- **Comparison with Subjective Logic**:
+  - CLAIR's ⊕ is NOT identical to SL cumulative fusion
+  - SL: b_combined = (c₁ + c₂ - 2c₁c₂) / (1 - c₁c₂)
+  - CLAIR: c₁ ⊕ c₂ = c₁ + c₂ - c₁c₂
+  - Different formulas! CLAIR's is simpler but assumes no explicit disbelief mass
+- **Prior art surveyed**:
+  - Jøsang (2016): Subjective Logic cumulative fusion
+  - Shafer (1976): Dempster-Shafer combination rule
+  - Klement et al. (2000): T-norms/t-conorms in fuzzy logic
+  - Pearl (1988): Bayesian independence and combination
+  - Condorcet jury theorem: Independence requirement for collective wisdom
+- **Integration with CLAIR DAG**:
+  - `aggregate` node type combines support edges using ⊕
+  - `CombinationRule.independent` explicitly marks independent aggregation
+  - Future: `CombinationRule.correlated` for non-independent case (Task 2.13)
+- **Output**: exploration/thread-2.11-aggregation.md
+- **Status**: Task 2.11 SUBSTANTIALLY COMPLETE
+- **Beliefs updated**:
+  - "⊕ is correct for independent aggregation" → ESTABLISHED (0.95)
+  - "Independence assumption critical for ⊕" → ESTABLISHED (0.95)
+  - "Aggregation increases confidence" → PROVEN (a ⊕ b ≥ max(a,b))
+  - "Diminishing returns hold for ⊕" → PROVEN (0.99)
+- **Remaining related tasks**:
+  - Task 2.13: Correlated evidence (what to do when independence fails)
+  - Task 8: Lean formalization of aggregation
+  - Task 5: Interaction of aggregation with belief revision

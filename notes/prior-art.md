@@ -642,3 +642,46 @@ See exploration/thread-9-phenomenology.md for detailed exploration.
 - Open questions: correlated evidence, fixed-point for defeat chains, DEL mapping
 
 See exploration/thread-5-belief-revision.md for detailed exploration.
+
+### ✓ SURVEYED (Session 19)
+
+**Thread 2.11 (Aggregation of Independent Evidence):** ✓ SUBSTANTIALLY COMPLETE
+
+**Probabilistic foundations**:
+- Independent events: P(A ∨ B) = P(A) + P(B) - P(A)P(B) = a ⊕ b
+- This is the standard "probabilistic OR" for independent events
+- CLAIR adopts this directly for confidence aggregation
+
+**Subjective Logic Cumulative Fusion (Jøsang 2016)**:
+- Full formula for opinions ω = (b, d, u, a): more complex than CLAIR's ⊕
+- b_A⊕B = (b_A × u_B + b_B × u_A) / κ where κ = u_A + u_B - u_A × u_B
+- If we map confidence c to opinion (c, 0, 1-c, 0.5), SL gives DIFFERENT result than ⊕
+- CLAIR's simpler ⊕ = c₁ + c₂ - c₁c₂ assumes no explicit disbelief mass
+- **Key insight**: CLAIR and SL differ in how they model the structure of uncertainty
+
+**Dempster-Shafer Combination (Shafer 1976)**:
+- Dempster's rule: m₁₂(A) = [Σ_{B∩C=A} m₁(B)·m₂(C)] / (1-K)
+- K = conflict measure (mass on empty set before normalization)
+- Zadeh's paradox: Can give counterintuitive results with high conflict
+- For CLAIR (combining confidence in SAME proposition), conflict issues less severe
+- DS theory is more general than needed for simple aggregation
+
+**Fuzzy Logic T-conorms (Klement et al. 2000)**:
+- CLAIR's ⊕ is the "algebraic sum" or "probabilistic sum" t-conorm
+- Dual to the product t-norm (×) via De Morgan: a ⊕ b = 1 - (1-a)×(1-b)
+- Standard choice for "fuzzy OR" in fuzzy logic literature
+- Properties: commutative, associative, monotonic, bounded
+
+**Condorcet's Jury Theorem (1785)**:
+- If each juror is independently more likely than not to be correct, majority voting converges to truth
+- KEY ASSUMPTION: Independence. If jurors influence each other, theorem breaks
+- **Key for CLAIR**: ⊕ requires genuine independence; correlated evidence overcounts
+
+**Key design decision for CLAIR (Session 19)**:
+- Use ⊕ = c₁ + c₂ - c₁c₂ for independent evidence aggregation
+- "Survival of doubt" interpretation: combined confidence = P(at least one evidence succeeds)
+- N-ary: aggregate(c₁,...,cₙ) = 1 - ∏(1-cᵢ)
+- Diminishing returns: marginal contribution of a at aggregate c is a(1-c)
+- Independence is CRITICAL—correlated evidence needs different treatment (Task 2.13)
+
+See exploration/thread-2.11-aggregation.md for detailed exploration.
