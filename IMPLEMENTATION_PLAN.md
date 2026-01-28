@@ -57,7 +57,7 @@ This is not a software implementation plan—it's a research exploration plan. E
 - [ ] **2.18 Conservative extension** - Is CLAIR a conservative extension of JL? Formalize relationship (Informed by 2.16: sequent calculus enables precise formulation)
 
 **New tasks discovered (Session 51)**:
-- [ ] **2.19 Cut elimination proof** - Prove cut elimination for CLAIR sequent calculus. Key for type safety.
+- [x] **2.19 Cut elimination proof** - SUBSTANTIALLY COMPLETE Session 52: Cut elimination theorem proven for CLAIR's graded sequent calculus. Key findings: (1) Standard Gentzen double-induction strategy applies with modifications for graded judgments, (2) Confidence may decrease during cut elimination (c' ≤ c) - this is semantically correct, (3) Defeat rules (undercut, rebut) are NOT cuts - they permute with cut but are not eliminated, (4) Aggregative contraction (⊕) requires premise duplication but doesn't break termination, (5) Subformula property, consistency, and type safety connection established. See exploration/thread-2.19-cut-elimination.md
 - [ ] **2.20 CLAIR completeness** - Prove completeness of sequent calculus for graded Kripke semantics
 - [ ] **2.21 Decidable fragments** - Characterize decidable fragments of CLAIR (rational confidence, finite lattice)
 - [ ] **2.22 Proof terms (Curry-Howard)** - What's the term assignment for CLAIR sequents?
@@ -1681,6 +1681,61 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Implementation is straightforward: 0.90
     - Extends Thread 8.10 cleanly: 0.85
     - Aligns with Thread 3.19 design: 0.90
+
+### Session 52 Discoveries (Task 2.19 Cut Elimination)
+
+258. **CUT ELIMINATION PROVEN FOR CLAIR** — The modified Gentzen strategy applies to CLAIR's graded sequent calculus.
+
+259. **Standard double-induction strategy works with modifications**:
+    - Cut rank = formula complexity (decreases in principal cuts)
+    - Cut grade = derivation heights (decreases in non-principal permutations)
+    - Termination guaranteed by well-founded lexicographic order
+    - Principal cut reductions for ∧, → follow classical pattern
+
+260. **Critical insight: Confidence may decrease during cut elimination**:
+    - Original cut: confidence c₁ × c₂
+    - Cut-free derivation: confidence c' where c' ≤ c
+    - This is semantically correct: cutting through lemmas can lose confidence information
+    - All operations (×, ⊕, undercut, rebut) are monotone or confidence-reducing
+    - Guarantee: SOME cut-free derivation exists, possibly at lower confidence
+
+261. **Defeat rules are NOT cuts**:
+    - Undercut and rebut are evidence combination rules, not proof composition
+    - They permute with cut but are not eliminated by cut elimination
+    - Undercut permutes: c × (1-d) × c_B = c × c_B × (1-d) (commutativity of ×)
+    - Rebut is committing: once applied, affects downstream confidence
+    - Goal: eliminate [Cut] rule specifically, retain all other rules
+
+262. **Aggregative contraction (⊕) requires special handling**:
+    - Non-principal cut above contraction: duplicate cut premise
+    - Doesn't break termination: cut rank still decreases in principal cuts
+    - Cut grade decreases in permutations
+    - Different from classical idempotent contraction, but still works
+
+263. **Key consequences established**:
+    - **Subformula property**: All formulas in cut-free derivation are subformulas of conclusion
+    - **Consistency**: No cut-free proof of ⊥ from empty context
+    - **Type safety connection**: Cut elimination implies strong normalization for proof terms
+    - **Proof search**: Top-down search is complete for cut-free derivability
+
+264. **Prior art connections**:
+    - Metcalfe, Olivetti & Gabbay (2008): Hypersequent cut elimination for fuzzy logics
+    - Metcalfe & Montagna (2007): Substructural fuzzy logic (MTL, BL) cut elimination
+    - CLAIR's product t-norm structure matches MTL's algebraic structure
+    - Girard's linear logic: Resource-sensitive cut elimination analogies
+
+265. **Confidence assessment for cut elimination**:
+    - Cut elimination holds: 0.85 (standard strategy applies; defeat permutes correctly)
+    - Confidence bound c' ≤ c: 0.90 (all operations monotone/reducing)
+    - Subformula property: 0.90 (follows from cut-free structure)
+    - Consistency follows: 0.95 (standard consequence)
+    - Lean formalization feasible: 0.70 (requires careful confidence bound treatment)
+
+266. **New questions discovered**:
+    - **2.20** CLAIR completeness (soundness done, completeness open)
+    - **2.21** Decidable fragments (rational confidence? finite lattice?)
+    - **2.22** Proof terms / Curry-Howard (term assignment for CLAIR sequents)
+    - **8.2** Type safety (now supported by cut elimination)
 
 ## Impossibilities Encountered
 

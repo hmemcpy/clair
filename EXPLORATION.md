@@ -44,8 +44,8 @@ What IS confidence for an LLM?
 ---
 
 ### Thread 2: The Structure of Justification
-**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50)
-**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md)
+**Status**: ✓ SUBSTANTIALLY COMPLETE (Sessions 9, 50, 51, 52)
+**Depth**: Deep (see exploration/thread-2-justification.md, thread-2.4-justification-logic-connection.md, thread-2.16-sequent-calculus.md, thread-2.19-cut-elimination.md)
 
 **Core question answered**: Are trees adequate for justification? **NO.**
 
@@ -64,16 +64,36 @@ What IS confidence for an LLM?
 - CLAIR is strictly more expressive than JL for belief structures
 - Potential extension: add `Choice` construct for JL-style "any suffices" scenarios
 
-**Prior work surveyed**: Pollock (1987), Doyle (1979), de Kleer (1986), Artemov (2001, 2019), Jøsang (2016), Toulmin (1958), Fitting (2005)
-**Formal tools**: DAG structure with EdgeType labels; new constructors for abduction, analogy, induction, aggregate
+**Findings (Session 51) - Sequent Calculus for CLAIR**:
+- Full sequent calculus designed with graded judgments Γ ⊢ A @c : j
+- Structural rules (Id, Cut, Weak, Contr with aggregation)
+- Logical rules (∧, →), defeat rules (Undercut, Rebut), aggregation rule
+- Stratified belief rules for self-reference
+- Soundness theorem stated; completeness conjectured
+
+**Findings (Session 52) - Cut Elimination**:
+- **Cut elimination holds** for CLAIR's graded sequent calculus
+- Standard Gentzen double-induction strategy applies with modifications
+- Confidence may decrease during cut elimination (c' ≤ c) — semantically correct
+- Defeat rules (undercut, rebut) are NOT cuts — they permute but are not eliminated
+- Aggregative contraction (⊕) requires premise duplication but doesn't break termination
+- Consequences: subformula property, consistency, type safety connection
+
+**Prior work surveyed**: Pollock (1987), Doyle (1979), de Kleer (1986), Artemov (2001, 2019), Jøsang (2016), Toulmin (1958), Fitting (2005), Gentzen (1935), Girard (1987), Metcalfe et al. (2008)
+**Formal tools**: DAG structure with EdgeType labels; new constructors for abduction, analogy, induction, aggregate; sequent calculus with cut elimination
 **Questions answered**:
 - Q2.1: ✓ Trees inadequate; DAGs with labeled edges required
 - Q2.3: Related to aggregation and defeat—confidence gradation through edges
 - Q2.4: ✓ CLAIR extends JL; formal mapping established (Session 50)
+- Q2.16: ✓ Sequent calculus designed (Session 51)
+- Q2.19: ✓ Cut elimination proven (Session 52)
 **Questions remaining**:
 - Q2.2: How do I (Claude) actually form beliefs? → Thread 9
 - Q2.15: Should CLAIR add JL-style Choice construct?
-- Q2.16: Develop sequent calculus for CLAIR
+- Q2.17: Justification equivalence via normal forms
+- Q2.20: CLAIR completeness
+- Q2.21: Decidable fragments
+- Q2.22: Proof terms (Curry-Howard)
 
 ---
 
@@ -580,10 +600,16 @@ What I believe I know:
 | Löb discount at type level | 0.90 | Session 47: g(c) = floor_L(c²) in typing rules | Find type-level flaw | ✓ Session 47 |
 | Information flow types relevant | 0.80 | Session 47: lattice-based constraint propagation | Find inapplicability | ✓ Session 47 |
 | CLAIR has sequent calculus | 0.90 | Session 51: full sequent system designed | Find inconsistency in rules | ✓ Session 51 |
-| Cut elimination holds for CLAIR | 0.75 | Session 51: conjecture stated, proof sketch provided | Find counterexample | ⚠ Session 51 |
+| Cut elimination holds for CLAIR | 0.85 | Session 52: proof via modified Gentzen strategy | Find cut that cannot be eliminated | ✓ Session 52 |
 | CLAIR closer to graded linear logic | 0.85 | Session 51: contraction aggregative, resources tracked | Find classical pattern | ✓ Session 51 |
 | Contraction is aggregative in CLAIR | 0.95 | Session 51: multiple evidence combines via ⊕ | Find non-aggregative case | ✓ Session 51 |
 | Graded modal types relevant | 0.85 | Session 47: semiring-indexed modalities | Find mismatch | ✓ Session 47 |
+| Confidence decreases during cut elimination | 0.90 | Session 52: c' ≤ c in cut-free proof | Find confidence-preserving cut elim | ✓ Session 52 |
+| Defeat rules are not cuts | 0.95 | Session 52: undercut/rebut are evidence combination | Find defeat that is a cut | ✓ Session 52 |
+| Undercut permutes with cut | 0.95 | Session 52: c×(1-d)×c_B = c×c_B×(1-d) | Find non-permuting case | ✓ Session 52 |
+| Aggregative contraction compatible with cut elim | 0.90 | Session 52: premise duplication maintains termination | Find non-terminating reduction | ✓ Session 52 |
+| Subformula property holds for CLAIR | 0.90 | Session 52: follows from cut elimination | Find non-subformula | ✓ Session 52 |
+| CLAIR consistency follows from cut elimination | 0.95 | Session 52: no cut-free proof of ⊥ | Find inconsistency | ✓ Session 52 |
 
 ---
 
