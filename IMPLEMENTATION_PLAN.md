@@ -224,7 +224,7 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
 - [x] **8.8** Verify Mathlib's `unitInterval` API matches our needs exactly - COMPLETED Session 21. Mathlib's unitInterval is an EXACT MATCH for CLAIR's Confidence type. Key findings: (1) Full multiplication monoid structure via `LinearOrderedCommMonoidWithZero`, (2) `symm` operation provides 1-x for undercut, (3) `unit_interval` tactic automates bound proofs, (4) CLAIR only needs ~30 lines of custom definitions (oplus, undercut, rebut, min). See exploration/thread-8-verification.md §14.
 - [ ] **8.9** Complete `min_assoc` proof with full case analysis (has `sorry` in sketch)
 - [x] **8.10** Formalize Belief type with confidence component - SUBSTANTIALLY COMPLETE Session 48. Core Belief<α> type defined as value + confidence. Created `formal/lean/CLAIR/Belief/Basic.lean` with: Functor structure (map), derivation (derive₂ with × composition), aggregation (⊕ combination), defeat operations (undercut, rebut), conservative combination (min), and graded monad structure (bind, pure). Key theorems proven: derivation decreases confidence, aggregation increases confidence, undercut composition law, monad laws for confidence. Incremental approach: Phase 1 (core) complete, Phases 2-4 (justification graph, stratification, full metadata) deferred. See exploration/thread-8.10-belief-type-formalization.md.
-- [ ] **8.11** Formalize stratified belief levels from Thread 3
+- [x] **8.11** Formalize stratified belief levels from Thread 3 - SUBSTANTIALLY COMPLETE Session 49. Created `formal/lean/CLAIR/Belief/Stratified.lean` with: StratifiedBelief<n, α> type, Meta<α> wrapper, introspect operation with level constraint (h : m < n), level-preserving operations (map, derive₂, aggregate, applyUndercut), coercion to basic Belief, safety theorems (no same-level introspection, no circular introspection). See exploration/thread-8.11-stratified-belief-lean.md
 
 ### Thread 9: Phenomenology
 **Status**: ✓ SUBSTANTIALLY EXPLORED (Session 15). See exploration/thread-9-phenomenology.md
@@ -1612,6 +1612,63 @@ type MultiAgentBelief<A> = { beliefs, frameworks, compatibility, aggregated, dis
     - Connects to Thread 3.19 type-level anti-bootstrapping
 
 247. **Confidence in Phase 1**: 0.90 that design is sound, 0.85 that theorems are provable (pending Lean build verification)
+
+### Session 49 Discoveries (Task 8.11 Stratified Belief Formalization)
+
+248. **STRATIFIED BELIEF TYPE COMPLETE** — Level-indexed beliefs formalized in Lean 4 at `formal/lean/CLAIR/Belief/Stratified.lean`.
+
+249. **Core design: Level parameter with constrained introspection**:
+    - `StratifiedBelief (level : Nat) (α : Type*)` — level is a type parameter
+    - `introspect (h : m < n) (b : StratifiedBelief m α) : StratifiedBelief n (Meta α)` — requires proof m < n
+    - No same-level introspection possible (would require proof of n < n)
+    - Well-foundedness automatic via Nat.lt
+
+250. **Meta wrapper type**:
+    - `Meta<α>` wraps introspected values with optional description
+    - Used as the content type when introspecting lower-level beliefs
+    - Supports reflection: can describe what the original belief was about
+
+251. **Level-preserving operations formalized**:
+    - `map` : Functor over value, preserving level
+    - `derive₂` : Multiplicative confidence combination at same level
+    - `aggregate` : ⊕ combination for independent evidence at same level
+    - `applyUndercut` : Defeat operation at same level
+    - `bind/pure` : Graded monad at same level
+
+252. **Key safety theorems proven**:
+    - `level_zero_cannot_introspect_from` : Level 0 has no predecessors
+    - `no_self_introspection` : ¬(n < n) — no belief introspects itself
+    - `no_circular_introspection` : If m < n then ¬(n < m) — no cycles
+    - Introspection preserves confidence
+
+253. **Connection to Tarski's hierarchy established**:
+    - StratifiedBelief captures Tarski's stratified truth predicates
+    - Level-n can talk about level-m for m < n, but not same or higher
+    - Resolves Liar paradox: "This sentence is false" cannot be formalized
+    - Well-foundedness terminates at level 0 (ground beliefs)
+
+254. **Coercion to basic Belief**:
+    - `toBelief : StratifiedBelief n α → Belief α` drops the level
+    - Allows use of stratified beliefs where level doesn't matter
+    - Preserves value and confidence
+
+255. **Phase 3 of incremental Belief formalization complete**:
+    - Phase 1: Core Belief (Session 48) ✓
+    - Phase 2: JustifiedBelief (future)
+    - Phase 3: StratifiedBelief (Session 49) ✓
+    - Phase 4: FullBelief with all metadata (future)
+
+256. **New questions discovered**:
+    - **8.12 Polymorphic level operations** : Can we write functions polymorphic over level?
+    - **8.13 Level inference** : How much can Lean infer automatically?
+    - **8.14 Universe interaction** : How do belief levels interact with Lean's universes?
+
+257. **Confidence assessment**:
+    - Level parameter approach is sound: 0.90
+    - Introspection constraint captures Tarski: 0.85
+    - Implementation is straightforward: 0.90
+    - Extends Thread 8.10 cleanly: 0.85
+    - Aligns with Thread 3.19 design: 0.90
 
 ## Impossibilities Encountered
 

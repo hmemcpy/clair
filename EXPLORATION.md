@@ -310,14 +310,15 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 ---
 
 ### Thread 8: Formal Verification Strategy
-**Status**: ✓ BELIEF TYPE PHASE 1 COMPLETE (Session 48)
-**Depth**: Deep - Confidence operations + core Belief type formalized in Lean 4
+**Status**: ✓ STRATIFIED BELIEF TYPE COMPLETE (Session 49)
+**Depth**: Deep - Confidence operations + core Belief + stratified beliefs formalized in Lean 4
 
-**Lean 4 Project Created (Sessions 31, 48)**:
+**Lean 4 Project Created (Sessions 31, 48, 49)**:
 - `formal/lean/` - Complete Lean 4 project with Mathlib 4 dependency
 - Confidence type defined as `unitInterval` from Mathlib
 - All core operations implemented and proven: oplus, undercut, rebut, min
-- **NEW (Session 48)**: Belief type formalized with confidence component
+- **Session 48**: Core Belief type formalized with confidence component
+- **Session 49**: Stratified Belief type formalized with level indexing
 
 **Key Artifacts**:
 - `CLAIR/Confidence/Basic.lean` - Confidence type definition, basic properties
@@ -325,7 +326,8 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - `CLAIR/Confidence/Undercut.lean` - Multiplicative discounting with composition law
 - `CLAIR/Confidence/Rebut.lean` - Probabilistic comparison for competing evidence
 - `CLAIR/Confidence/Min.lean` - Conservative combination (meet-semilattice)
-- **NEW**: `CLAIR/Belief/Basic.lean` - Core Belief type with derivation, aggregation, defeat
+- `CLAIR/Belief/Basic.lean` - Core Belief type with derivation, aggregation, defeat
+- **NEW (Session 49)**: `CLAIR/Belief/Stratified.lean` - Level-indexed beliefs for safe introspection
 
 **Key Theorems Proven (Confidence)**:
 - All operations preserve [0,1] bounds
@@ -342,23 +344,42 @@ CLAIR allows beliefs about beliefs. The safe fragment is now characterized:
 - Monad laws for confidence: `bind_pure_left_confidence`, `bind_pure_right_confidence`
 - Graded monad structure over ([0,1], ×, 1)
 
-**Belief Type Design (Session 48)**:
-- Incremental approach: Phase 1 (core) → Phase 2 (justification) → Phase 3 (stratification) → Phase 4 (full)
-- Phase 1 complete: Belief<α> = value + confidence
-- Operations: map, derive₂, aggregate, applyUndercut, applyRebut, combineConservative, bind, pure
-- Deferred: justification graph, stratification, provenance, invalidation
+**Key Theorems Proven (Stratified Belief - Session 49)**:
+- `level_zero_cannot_introspect_from`: No m < 0 exists
+- `no_self_introspection`: ¬(n < n) prevents same-level self-reference
+- `no_circular_introspection`: If m < n then ¬(n < m)
+- `introspect_confidence`: Introspection preserves confidence
+- Level-preserving operations mirror core Belief operations
 
-**Prior work**: Lean Mathlib (unitInterval), fuzzy logic t-norms/t-conorms, graded monads
+**Stratified Belief Design (Session 49)**:
+- `StratifiedBelief (level : Nat) (α : Type*)` - level is type parameter
+- `Meta<α>` wrapper for introspected values
+- `introspect (h : m < n) ...` - requires proof that source level < target level
+- Level-preserving: map, derive₂, aggregate, applyUndercut, bind, pure
+- `toBelief` coercion to forget level when not needed
+- Captures Tarski's hierarchy: prevents Liar paradox by construction
+
+**Belief Type Design (Sessions 48, 49)**:
+- Incremental approach: Phase 1 (core) ✓ → Phase 2 (justification) → Phase 3 (stratification) ✓ → Phase 4 (full)
+- Phase 1 complete: Belief<α> = value + confidence
+- Phase 3 complete: StratifiedBelief<n, α> = value + confidence + level constraint
+- Operations: map, derive₂, aggregate, applyUndercut, applyRebut, combineConservative, bind, pure
+- Deferred: justification graph, provenance, invalidation, finite confidence caps
+
+**Prior work**: Lean Mathlib (unitInterval), fuzzy logic t-norms/t-conorms, graded monads, Tarski's truth hierarchy
 **Formal tools**: Lean 4 v4.15.0, Mathlib v4.15.0
 **Questions answered**:
 - Q8.1: ✓ Confidence operations are the useful minimal formalization
 - Q8.4: ✓ Boundedness, algebraic properties, monotonicity worth proving first
 - Q8.10: ✓ (Phase 1) Belief type with confidence component formalized
+- Q8.11: ✓ Stratified belief levels capture Tarski hierarchy
 **Questions remaining**:
 - Q8.2: Natural language intents remain outside formalization scope
 - Q8.3: Extraction to working interpreter (rebut is noncomputable due to division)
-- Q8.10: Phases 2-4 (justification graph, stratification, full metadata)
-- Q8.11: Stratified belief levels from Thread 3
+- Q8.10: Phases 2, 4 (justification graph, full metadata)
+- Q8.12: Polymorphic level operations
+- Q8.13: Level inference in Lean
+- Q8.14: Universe interaction with belief levels
 
 ---
 
@@ -429,6 +450,9 @@ What I believe I know:
 | Belief type formalizable | 0.90 | Session 48: Phase 1 complete | Implementation failure | ✓ Session 48 |
 | Belief is graded monad | 0.95 | Session 48: bind/pure over ([0,1],×,1) | Monad law failure | ✓ Session 48 |
 | Derivation decreases confidence | 0.99 | Session 48: derive₂_le_left/right | None (mathematical) | ✓ Proven |
+| Stratified beliefs capture Tarski | 0.90 | Session 49: StratifiedBelief<n,α> | Paradox in formalization | ✓ Session 49 |
+| No same-level introspection | 0.99 | Session 49: requires h : m < n | None (mathematical) | ✓ Proven |
+| Introspection well-founded | 0.99 | Session 49: Nat.lt is well-founded | None (mathematical) | ✓ Proven |
 | Aggregation increases confidence | 0.99 | Session 48: aggregate_ge_left/right | None (mathematical) | ✓ Proven |
 | Defeat propagation open | 0.10 | **ANSWERED** Session 12 | Better model found | ✓ Session 12 |
 | Undercut uses multiplicative discounting | 0.90 | Session 12: c × (1-d), aligns with Subjective Logic | Better model found | ✓ Session 12 |
