@@ -2272,6 +2272,19 @@ With Threads 1, 2, 3 complete, priority shifts to:
 - [x] **10.1m Write Chapter 13: Conclusion and Future Work** — COMPLETED Session 45. Dissertation conclusion synthesizing contributions, assessing thesis, identifying open questions, charting future directions. Sections: (1) Summary of contributions (primary and secondary), (2) Thesis assessment by component (all established, implementation pending), (3) Open questions by thread (1-9), (4) Future research directions (empirical validation, tooling, integration, domain extensions, multi-modal, alignment, theoretical extensions), (5) Broader implications (AI systems, PLs, epistemology, philosophy of mind, trust), (6) Closing remarks on honest uncertainty. ~15 pages. See `formal/dissertation/chapters/13-conclusion.tex`.
 - [x] **10.1n Write Appendices** — COMPLETED Session 46. Four appendices written: (A) Complete Lean 4 formalization code with all five modules documented, (B) Haskell reference interpreter design specification with core types, confidence operations, evaluator, and justification DAG operations, (C) Additional proofs for confidence algebra (oplus bounds, undercut composition, non-distributivity, rebut antisymmetry), defeat fixed-points (existence via Brouwer, uniqueness via Banach, mutual undercut formula, chain convergence), CPL decidability, and AGM extension, (D) Glossary with ~60 terms organized by theme (confidence, belief/justification, self-reference, epistemology, multi-agent, implementation, verification, phenomenology). See `formal/dissertation/appendices/`. Dissertation now complete with all 13 chapters and 4 appendices (~280 pages total).
 
+- [ ] **10.2 Finalize Thesis (FINAL TASK)** — **IMPORTANT: Do this ONLY after ALL other exploration tasks are complete, all Lean proofs pass, and all assumptions have been validated.** Recreate and rewrite all TeX files (`formal/dissertation/`) with final and complete text based on the entire exploration. This includes:
+  - Review all exploration findings from Threads 1-9
+  - Ensure all proofs in `formal/lean/` compile successfully
+  - Update all chapters with any discoveries made after initial writing
+  - Verify all cross-references and citations are accurate
+  - Ensure consistency across all chapters
+  - Generate final bibliography from all cited sources
+  - Produce publication-ready LaTeX output
+
+  **Prerequisites**: All tasks marked [x], all Lean proofs verified, IMPLEMENTATION_PLAN.md shows 0 open tasks (except this one)
+
+  **Output**: Final, polished dissertation ready for submission
+
   **Objective**: Synthesize all exploration findings into a coherent, PhD-level academic document that formalizes CLAIR as a novel contribution to the intersection of programming language theory, epistemology, and AI reasoning.
 
   **Document Structure** (suggested):
