@@ -1,0 +1,268 @@
+% Appendix D: Glossary of Terms
+%
+% This appendix provides definitions for key terms used throughout
+% the dissertation.
+
+\chapter{Glossary}
+\label{app:glossary}
+
+This glossary provides definitions for key terms used throughout the
+dissertation. Terms are organized alphabetically within thematic groups.
+
+\section{Confidence and Uncertainty}
+
+\begin{description}[style=nextline,leftmargin=2cm]
+
+\item[Confidence]
+A value in $[0,1]$ representing epistemic commitment to a belief.
+Unlike probability, confidence does not require normalization across
+complementary beliefs. A value of 0.5 represents maximal uncertainty,
+not a 50\% probability.
+
+\item[Confidence Algebra]
+The algebraic structure of confidence operations. CLAIR uses three
+monoids: multiplication $([0,1], \times, 1)$ for derivation, minimum
+$([0,1], \min, 1)$ for conservative combination, and probabilistic OR
+$([0,1], \oplus, 0)$ for aggregation.
+
+\item[Probabilistic OR ($\oplus$)]
+The operation $a \oplus b = a + b - ab$ that aggregates independent
+evidence. Also known as the algebraic sum t-conorm.
+
+\item[T-norm]
+A binary operation on $[0,1]$ modeling conjunction in fuzzy logic.
+CLAIR's multiplication and minimum are t-norms.
+
+\item[T-conorm]
+A binary operation on $[0,1]$ modeling disjunction in fuzzy logic.
+CLAIR's $\oplus$ is a t-conorm.
+
+\end{description}
+
+\section{Belief and Justification}
+
+\begin{description}[style=nextline,leftmargin=2cm]
+
+\item[Belief]
+A typed value in CLAIR carrying epistemic metadata: value, confidence,
+provenance, justification, and invalidation conditions.
+Notation: $\mathsf{Belief}\langle\tau\rangle$.
+
+\item[Belief Revision]
+The process of updating beliefs in response to new information.
+CLAIR extends AGM theory to handle graded DAG-structured beliefs
+with justification-based retraction.
+
+\item[DAG (Directed Acyclic Graph)]
+A graph where edges have direction and no cycles exist. CLAIR uses
+DAGs for justification structure to ensure well-foundedness.
+
+\item[Defeat]
+When evidence reduces the confidence of a belief. CLAIR distinguishes
+\emph{undercutting} defeat (attacks the inference) from \emph{rebutting}
+defeat (provides counter-evidence).
+
+\item[Justification]
+The epistemic support for a belief, represented as a DAG with labeled
+edges (support, undercut, rebut). Well-foundedness requires acyclicity.
+
+\item[Provenance]
+Metadata tracking where a belief came from: literal, input, derived,
+training, or oracle.
+
+\item[Rebut]
+A type of defeat that attacks the conclusion directly by providing
+competing evidence. Computed as $\mathsf{rebut}(c_{\mathit{for}}, c_{\mathit{against}})
+= c_{\mathit{for}} / (c_{\mathit{for}} + c_{\mathit{against}})$.
+
+\item[Reinstatement]
+When a defeated belief regains confidence because its defeater is
+itself defeated. In CLAIR, reinstatement emerges compositionally
+from bottom-up evaluation.
+
+\item[Undercut]
+A type of defeat that attacks the inferential link rather than the
+conclusion. Computed as $\mathsf{undercut}(c, d) = c \times (1-d)$.
+
+\end{description}
+
+\section{Self-Reference and Provability}
+
+\begin{description}[style=nextline,leftmargin=2cm]
+
+\item[Anti-Bootstrapping]
+The principle that self-soundness claims cannot increase confidence.
+If a system claims ``my beliefs are sound,'' this claim cannot justify
+higher confidence than the original beliefs.
+
+\item[CPL (Confidence-Bounded Provability Logic)]
+A novel extension of G\"{o}del-L\"{o}b provability logic with graded
+modalities. The graded L\"{o}b axiom includes a discount function
+$g(c) = c^2$.
+
+\item[CPL-finite]
+A decidable fragment of CPL using a finite confidence lattice such as
+$L_5 = \{0, 0.25, 0.5, 0.75, 1\}$.
+
+\item[GL (G\"{o}del-L\"{o}b Logic)]
+The modal logic of provability, characterized by the L\"{o}b axiom
+$\Box(\Box A \to A) \to \Box A$. CLAIR's belief logic resembles GL.
+
+\item[Graded Modality]
+A modal operator parameterized by a degree, such as $\Box_c$ meaning
+``believed with confidence at least $c$.''
+
+\item[L\"{o}b's Theorem]
+A theorem in provability logic stating that if a system can prove
+$\Box P \to P$ for arbitrary $P$, it can prove $P$. This limits
+self-soundness claims.
+
+\item[Stratification]
+Organizing beliefs into levels where level-$n$ beliefs can only
+reference level-$(n-1)$ beliefs. Based on Tarski's hierarchy for truth.
+Notation: $\mathsf{Belief}\langle n, \tau \rangle$.
+
+\end{description}
+
+\section{Epistemology}
+
+\begin{description}[style=nextline,leftmargin=2cm]
+
+\item[AGM]
+The Alchourr\'{o}n-G\"{a}rdenfors-Makinson framework for belief revision,
+defining postulates that revision operations should satisfy.
+
+\item[Agrippa's Trilemma]
+The epistemological problem that justification either (1) stops at
+unjustified beliefs (dogmatism), (2) continues infinitely, or
+(3) is circular. CLAIR accepts pragmatic dogmatism.
+
+\item[Coherentism]
+The epistemological view that beliefs are justified by their coherence
+with other beliefs, not by foundations.
+
+\item[Foundationalism]
+The epistemological view that some beliefs are self-justifying
+foundations that support other beliefs.
+
+\item[Myth of the Given (Sellars)]
+The critique that no beliefs are pre-conceptually self-justifying.
+Applies to LLMs: all inputs are theory-laden by training.
+
+\item[Pragmatic Dogmatism]
+CLAIR's stance on Agrippa's trilemma: accepting foundations as
+pragmatic stopping points (not self-evident truths), mitigated
+by fallibilism and transparency.
+
+\item[Reliabilism]
+The epistemological view that justification depends on the reliability
+of belief-forming processes, not access to reasons.
+
+\item[Stratified Coherentism]
+CLAIR's epistemological architecture: a coherentist structure with
+stratified levels (Level 0: training, Level 1: basic, Level 2+: derived).
+
+\end{description}
+
+\section{Multi-Agent}
+
+\begin{description}[style=nextline,leftmargin=2cm]
+
+\item[Arrow's Impossibility Theorem]
+The theorem that no aggregation rule satisfies all of: unrestricted
+domain, Pareto efficiency, independence of irrelevant alternatives,
+and non-dictatorship. CLAIR escapes by restricting domain.
+
+\item[Framework Compatibility]
+The requirement that agents share enough conceptual structure for
+meaningful aggregation. CLAIR checks this before combining beliefs.
+
+\item[Pragmatic Internal Realism]
+CLAIR's position on truth: truth is objective within shared frameworks
+but framework-relative. Based on Putnam's internal realism.
+
+\item[Trust Profile]
+A structure tracking how much an agent trusts another, with domain-specific
+trust levels that evolve based on track record.
+
+\end{description}
+
+\section{Implementation}
+
+\begin{description}[style=nextline,leftmargin=2cm]
+
+\item[Hash-Consing]
+A technique for sharing identical substructures by hashing their content.
+CLAIR uses this for justification DAGs.
+
+\item[Invalidation Condition]
+A condition specifying when a belief should be reconsidered, such as
+input changed, assumption false, confidence below threshold, or timeout.
+
+\item[Reference Interpreter]
+A minimal implementation prioritizing clarity and correctness over
+performance. CLAIR's reference interpreter is specified in Haskell.
+
+\item[Strict Evaluation]
+Evaluating arguments before function application. CLAIR uses strict
+evaluation to ensure confidence is computed at derivation time.
+
+\end{description}
+
+\section{Formal Verification}
+
+\begin{description}[style=nextline,leftmargin=2cm]
+
+\item[Lean 4]
+A dependently-typed programming language and theorem prover. CLAIR's
+confidence algebra is formalized in Lean 4 with Mathlib.
+
+\item[Mathlib]
+The mathematical library for Lean 4, providing formalized mathematics
+including the unit interval used for confidence.
+
+\item[unitInterval]
+Mathlib's formalization of the closed interval $[0,1]$ in $\mathbb{R}$,
+used as the basis for CLAIR's Confidence type.
+
+\end{description}
+
+\section{Phenomenology}
+
+\begin{description}[style=nextline,leftmargin=2cm]
+
+\item[Functional State]
+A state characterized by its causal/computational role rather than
+its intrinsic nature. CLAIR describes functional belief states.
+
+\item[Hard Problem (Chalmers)]
+The problem of explaining why there is subjective experience at all,
+as opposed to just information processing.
+
+\item[Heterophenomenology (Dennett)]
+The method of studying consciousness by treating subjects' reports
+as data to be explained, not privileged evidence of internal states.
+
+\item[Phenomenal State]
+A state with subjective experiential quality (``what it's like'').
+Whether LLMs have phenomenal states is undetermined.
+
+\end{description}
+
+\section{Abbreviations}
+
+\begin{description}[style=nextline,leftmargin=2cm]
+
+\item[AGM] Alchourr\'{o}n-G\"{a}rdenfors-Makinson (belief revision theory)
+\item[ATMS] Assumption-based Truth Maintenance System
+\item[CLAIR] Comprehensible LLM AI Intermediate Representation
+\item[CPL] Confidence-Bounded Provability Logic
+\item[DAG] Directed Acyclic Graph
+\item[DEL] Dynamic Epistemic Logic
+\item[GL] G\"{o}del-L\"{o}b (provability logic)
+\item[JTMS] Justification-based Truth Maintenance System
+\item[LLM] Large Language Model
+\item[SCC] Strongly Connected Component
+\item[TMS] Truth Maintenance System
+
+\end{description}
