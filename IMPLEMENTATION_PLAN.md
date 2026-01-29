@@ -56,17 +56,17 @@ These citations EXIST but are cited with wrong keys in text:
 - [x] **1.11 Add amgoud2017evaluation** - Amgoud & Ben-Naim "Evaluation of Arguments in Weighted Bipolar Graphs" (ECSQARU 2017) (DONE 2026-01-29)
 - [x] **1.12 Add amgoud2023parameterised** - Amgoud, Doder & Vesic "Parameterised Gradual Semantics Dealing with Varied Degrees of Compensation" (IJCAI 2023) (DONE 2026-01-29)
 - [x] **1.13 Add beklemishev2004provability** - Beklemishev "Provability algebras and proof-theoretic ordinals" (DONE 2026-01-29)
-- [ ] **1.14 Add bonjour1999defense** - BonJour "The Dialectic of Foundationalism and Coherentism"
-- [ ] **1.15 Add bonzon2016comparative** - Bonzon et al. "Comparative analysis of weighted argumentation"
-- [ ] **1.16 Add derijke2000graded** - de Rijke "Graded Modalities"
-- [ ] **1.17 Add fine1972conjunction** - Fine "Propositional Quantifiers in Modal Logic"
-- [ ] **1.18 Add frankish2016illusionism** - Frankish "Illusionism as a Theory of Consciousness"
-- [ ] **1.19 Add godo2003many** - Godo et al. "Many-valued modal logics"
-- [ ] **1.20 Add godo2011fuzzy** - Godo et al. "Fuzzy modal logics over finite residuated lattices"
-- [ ] **1.21 Add goldman2012reliabilism** - Goldman "Reliabilism" (Stanford Encyclopedia)
-- [ ] **1.22 Add klein2005infinitism** - Klein "Infinitism is the Solution to the Regress Problem"
-- [ ] **1.23 Add pollock2001defeasible** - Pollock "Defeasible Reasoning and Degrees of Justification"
-- [ ] **1.24 Add xue2024loeb** - Xue et al. "Graded Löb logic" (if exists; may be conjectural)
+- [x] **1.14 Add bonjour1999defense** - BonJour "The Dialectic of Foundationalism and Coherentism" (DONE 2026-01-29)
+- [x] **1.15 Add bonzon2016comparative** - Bonzon et al. "Comparative analysis of weighted argumentation" (DONE 2026-01-29)
+- [x] **1.16 Add derijke2000graded** - de Rijke "Graded Modalities" (DONE 2026-01-29)
+- [x] **1.17 Add fine1972conjunction** - Fine "Propositional Quantifiers in Modal Logic" (DONE 2026-01-29)
+- [x] **1.18 Add frankish2016illusionism** - Frankish "Illusionism as a Theory of Consciousness" (DONE 2026-01-29)
+- [x] **1.19 Add godo2003many** - Godo et al. "Many-valued modal logics" (DONE 2026-01-29)
+- [x] **1.20 Add godo2011fuzzy** - Godo et al. "Fuzzy modal logics over finite residuated lattices" (DONE 2026-01-29)
+- [x] **1.21 Add goldman2012reliabilism** - Goldman "Reliabilism" (Stanford Encyclopedia) (DONE 2026-01-29)
+- [x] **1.22 Add klein2005infinitism** - Klein "Infinitism is the Solution to the Regress Problem" (DONE 2026-01-29)
+- [x] **1.23 Add pollock2001defeasible** - Pollock "Defeasible Reasoning and Degrees of Justification" (DONE 2026-01-29)
+- [ ] **1.24 Add xue2024loeb** - Xue et al. "Graded Löb logic" (if exists; may be conjectural - NOT FOUND in literature)
 
 ### Verification
 
