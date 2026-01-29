@@ -82,7 +82,7 @@ belief := id confidence level source justifications? invalidations? content
 | `id` | Unique identifier (e.g., `b1`, `b2`) |
 | `confidence` | Calibrated reliability in [0,1] |
 | `level` | Stratification level for self-reference safety |
-| `source` | Provenance (@user, @self, @file, etc.) |
+| `source` | Provenance (`@user`, `@self`, `@file`, etc.) |
 | `justifications` | Backward edges to supporting beliefs |
 | `invalidations` | Conditions that would defeat this belief |
 | `content` | The proposition (opaque natural language string) |
@@ -132,8 +132,8 @@ Confidence is #emph[calibrated reliability] in [0,1]:
 | 1.0 | Certain (axiomatic, from trusted source) |
 | 0.0 | Certainly false (contradicted, defeated) |
 | 0.5 | Maximally uncertain (no evidence either way) |
-| >0.5 | Net evidence for |
-| <0.5 | Net evidence against |
+| \>0.5 | Net evidence for |
+| \<0.5 | Net evidence against |
 
 0.5 represents maximal uncertainty, not algebraic neutrality. This is intentional:
 - `0.5 × 0.5 = 0.25` (confidence decreases through derivation)
@@ -361,7 +361,7 @@ b3 .72 L0 @self <b1 <b2 "therefore Z"   ; 0.9 × 0.8 = 0.72
 The confidence algebra (Chapter 3) specifies:
 - $c_1 times c_2$ — sequential derivation (confidence multiplies)
 - $min(c_1, c_2)$ — conservative combination
-- $c_1 oplus c_2 = 1 - (1-c_1)(1-c_2)$ — independent evidence aggregation
+- $c_1 plus.circle c_2 = 1 - (1-c_1)(1-c_2)$ — independent evidence aggregation
 
 These are #emph[constraints on valid traces], not operations the format provides.
 
