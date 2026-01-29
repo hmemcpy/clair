@@ -338,9 +338,194 @@ Artemov's Justification Logic (Artemov 2001) adds explicit justification terms t
 
 #strong[CLAIR contribution]: Extend from tree-like justification terms to DAGs with labeled edges, supporting defeasible reasoning.
 
+#heading(level: 2)[The Tracking Paradigm]
+
+The preceding sections developed the machinery of justification DAGs, confidence propagation, and defeat semantics. We now step back and articulate the underlying #emph[tracking paradigm] that distinguishes CLAIR from traditional formal systems.
+
+#heading(level: 3)[State Representation]
+
+#heading(level: 4)[The Epistemic State]
+
+A CLAIR system's #strong[epistemic state] at any point in time is a pair:
+
+#definition[
+  #strong[Epistemic state.]
+
+  An epistemic state #emph[cal(E)] is a tuple #emph[cal(E) = (cal(G), cal(B))] where:
+  + #emph[cal(G) = set(G_1, dots, G_n)] is a finite set of justification graphs (one for each belief)
+  + #emph[cal(B) = set((v_i, c_i, j_i, p_i) mid i in I)] is a set of beliefs with values, confidences, justifications, and provenance
+]
+
+Each belief in #emph[cal(B)] corresponds to the root of some graph in #emph[cal(G)]. The graphs may share nodes (shared premises) but are not required to be connected.
+
+#heading(level: 4)[Comparison with Proving Paradigm]
+
+Traditional formal systems focus on #emph[provability]:
++ #strong[State]: A set of axioms and inference rules
++ #strong[Question]: Is #emph[phi] provable from the axioms? (#emph[Gamma |- phi])
++ #strong[Output]: Yes/No (with proof term)
+
+CLAIR's tracking paradigm focuses on #emph[epistemic representation]:
++ #strong[State]: A set of labeled graphs with confidence values
++ #strong[Question]: What is the confidence, justification structure, and provenance of belief #emph[phi]?
++ #strong[Output]: #emph[(c, G, p)] where #emph[c in [0,1]] is confidence, #emph[G] is the justification graph, #emph[p] is provenance
+
+#heading(level: 3)[Update Rules]
+
+The epistemic state changes through #emph[epistemic actions]. Each action maps #emph[cal(E) -> cal(E)'].
+
+#heading(level: 4)[Primitive Actions]
+
+#definition[
+  #strong[Epistemic actions.]
+
+  The primitive actions on epistemic states are:
+  1. #strong[Add belief]: `add(phi, c, j, p)` creates a new belief with confidence #emph[c], justification #emph[j], and provenance #emph[p].
+  2. #strong[Aggregate]: `aggregate(phi, psi, r)` combines two beliefs about the same proposition using rule #emph[r in set("independent", "correlated"($delta$), "max")].
+  3. #strong[Derive]: `derive(phi, [psi_1, ..., psi_k], rule)` creates $phi$ as a conclusion from premises using an inference rule.
+  4. #strong[Undercut]: `undercut(phi, delta, d)` adds an undercutting defeater to $phi$ with strength #emph[d].
+  5. #strong[Rebut]: `rebut(phi, delta, d)` adds a rebutting defeater to $phi$ with strength #emph[d].
+  6. #strong[Invalidate]: `invalidate(psi)` removes belief $psi$ and propagates invalidation to all beliefs that depend on $psi$.
+]
+
+#heading(level: 4)[Action Semantics]
+
+#example[
+  #strong[Adding a belief.]
+
+  When adding a belief `add(phi, 0.8, source: testimony, witness_A)`:
+  1. Create a new node $n_phi$ with type `axiom` and confidence 0.8
+  2. Create a single-node graph $G_phi$ containing only $n_phi$ with no edges
+  3. Add $(n_phi, 0.8, "source: testimony", "witness_A")$ to $cal(B)$
+  4. Add $G_phi$ to $cal(G)$
+]
+
+#example[
+  #strong[Deriving a conclusion.]
+
+  When deriving `derive(phi, [psi_1, psi_2], modus_ponens)`:
+  1. Create a new node $n_phi$ with type `rule(modus_ponens, [n_psi_1, n_psi_2])`
+  2. Create support edges $(n_psi_1, n_phi, "support")$ and $(n_psi_2, n_phi, "support")$
+  3. Compute confidence via propagation: $c_phi = c_psi_1 times c_psi_2$
+  4. Add graph $G_phi$ to $cal(G)$ and belief $(n_phi, c_phi, G_phi, "derived")$ to $cal(B)$
+]
+
+#example[
+  #strong[Invalidation propagation.]
+
+  When `invalidate(psi)` is called:
+  1. Remove $psi$ from $cal(B)$
+  2. Find all beliefs $phi$ such that $psi$ appears in $G_phi$'s support graph
+  3. Recursively invalidate each such $phi$ (mark as defeated or recompute without $psi$)
+  4. Update confidence values via re-propagation
+
+  This is the #emph[dependency-directed backtracking] inherited from TMS systems.
+]
+
+#heading(level: 3)[Correctness Criteria]
+
+What does it mean for the tracking paradigm to be "correct"? We distinguish three levels of correctness.
+
+#heading(level: 4)[Syntactic Correctness]
+
+#definition[
+  #strong[Syntactic correctness.]
+
+  An epistemic state #emph[cal(E)] is #emph[syntactically correct] if:
+  1. Every graph in #emph[cal(G)] is acyclic (support edges)
+  2. Every node has a well-defined type
+  3. Every edge has a valid label (#text[support], #text[undercut], #text[rebut])
+  4. All confidence values are in #emph[[0,1]]
+]
+
+Syntactic correctness is enforced by the type system and checked at runtime. The Lean 4 formalization proves that propagation preserves syntactic correctness.
+
+#heading(level: 4)[Semantic Correctness (Internal)]
+
+#definition[
+  #strong[Semantic correctness (internal).]
+
+  An epistemic state #emph[cal(E)] is #emph[semantically correct] if:
+  1. Confidence propagation is consistent: Re-computing any belief's confidence yields the same value
+  2. Defeat semantics are satisfied: Undercuts and rebuts are applied according to their definitions
+  3. Bounds are preserved: All confidences remain in #emph[[0,1]] after any update
+]
+
+This is #emph[internal] correctness: the system behaves according to its own rules. The theorems on propagation termination and sound establish internal correctness for confidence propagation.
+
+#heading(level: 4)[Semantic Correctness (External)]
+
+#definition[
+  #strong[Semantic correctness (external).]
+
+  An epistemic state #emph[cal(E)] is #emph[externally correct] with respect to a reference system #emph[cal(R)] if:
+  1. #strong[Calibration]: For any belief with confidence #emph[c], the reference system assigns probability #emph[c' approx c] (within calibration tolerance)
+  2. #strong[Justification adequacy]: The justification graph #emph[G] accurately represents the actual dependency structure in #emph[cal(R)]
+  3. #strong[Provenance accuracy]: The provenance field correctly identifies the source of the belief in #emph[cal(R)]
+]
+
+External correctness cannot be established by formal proof alone---it requires empirical validation. CLAIR provides the #emph[machinery] for tracking (internal correctness) but calibration and accuracy are properties of the #emph[sources], not the tracking system.
+
+#block[
+  #strong[The Honesty Principle.]
+
+  CLAIR's tracking paradigm embodies epistemic humility:
+  + The system #emph[reports] its confidence, justification, and provenance
+  + It does not #emph[guarantee] that these correspond to external reality
+  + External correctness must be validated empirically (calibration studies, provenance audits)
+
+  This distinguishes tracking from proving: a proof claims certainty; a tracked belief admits uncertainty while documenting its grounds.
+]
+
+#heading(level: 3)[Tracking vs. Proving: A Summary]
+
+#table(
+  columns: 3,
+  fill: (x, y) => if calc.rem(y, 2) == 0 { rgb("#f9f9f9") } else { white },
+  stroke: 0.5pt + gray,
+  table.header([*Aspect*], [*Proving Paradigm*], [*Tracking Paradigm*]),
+  [Goal], [Establish truth], [Record epistemic state],
+  [State], [Set of formulas], [Set of labeled graphs],
+  [Query], [$Gamma |- phi$?], [What is the #emph[confidence], #emph[justification], and #emph[provenance] of $phi$?],
+  [Output], [Proof term (or $bot$)], [$(c, G, p)$ triple],
+  [Update], [Add axiom/formula], [Add/undercut/rebut/invalidate],
+  [Correctness], [Soundness], [Internal + External],
+  [Limits], [Hidden or denied], [Explicit with confidence],
+)
+
+#heading(level: 3)[Practical Implications]
+
+The tracking paradigm has several practical consequences for CLAIR as an AI reasoning intermediate representation:
+
+#heading(level: 4)[Explainability]
+
+Every belief carries its justification graph. Queries like "why does the system believe $phi$?" can be answered by traversing the graph and presenting the dependency chain.
+
+#heading(level: 4)[Debugging]
+
+When a belief has unexpectedly low confidence, the graph reveals which defeaters are responsible. When confidence is too high, the graph shows whether aggregation rules were misapplied.
+
+#heading(level: 4)[Revision]
+
+New evidence is incorporated by adding nodes and edges. The system automatically recomputes confidences via propagation, handling reinstatement without special cases.
+
+#heading(level: 4)[Uncertainty]
+
+Unlike binary logic, CLAIR tracks degrees of belief. This matches the uncertainty inherent in real-world reasoning and LLM outputs.
+
 #heading(level: 2)[Conclusion]
 
-This chapter established the structural foundation of CLAIR:
+This chapter established the structural foundation of CLAIR and articulated the tracking paradigm:
+
++ #strong[DAGs, not trees]: Shared premises require graph structure; explicit sharing enables correct invalidation.
++ #strong[Acyclic]: Cycles in evidential support violate well-foundedness; defeat cycles handled via fixed-point semantics.
++ #strong[Labeled edges]: Support, undercut, and rebut serve different epistemic roles.
++ #strong[Compositional reinstatement]: Defeaters being defeated automatically recovers confidence.
++ #strong[Correlated evidence]: Independence assumptions must be explicit; dependency adjustment prevents overcounting.
++ #strong[Tracking paradigm]: CLAIR represents epistemic state as labeled graphs with confidence values, updating via add/derive/undercut/rebut/invalidate operations. Correctness has three levels: syntactic (well-formedness), internal semantic (consistency with propagation rules), and external semantic (calibration to reality).
+
+The justification DAG provides the structural substrate for CLAIR's beliefs.
+The tracking paradigm formalizes what it means to "track not prove"---a fundamental shift from establishing truth to documenting epistemic grounds with explicit confidence.
 
 + #strong[DAGs, not trees]: Shared premises require graph structure; explicit sharing enables correct invalidation.
 + #strong[Acyclic]: Cycles in evidential support violate well-foundedness; defeat cycles handled via fixed-point semantics.
