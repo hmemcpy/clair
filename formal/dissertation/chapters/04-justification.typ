@@ -1,3 +1,5 @@
+#import "../layout.typ": *
+
 // Chapter 4: Justification
 #heading(level: 1)[Justification]
 

@@ -9,9 +9,11 @@
 }{E.T. Jaynes, \textit{Probability Theory: The Logic of Science}}
 
 The confidence system is the algebraic foundation of CLAIR. This chapter defines
-confidence formally, distinguishes it from probability, and develops the three
-monoid structures that govern how confidence values combine. We prove key
-properties in Lean~4, connecting abstract theory to machine-verified implementation.
+confidence formally, distinguishes it from probability, and develops the theory of
+\emph{epistemic linearity}---treating evidence as a resource that cannot be
+counted multiple times. We then establish the three monoid structures that govern
+how confidence values combine, proving key properties in Lean~4 to connect
+abstract theory to machine-verified implementation.
 
 \section{Confidence as Epistemic Commitment}
 \label{sec:conf-definition}
@@ -131,6 +133,411 @@ CLAIR could be extended to full Subjective Logic opinions. The algebraic
 structure developed in this chapter would generalize, with the three monoids
 operating on opinion tuples. We leave this extension to future work.
 \end{remark}
+
+\section{Evidence as Affine Resource}
+\label{sec:affine-evidence}
+
+Confidence values quantify epistemic commitment, but they do not address a deeper
+question: when can the \emph{same evidence} support multiple conclusions? This
+section develops the theory of \emph{epistemic linearity}, which treats evidence
+as a resource that cannot be counted multiple times.
+
+\subsection{The Double-Counting Problem}
+\label{subsec:double-counting}
+
+Consider a witness who testifies to two distinct facts:
+\begin{itemize}
+  \item ``The suspect was at the scene'' (confidence $0.8$)
+  \item ``The suspect was wearing a red jacket'' (confidence $0.8$)
+\end{itemize}
+
+If we aggregate the witness's testimony with itself, na\"ively applying the
+$\oplus$ operation would give:
+\[
+  0.8 \oplus 0.8 = 0.8 + 0.8 - 0.64 = 0.96
+\]
+But this is \emph{double-counting}: the same testimony cannot provide
+independent support. The correct aggregate should remain $0.8$.
+
+\begin{definition}[Epistemic non-duplication]
+\label{def:non-duplication}
+A piece of evidence $e$ satisfies the \emph{non-duplication principle} if:
+\[
+  e \oplus e = e
+\]
+More generally, for any finite number of uses:
+\[
+  \underbrace{e \oplus e \oplus \cdots \oplus e}_{n \text{ times}} = e
+\]
+\end{definition}
+
+This is \emph{idempotence} of evidence aggregation over identical sources.
+Violating this principle creates a \emph{bootstrap vulnerability} where
+repeated references to the same evidence amplify confidence spuriously.
+
+\paragraph{Three manifestations of double-counting:}
+
+1. \textbf{Self-introspection}: When a belief introspects itself, aggregating
+   the result with the original overcounts. \Cref{ch:self-reference} shows
+   how stratification prevents this at the type level.
+
+2. \textbf{Correlated sources}: Two news articles citing the same anonymous
+   source are not independent evidence. \Cref{ch:justification} develops
+   $\delta$-parameterized aggregation to handle this.
+
+3. \textbf{Shared premises}: In a justification DAG, multiple conclusions
+   supported by the same premise should not each ``get full credit'' for it.
+
+\subsection{Linear Logic Background}
+\label{subsec:linear-logic}
+
+Girard's linear logic~\citep{girard1987linear} provides the theoretical
+foundation for resource-sensitive reasoning. The key insight is to reject the
+\emph{contraction rule} of classical logic:
+
+\[
+  \frac{\Gamma, A, A \vdash B}{\Gamma, A \vdash B} \quad \text{(Contraction)}
+\]
+
+Contraction says: ``if we can prove $B$ using $A$ twice, we can prove $B$
+using $A$ once (because we can duplicate $A$).'' Linear logic forbids this:
+if you have one $A$, you can use it \emph{exactly once}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lllll}
+\toprule
+\textbf{Logic} & \textbf{Weakening} & \textbf{Contraction} & \textbf{Exchange} & \textbf{Use} \\
+\midrule
+Classical    & \checkmark & \checkmark & \checkmark & Any number \\
+Affine       & \checkmark & $\times$      & \checkmark & At most once \\
+Relevant     & $\times$    & \checkmark & \checkmark & At least once \\
+Linear       & $\times$    & $\times$      & \checkmark & Exactly once \\
+\bottomrule
+\end{tabular}
+\caption{Substructural logic hierarchy}
+\label{tab:substructural}
+\end{table}
+
+For epistemic evidence, \emph{affine logic} is the appropriate discipline:
+\begin{itemize}
+  \item \textbf{No contraction}: Evidence cannot be used multiple times
+  \item \textbf{Weakening allowed}: Not all evidence need be used
+\end{itemize}
+
+This matches epistemic practice: we can hold evidence without using it
+(weakening), but we shouldn't count the same evidence twice (no contraction).
+
+\subsection{Affine vs.\ Exponential Evidence}
+\label{subsec:affine-vs-exponential}
+
+Not all evidence should be affine. Some evidence genuinely supports multiple
+conclusions:
+
+\begin{example}[Axioms as exponential evidence]
+The axiom $2 + 2 = 4$ can support ``$4 + 4 = 8$'' and ``$4 \times 2 = 8$''
+simultaneously. This evidence should be marked \emph{exponential} (written $!e$)
+to indicate it can be freely reused.
+\end{example}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Affine Evidence} & \textbf{Exponential Evidence} \\
+\midrule
+Testimony from a witness & Mathematical axioms \\
+Specific observation & Established definitions \\
+Particular data point & Domain-general facts \\
+Source-specific attack & Common knowledge \\
+\bottomrule
+\end{tabular}
+\caption{Classification of evidence by reusability}
+\label{tab:evidence-classification}
+\end{table}
+
+Linear logic marks exponential evidence with the \emph{of-course} operator
+$!$. In CLAIR:
+\[
+  \begin{cases}
+    e : \text{Evidence} & \text{can be used at most once (affine)} \\
+    !e : \text{Evidence} & \text{can be used any number of times (exponential)}
+  \end{cases}
+\]
+
+\subsection{Information-Theoretic Grounding}
+\label{subsec:information-theoretic}
+
+The non-duplication principle is not arbitrary---it follows from Shannon's
+information theory~\citep{shannon1948mathematical}.
+
+\begin{definition}[Mutual information]
+\label{def:mutual-information}
+For random variables $A$ and $B$, the mutual information is:
+\[
+  I(A; B) = H(A) + H(B) - H(A, B)
+\]
+where $H$ denotes Shannon entropy.
+\end{definition}
+
+When $A = B$ (perfect correlation):
+\[
+  I(A; A) = H(A) + H(A) - H(A) = H(A)
+\]
+
+\begin{theorem}[Information content of repeated evidence]
+\label{thm:repeated-evidence-information}
+Observing the same evidence twice provides no more information than observing
+it once: $I(A; A, A) = I(A; A) = H(A)$.
+\end{theorem}
+
+\begin{proof}
+By the chain rule of mutual information:
+\[
+  I(A; A, A) = I(A; A) + I(A; A|A) = H(A) + 0 = H(A)
+\]
+The conditional mutual information $I(A; A|A) = 0$ because $A$ provides no
+additional information about itself when already known.
+\end{proof}
+
+Epistemic linearity is the type-theoretic encoding of this informational
+principle: preventing double-counting at the syntactic level preserves the
+correct information accounting at the semantic level.
+
+\subsection{Type System for Affine Evidence}
+\label{subsec:affine-type-system}
+
+To enforce non-duplication statically, CLAIR uses a \emph{dual context} type
+judgment:
+
+\begin{definition}[Affine typing judgment]
+\label{def:affine-judgment}
+\[
+  \Gamma; \Delta \vdash e : A @c \rightsquigarrow U
+\]
+means: in unrestricted context $\Gamma$ and affine context $\Delta$,
+expression $e$ has type $A$ with confidence $c$, using affine evidence $U
+\subseteq \Delta$.
+\end{definition}
+
+The key rule is aggregation with disjointness:
+
+\begin{theorem}[Aggregation disjointness]
+\label{thm:aggregation-disjointness}
+Two beliefs can be aggregated only if their evidence sources are disjoint:
+\[
+  \frac{
+    \Gamma; \Delta \vdash e_1 : \text{Belief}(A) @c_1 \rightsquigarrow U_1 \quad
+    \Gamma; \Delta \vdash e_2 : \text{Belief}(A) @c_2 \rightsquigarrow U_2 \quad
+    U_1 \cap U_2 = \emptyset
+  }{
+    \Gamma; \Delta \vdash \text{aggregate}(e_1, e_2) :
+      \text{Belief}(A) @(c_1 \oplus c_2) \rightsquigarrow U_1 \cup U_2
+  }
+\]
+\end{theorem}
+
+The disjointness constraint $U_1 \cap U_2 = \emptyset$ prevents the same
+evidence from being counted twice. If $e_1$ and $e_2$ share evidence, the
+aggregation is ill-typed.
+
+\begin{example}[Rejected aggregation]
+\begin{lstlisting}[language=CLAIR]
+let testimony : Evidence<SawEvent> = witness_says(...)
+
+let deriv1 = derive EventHappened from testimony  -- Uses testimony
+let deriv2 = derive SuspectPresent from testimony  -- Uses testimony
+
+let combined = aggregate(deriv1, deriv2)  -- TYPE ERROR: testimony used twice
+\end{lstlisting}
+The type system rejects this at compile time.
+\end{example}
+
+\subsection{Connection to Correlation-Aware Aggregation}
+\label{subsec:affine-correlation}
+
+\Cref{sec:aggregation-monoid} introduced $\oplus$ as independent aggregation.
+\Cref{ch:justification} will introduce $\oplus_\delta$ for correlated evidence.
+Affine typing provides the limit case:
+
+\begin{theorem}[Affine as $\delta=1$ enforcement]
+\label{thm:affine-as-delta-one}
+Aggregation under affine typing enforces $\delta = 1$ (perfect correlation)
+for evidence with overlapping usage:
+\[
+  \text{aggregate}(e, e) \text{ ill-typed} \iff \oplus_{\delta=1}(c, c) = c
+\]
+\end{theorem}
+
+Affine types provide \emph{static} prevention (compile-time) while
+correlation-aware aggregation provides \emph{dynamic} handling (runtime).
+Both enforce the same principle at different stages.
+
+\subsection{Linearity and Defeat}
+\label{subsec:linearity-defeat}
+
+How does affine evidence interact with defeat operations
+(\Cref{sec:defeat-operations})?
+
+\begin{theorem}[Consumption irreversibility]
+\label{thm:consumption-irreversibility}
+Once affine evidence $e$ is consumed in a derivation, defeat of that
+derivation does not return $e$ to the affine context.
+\end{theorem}
+
+\begin{proof}
+The typing rules only move evidence from $\Delta$ to usage sets $U$.
+No rule adds evidence back to $\Delta$. Defeat rules transform confidence
+but do not modify contexts. Therefore evidence consumption is monotonic
+and irreversible. \qed
+\end{proof}
+
+This has important implications:
+
+\paragraph{Partial undercut}: If evidence $e$ supports $P$ with confidence $c$,
+and this support is undercut by strength $d = 0.5$, the resulting confidence
+is $c \times 0.5$. The evidence $e$ remains consumed---partial undercut does
+\emph{not} release ``half'' of $e$ for other uses.
+
+\paragraph{Defeat evidence is also affine}: The evidence used for undercut or
+rebut follows the same discipline:
+\[
+  \frac{
+    \Gamma; \Delta_1 \vdash D : \text{Belief}(A) @c_D \rightsquigarrow U_D \quad
+    \Gamma; \Delta_2 \vdash d : \text{Undercuts}(D) @c_d \rightsquigarrow U_d \quad
+    U_D \cap U_d = \emptyset
+  }{
+    \Gamma; \Delta_1 \cup \Delta_2 \vdash \text{undercut}(D, d) :
+      \text{Belief}(A) @(c_D \times (1 - c_d)) \rightsquigarrow U_D \cup U_d
+  }
+\]
+
+\paragraph{Source-level defeaters are exponential}: Evidence that attacks a
+\emph{source's reliability} (rather than a specific inference) should be marked
+exponential, as it affects all derivations from that source:
+
+\begin{example}[Exponential defeater]
+\begin{lstlisting}[language=CLAIR]
+let testimony1 = witness_says("suspect was at scene")
+let testimony2 = witness_says("suspect wore red jacket")
+let drunk : !Evidence<WitnessWasDrunk> = blood_test(...)  -- Exponential
+
+let undercut1 = undercut(testimony1, drunk)  -- OK: drunk not consumed
+let undercut2 = undercut(testimony2, drunk)  -- OK: drunk still available
+\end{lstlisting}
+\end{example}
+
+\subsection{Exponential Promotion}
+\label{subsec:exponential-promotion}
+
+When can evidence be promoted from affine to exponential?
+
+\begin{definition}[Exponential promotion]
+\label{def:promotion}
+If a derivation uses only unrestricted (exponential) evidence, its result
+can be marked exponential:
+\[
+  \frac{
+    \Gamma; \cdot \vdash e : A @c \rightsquigarrow \emptyset
+  }{
+    \Gamma; \Delta \vdash \text{promote}(e) : !A @c \rightsquigarrow \emptyset
+  }
+\]
+\end{definition}
+
+This allows ``evidence that didn't depend on affine resources'' to be freely
+shared. Examples include:
+\begin{itemize}
+  \item Mathematical proofs (only axioms, no empirical data)
+  \item Logical tautologies
+  \item Analytic definitions
+\end{itemize}
+
+\subsection{Decidability of Affine Type Checking}
+\label{subsec:affine-decidability}
+
+A critical question: is type checking with affine evidence decidable?
+
+\begin{theorem}[Decidability of affine type checking]
+\label{thm:affine-decidability}
+Type checking for CLAIR with affine evidence is decidable in polynomial time:
+$O(n^2)$ where $n$ is the size of the expression.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+By structural induction on the expression $e$:
+\begin{enumerate}
+  \item \textbf{Variables}: Lookup in $\Gamma$ or $\Delta$ is $O(n)$.
+  \item \textbf{Application}: Recursively type check subexpressions, then verify
+        $U_1 \cap U_2 = \emptyset$. Finite set intersection is $O(n)$.
+  \item \textbf{Aggregation}: Same as application.
+  \item \textbf{Lambdas}: Extend context and recurse.
+\end{enumerate}
+All operations are structural with finite context and set operations.
+No unbounded search is required. \qed
+\end{proof}
+
+The algorithm uses \emph{bidirectional type checking} with usage tracking:
+\begin{itemize}
+  \item \textbf{Synthesis mode}: Given $\Gamma; \Delta$ and $e$, compute $A$, $c$, and $U$.
+  \item \textbf{Checking mode}: Given $\Gamma; \Delta$, $e$, and claimed $A$, $c$, verify.
+\end{itemize}
+
+Usage sets propagate bottom-up, ensuring disjointness is checked locally at
+each aggregation point.
+
+\begin{remark}[Distinction from CPL decidability]
+This decidability result is for \emph{type checking}, not validity checking in
+Confidence-Bounded Provability Logic (CPL). CPL validity is likely undecidable
+(\Cref{ch:self-reference}), but type checking---verifying that a well-typed
+derivation exists---is decidable because it involves only finite structural
+analysis, not quantification over all models.
+\end{remark}
+
+\subsection{Summary: The Affine Discipline}
+\label{subsec:affine-summary}
+
+The affine evidence system provides:
+
+\begin{enumerate}
+  \item \textbf{Static guarantees}: The type system prevents double-counting at
+        compile time.
+
+  \item \textbf{Information-theoretic grounding}: Non-duplication follows from
+        Shannon's mutual information theory.
+
+  \item \textbf{Flexibility}: The exponential $!$ marker allows genuinely
+        reusable evidence (axioms, definitions).
+
+  \item \textbf{Decidability}: Type checking remains polynomial-time.
+
+  \item \textbf{Integration}: Affine typing complements stratification
+        (\Cref{ch:self-reference}) and correlation-aware aggregation
+        (\Cref{ch:justification}) to form a coherent system.
+\end{enumerate}
+
+Table~\ref{tab:affine-interactions} summarizes how affine evidence interacts
+with other CLAIR mechanisms.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Mechanism} & \textbf{Prevents} \\
+\midrule
+Affine typing & All evidence duplication at type level \\
+Correlation-aware aggregation ($\oplus_\delta$) & Runtime-discovered correlation \\
+Stratification & Paradoxical self-reference \\
+Löb discount ($g(c) = c^2$) & Bootstrapping via self-soundness \\
+\bottomrule
+\end{tabular}
+\caption{Multi-layer protection against epistemic errors}
+\label{tab:affine-interactions}
+\end{table}
+
+% ============================================================================
+% END OF NEW SECTION
+% ============================================================================
 
 \section{The Multiplication Monoid}
 \label{sec:multiplication-monoid}
@@ -755,11 +1162,17 @@ Total: approximately 500 lines of Lean code including proofs.
 \section{Conclusion}
 \label{sec:confidence-conclusion}
 
-This chapter established the algebraic foundation of CLAIR:
+This chapter established the algebraic and type-theoretic foundation of CLAIR:
 
 \begin{enumerate}
   \item \textbf{Confidence is not probability}: It represents epistemic commitment
         without normalization, enabling paraconsistent reasoning.
+
+  \item \textbf{Evidence is an affine resource}: Linear logic provides the
+        theoretical foundation for treating evidence as non-duplicable. The
+        dual-context type system $\Gamma; \Delta \vdash e : A @c \rightsquigarrow U$
+        prevents double-counting at compile time, grounded in Shannon's
+        information theory.
 
   \item \textbf{Three monoids, not a semiring}: Multiplication (derivation),
         minimum (conservative), and oplus (aggregation) serve distinct semantic
@@ -767,13 +1180,16 @@ This chapter established the algebraic foundation of CLAIR:
 
   \item \textbf{Defeat operations}: Undercut and rebut formalize how evidence
         can undermine beliefs, with undercuts composing beautifully via oplus.
+        Affine typing ensures defeat evidence follows the same discipline.
 
   \item \textbf{Machine-verified}: The algebra is formalized in Lean~4, ensuring
-        type safety and algebraic correctness.
+        type safety and algebraic correctness. Affine type checking is decidable
+        in polynomial time.
 \end{enumerate}
 
-The confidence system provides the numeric foundation. The next chapter develops
-the \emph{structural} foundation: how beliefs connect through justification DAGs.
+The confidence system provides the numeric and type-theoretic foundation. The next
+chapter develops the \emph{structural} foundation: how beliefs connect through
+justification DAGs.
 
 %% ============================================================================
 %% BIBLIOGRAPHY NOTES

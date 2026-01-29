@@ -1,3 +1,5 @@
+#import "../layout.typ": *
+
 // Chapter 3: Confidence System
 #heading(level: 1)[Confidence System]
 

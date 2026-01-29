@@ -1,3 +1,5 @@
+#import "../layout.typ": *
+
 // Chapter 10: Implementation
 #heading(level: 1)[Implementation]
 

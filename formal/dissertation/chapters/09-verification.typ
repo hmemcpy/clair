@@ -1,3 +1,5 @@
+#import "../layout.typ": *
+
 // Chapter 9: Formal Verification
 #heading(level: 1)[Formal Verification]
 

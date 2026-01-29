@@ -1,3 +1,5 @@
+#import "../layout.typ": *
+
 // Appendix A: Complete Lean 4 Formalization
 #heading(level: 1)[Complete Lean 4 Formalization]
 

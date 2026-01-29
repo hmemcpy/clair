@@ -1,3 +1,5 @@
+#import "../layout.typ": *
+
 // Chapter 5: Self-Reference
 #heading(level: 1)[Self-Reference]
 

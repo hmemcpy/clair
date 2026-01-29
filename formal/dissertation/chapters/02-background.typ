@@ -1,3 +1,5 @@
+#import "../layout.typ": *
+
 // Chapter 2: Background
 #heading(level: 1)[Background]
 
