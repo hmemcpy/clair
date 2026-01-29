@@ -700,15 +700,21 @@ For $L_5 = {0, 0.25, 0.5, 0.75, 1}$:
   #strong[CPL-finite Decidability.]
 
   CPL-finite is decidable via the finite model property.
-]
 
-#proof[
-  #strong[Proof Sketch.]
+  #emph[Proof Sketch.]
 
   By the theorem of Bou, Esteva, and Godo, many-valued modal
   logics over finite residuated lattices are decidable. CPL-finite evaluates over
   $L_n$, a finite lattice. The frame constraints (transitivity, converse well-foundedness)
   are expressible, and finitely many models of bounded size suffice for completeness.
+
+  #set text(size: 9pt)
+  A complete formal proof would establish: (1) $L_n$ forms a finite residuated
+  lattice under the discretized operations; (2) the frame conditions are expressible
+  in the corresponding modal logic; (3) the finite model property holds; and
+  (4) decidability follows from (3). The proof follows the standard technique
+  for finite-valued modal logics.
+  #set text(size: 10pt)
 ]
 
 #conjecture[
@@ -758,11 +764,16 @@ An alternative approach uses Gödel algebra (min/max) instead of product operati
   + $a plus b = max(a, b)$
 ]
 
-#theorem[
-  #strong[CPL-Gödel Likely Decidable.]
+#conjecture[
+  #strong[CPL-Gödel Decidability.]
 
-  CPL-Gödel is likely decidable because Gödel modal logic has the finite model
+  CPL-Gödel is decidable because Gödel modal logic has the finite model
   property via quasimodels.
+
+  #emph[Confidence: 0.75]
+
+  The conjecture follows from the known decidability of Gödel modal logic,
+  but requires verification that the graded Löb axiom preserves this property.
 ]
 
 However, CPL-Gödel is #emph[semantically inappropriate] for CLAIR:

@@ -277,6 +277,17 @@
   theorem_box(body, title: title, accent: rgb("#8b6914"))
 }
 
+#let claim(body, title: "Claim") = {
+  theorem_box(body, title: title, accent: rgb("#6b8e23"))
+}
+
+#let remark(body, title: "Remark") = [
+  #set text(size: 10pt)
+  #set block(above: 0.5em, below: 0.5em)
+  #h(0.3em, weak: true)
+  _#title._ #body
+]
+
 #let proof(body) = [
   #set text(size: 10pt)
   #set block(above: 0.5em, below: 0.5em)

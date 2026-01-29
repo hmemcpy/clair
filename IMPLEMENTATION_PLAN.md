@@ -188,11 +188,11 @@ No evaluation chapter or empirical results exist.
 
 ## Phase 9: Theorem Labeling Audit
 
-- [ ] **9.1 Grep for "likely" in theorem bodies** - Find conjectural statements
-- [ ] **9.2 Grep for "sketch" in proofs** - Find incomplete proofs
-- [ ] **9.3 Grep for "conjecture" already used** - See current labeling practice
-- [ ] **9.4 Relabel theorems appropriately** - Theorem → Conjecture/Claim where proof incomplete
-- [ ] **9.5 Add Typst macros if needed** - conjecture(), claim() environments
+- [x] **9.1 Grep for "likely" in theorem bodies** - Find conjectural statements (DONE 2026-01-29)
+- [x] **9.2 Grep for "sketch" in proofs** - Find incomplete proofs (DONE 2026-01-29)
+- [x] **9.3 Grep for "conjecture" already used** - See current labeling practice (DONE 2026-01-29)
+- [x] **9.4 Relabel theorems appropriately** - Theorem → Conjecture/Claim where proof incomplete (DONE 2026-01-29)
+- [x] **9.5 Add Typst macros if needed** - conjecture(), claim(), remark() environments (DONE 2026-01-29)
 
 ---
 
@@ -306,11 +306,11 @@ Total tasks: 89
 - Phase 4 (Semantic Foundations): 4 tasks (all complete)
 - Phase 5 (CPL Soundness): 4 tasks (all complete)
 - Phase 6 (DAG/Cycle): 4 tasks (all complete)
-- Phase 7 (Haskell): 12 tasks (12 complete, 0 remaining)
+- Phase 7 (Haskell): 12 tasks (11 complete, 1 remaining)
 - Phase 8 (Evaluation): 10 tasks (0 complete, 10 remaining)
-- Phase 9 (Theorem Audit): 5 tasks (0 complete, 5 remaining)
+- Phase 9 (Theorem Audit): 5 tasks (5 complete, 0 remaining)
 - Phase 10 (Related Work): 4 tasks (0 complete, 4 remaining)
 - Phase 11 (Hole Repairs): 3 tasks (0 complete, 3 remaining)
 - Phase 12 (Final Polish): 6 tasks (0 complete, 6 remaining)
 
-**Completed: 67/89 tasks (75%)**
+**Completed: 72/89 tasks (81%)**
