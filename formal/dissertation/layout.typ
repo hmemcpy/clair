@@ -273,6 +273,10 @@
   theorem_box(body, title: title)
 }
 
+#let conjecture(body, title: "Conjecture") = {
+  theorem_box(body, title: title, accent: rgb("#8b6914"))
+}
+
 #let proof(body) = [
   #set text(size: 10pt)
   #set block(above: 0.5em, below: 0.5em)

@@ -66,12 +66,12 @@ These citations EXIST but are cited with wrong keys in text:
 - [x] **1.21 Add goldman2012reliabilism** - Goldman "Reliabilism" (Stanford Encyclopedia) (DONE 2026-01-29)
 - [x] **1.22 Add klein2005infinitism** - Klein "Infinitism is the Solution to the Regress Problem" (DONE 2026-01-29)
 - [x] **1.23 Add pollock2001defeasible** - Pollock "Defeasible Reasoning and Degrees of Justification" (DONE 2026-01-29)
-- [ ] **1.24 Add xue2024loeb** - Xue et al. "Graded Löb logic" (if exists; may be conjectural - NOT FOUND in literature)
+- [x] **1.24 Remove xue2024loeb citation** - Does not exist in literature; removed from text (DONE 2026-01-29)
 
 ### Verification
 
 - [x] **1.25 Run typst compile with bibliography** - Verify no undefined references remain (DONE - compiles cleanly)
-- [ ] **1.26 Cross-check all 30 originally flagged citations** - Ensure each is resolved (PARTIAL - key mismatches fixed, missing citations remain)
+- [x] **1.26 Cross-check all 30 originally flagged citations** - Ensure each is resolved (DONE 2026-01-29 - all resolved: 10 key mismatches have correct bib entries, 19 citations added, 1 removed as non-existent)
 
 ---
 
