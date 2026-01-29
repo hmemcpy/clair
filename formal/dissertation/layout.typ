@@ -77,7 +77,7 @@
 
     #v(1cm)
     #align(center)[
-      line(length: 20%, stroke: 1.5pt, paint: academic-burgundy)
+      line(length: 20%, stroke: 1.5pt, rest: academic-burgundy)
     ]
 
     #epigraph_block
@@ -121,7 +121,7 @@
   #v(4cm)
 
   #v(0.5cm)
-  line(length: 15%, stroke: 2pt, paint: academic-burgundy)
+  line(length: 15%, stroke: 2pt, rest: academic-burgundy)
   #v(0.5cm)
 
   #set text(

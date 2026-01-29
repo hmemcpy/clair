@@ -66,7 +66,7 @@
     fill: academic-cream,
     inset: (left: 12pt, right: 12pt, top: 8pt, bottom: 8pt),
     radius: 2pt,
-    stroke: (left: 2pt, paint: accent),
+    stroke: (left: 2pt, rest: accent),
     width: 100%,
     [
       #set text(weight: "bold", fill: accent, size: 9pt)
@@ -109,7 +109,7 @@
 
     #v(1cm)
     #align(center)[
-      line(length: 20%, stroke: 1.5pt, paint: academic-burgundy)
+      line(length: 20%, stroke: 1.5pt, rest: academic-burgundy)
     ]
 
     #if epigraph != none {
@@ -166,7 +166,7 @@
   #v(4cm)
 
   #v(0.5cm)
-  line(length: 15%, stroke: 2pt, paint: academic-burgundy)
+  line(length: 15%, stroke: 2pt, rest: academic-burgundy)
   #v(0.5cm)
 
   #set text(
