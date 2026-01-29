@@ -186,7 +186,7 @@ A corollary: no consistent system can prove its own soundness (that $square phi 
 holds for all $phi$). If it could, Löb's axiom would yield proofs of everything.
 
 #strong[Semantics.] GL is sound and complete for Kripke frames that are #emph[transitive] and #emph[converse
-well-founded] (no infinite ascending chains $w_1 R w_2 R w_3 diff$). Intuitively,
+well-founded] (no infinite ascending chains $w_1 R w_2 R w_3 partial$). Intuitively,
 every "higher" world is closer to $omega$-consistency.
 
 #strong[Relevance to CLAIR.] CLAIR's approach to self-reference is directly inspired by GL. A belief system
@@ -195,31 +195,75 @@ believe in its own soundness without qualification. CLAIR's stratification mecha
 and Confidence-Bounded Provability Logic (CPL) formalize
 how to reason about self-referential beliefs while respecting these limits.
 
-#heading(level: 4)[Graded and Fuzzy Modal Logics]
+#heading(level: 4)[Many-Valued and Graded Modal Logics]
 #label("subsec:graded-modal")
 
-Several traditions extend modal logic to graded settings:
+Several traditions extend modal logic to graded and many-valued settings. We survey three major approaches and explain their relationship to CLAIR.
 
-#strong[Graded modalities.] De Rijke and Fine introduce operators
-$square_n$ meaning "at least $n$ accessible worlds satisfy $phi$." This is not
-about truth degrees but about counting accessible worlds.
+#heading(level: 5)[Graded Modalities]
 
-#strong[Fuzzy modal logic.] Godo, Esteva, and colleagues develop modal logics
-over many-valued semantics (Gödel, Łukasiewicz, Product). The accessibility
-relation $R : W × W -> [0,1]$ assigns degrees, and:
+De Rijke and Fine introduce operators $square_n$ meaning "at least $n$ accessible worlds satisfy $phi$." This is not about truth degrees but about counting accessible worlds. Graded modalities are useful for resource-bounded reasoning (e.g., "at least 3 witnesses confirm $phi$") but do not provide a graded notion of truth itself.
+
+#heading(level: 5)[Fuzzy Modal Logics]
+
+Godo, Esteva, Hájek, and colleagues develop modal logics over many-valued semantics. Rather than binary accessibility relations, the accessibility relation becomes graded: $R : W × W -> [0,1]$. The semantics of modal operators then use fuzzy logic operations:
+
+For a frame with graded accessibility, the truth value of $square phi$ at world $w$ is:
 $
-  V_w(square phi) = inf_(w') max(1 - R(w,w'), V_(w')(phi))
+  V_w(square phi) = inf_(w') in W max(1 - R(w,w'), V_(w')(phi))
 $
 
-These logics focus on epistemic operators (knowledge, belief) rather than provability.
+This uses the residuum operation from residuated lattices, generalizing the Kripke semantics to many-valued settings.
 
-#strong[The gap CLAIR fills.] Despite extensive work on fuzzy/graded epistemic logic, there is no prior work combining:
-1. Graded truth values in $[0,1]$
+Two major t-norm based fuzzy logics are studied:
+- #strong[Gödel logic]: Uses min/max operations, corresponding to intuitionistic logic
+- #strong[Product logic]: Uses multiplication and residuum, corresponding to CLAIR's choice of operators
+- #strong[Łukasiewicz logic]: Uses Łukasiewicz t-norm $a ⊗ b = max(0, a + b - 1)$
+
+These logics focus on epistemic operators (knowledge, belief) rather than provability. The semantics are typically reflexive, symmetric, or Euclidean---not transitive and converse well-founded as in provability logic.
+
+#heading(level: 5)[Decidability and Undecidability Results]
+
+Bou, Esteva, Godo, and Rodríguez show that many fuzzy modal logics are #emph[decidable] when the accessibility relation is crisp (binary) but the truth values are many-valued. Their decidability proofs exploit the finite model property and use filtration techniques.
+
+However, Vidal establishes a striking #emph[undecidability] result: fuzzy modal logics with graded accessibility relations become undecidable when the frame condition is transitive. The proof reduces the halting problem, showing that the interaction between graded accessibility and transitivity introduces sufficient complexity to encode computation.
+
+#heading(level: 5)[Connection to CLAIR's CPL]
+
+CLAIR's Confidence-Bounded Provability Logic (CPL) operates at the intersection of these traditions:
+
+1. #strong[Graded truth values]: Like fuzzy modal logic, beliefs have truth/confidence degrees in $[0,1]$.
+
+2. #strong[Provability semantics]: Unlike most fuzzy modal logics, CPL uses transitive, converse well-founded frames (like GL), not reflexive or symmetric frames.
+
+3. #strong[Decidability implications]: Vidal's undecidability result for transitive fuzzy modal logics suggests that CPL may face similar decidability challenges. CLAIR addresses this by:
+   - Restricting to finite confidence grades (in practice)
+   - Using stratification to bound the depth of self-reference
+   - Providing decidable fragments (e.g., CPL-finite without the graded Löb axiom)
+
+4. #strong[Choice of operators]: CLAIR's use of product logic operations ($c_1 ⊗ c_2 = c_1 × c_2$ for multiplication, $c_1 ⊕ c_2 = 1 - (1-c_1)(1-c_2)$ for probabilistic sum) aligns with product fuzzy logic, though CLAIR's confidence has a different interpretation (epistemic commitment rather than truth degree).
+
+#heading(level: 5)[Weighted Argumentation Semantics]
+
+Amgoud, Ben-Naim, Vesic, and colleagues develop weighted and gradual semantics for argumentation frameworks. These assign numerical strengths to arguments and compute acceptability degrees via continuous functions.
+
+Key contributions include:
+- #strong[Hierarchy-based semantics]: Arguments inherit strength from their position in a hierarchy
+- #strong[Parameterised gradual semantics]: Handling varied degrees of compensation between strong and weak arguments
+- #strong[Complete rankings]: Producing total orderings over arguments rather than binary accepted/rejected classifications
+
+The gradual semantics share with CLAIR the intuition that reasoning support should be graded rather than binary. However:
+- Weighted argumentation focuses on acceptability of arguments, not truth of propositions
+- The semantics are typically defined extensionally (via fixed points over the argument graph) rather than intensionally (via graded modal operators)
+- Self-reference and Löb-style constraints are not addressed
+
+#strong[The gap CLAIR fills.] Despite extensive work on fuzzy/graded modal logics and weighted argumentation, no prior system combines:
+1. Graded truth values in $[0,1]$ interpreted as epistemic confidence
 2. Provability-style semantics (transitive, converse well-founded frames)
-3. Löb's axiom or its graded analog
+3. A graded Löb axiom with principled discounting to prevent bootstrapping
+4. DAG-structured justification graphs with defeat semantics
 
-CLAIR's CPL fills this gap, introducing a graded Löb
-axiom with a discount function that prevents confidence bootstrapping.
+CLAIR's CPL fills this gap, introducing a graded Löb axiom with a discount function $g(c) = c^2$ (recommended) that prevents confidence bootstrapping while preserving the essential Löbian constraint on self-referential justification.
 
 #heading(level: 3)[Truth Maintenance and Argumentation]
 #label("sec:tms-arg")
@@ -539,7 +583,7 @@ extends it to:
   columns: 3,
   align: (left, left, left),
   stroke: none,
-  fill: (x, y) => if y == 0 { navy.darken(80%) } else if calc.mod(y, 2) == 0 { navy.darken(95%) } else { white },
+  fill: (x, y) => if y == 0 { navy.darken(80%) } else if calc.rem(y, 2) == 0 { navy.darken(95%) } else { white },
   table.header([*Concept*, *Prior Work*, *CLAIR Extension*]),
   [Uncertainty], [Subjective Logic], [Epistemic confidence (about reasoning)],
   [Provenance], [Database provenance], [Computation provenance + invalidation],
