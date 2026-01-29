@@ -209,7 +209,7 @@ No evaluation chapter or empirical results exist.
 
 - [x] **11.1 Formalize "tracking paradigm"** - State representation, update rules, correctness criteria (DONE 2026-01-29)
 - [x] **11.2 Add dependency bounds discussion** - When ⊕ breaks under correlation, interval alternatives (DONE 2026-01-29)
-- [ ] **11.3 Document explanation extraction** - How CLAIR traces become human-auditable
+- [x] **11.3 Document explanation extraction** - How CLAIR traces become human-auditable (DONE 2026-01-29)
 
 ---
 
@@ -310,8 +310,8 @@ Total tasks: 89
 - Phase 8 (Evaluation): 10 tasks (6 complete, 4 remaining) - 8.7 requires API access for real experiments
 - Phase 9 (Theorem Audit): 5 tasks (5 complete, 0 remaining)
 - Phase 10 (Related Work): 4 tasks (all complete)
-- Phase 11 (Hole Repairs): 3 tasks (1 complete, 2 remaining)
+- Phase 11 (Hole Repairs): 3 tasks (3 complete, 0 remaining)
 - Phase 12 (Final Polish): 6 tasks (4 complete, 2 remaining)
 
-**Completed: 85/89 tasks (96%)**
-**Remaining: 9 tasks**
+**Completed: 86/89 tasks (97%)**
+**Remaining: 8 tasks**

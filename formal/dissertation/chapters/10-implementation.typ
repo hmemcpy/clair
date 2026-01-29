@@ -450,7 +450,186 @@ For a typical reasoning chain with 100 beliefs, memory usage is approximately 50
 4. #emph[Cyclic semantics]: Fixed-point iteration for cyclic justification graphs
 5. #emph[MLLM integration]: Support for multi-modal LLMs (images, audio)
 
-#heading(level: 2)[10.8 Relation to Formalization]
+#heading(level: 2)[10.8 Explanation Extraction]
+
+A key advantage of CLAIR is that every belief carries its justification trace, enabling the extraction of human-auditable explanations from evaluated programs. This section documents how CLAIR traces become explanations.
+
+#heading(level: 3)[10.8.1 Justification Traces in Runtime Values]
+
+When a CLAIR program evaluates, each `BeliefValue` maintains its complete justification history:
+
+```haskell
+data BeliefValue = BeliefValue
+  { bvValue       :: Value      -- The believed proposition
+  , bvConf        :: Confidence -- Confidence level
+  , bvJustify     :: [Value]    -- Supporting arguments (flattened)
+  , bvInvalidated :: Bool       -- Whether this belief is defeated
+  }
+```
+
+The `bvJustify` field preserves the derivation DAG as a list of supporting values. During evaluation:
+- When a belief is formed via `belief(v, c, j, i, p)`, its justifications are evaluated and stored
+- When beliefs are aggregated via `derive(e1, e2)`, the combined justification includes both sources
+- When a belief is defeated, `bvInvalidated` tracks whether it remains active
+
+This design means that examining a final value reveals the entire reasoning chain that produced it.
+
+#heading(level: 3)[10.8.2 Pretty-Printing for Human Auditing]
+
+The `CLAIR.Pretty` module provides several levels of explanation extraction:
+
+```haskell
+-- | Full explanation with justification trace
+prettyBeliefValue :: BeliefValue -> String
+prettyBeliefValue (BeliefValue v c j inv) =
+  "Belief(" ++ prettyValue v ++ ", " ++ prettyConfidence c ++ ")" ++
+  (if null j then "" else " justified by [" ++ unwords (map prettyValue j) ++ "]") ++
+  (if inv then " [defeated]" else "")
+```
+
+Output examples:
+
+```
+Belief("Paris is capital of France", 0.8)
+-> Simple belief with no justification shown
+
+Belief("It will rain", 0.88) justified by [Belief("Cloudy", 0.7) Belief("Humid", 0.6)]
+-> Shows the evidence that combined to produce this confidence
+
+Belief("System is secure", 0.4) justified by [Belief("No CVEs", 0.9)] [defeated]
+-> Indicates this belief was defeated (e.g., by undercut)
+```
+
+#heading(level: 3)[10.8.3 Explanation Levels]
+
+CLAIR supports multiple levels of explanation detail, depending on the auditing need:
+
++---+---+
+| **Level** | **What is shown** | **Use case** |
++---+---+
+| Minimal | Value + confidence only | Quick status checks |
+| Standard | Value + confidence + direct justifications | Typical auditing |
+| Full | Value + confidence + full derivation chain | Deep investigation |
++---+---+
+
+#heading(level: 4)[Minimal Explanation]
+
+Extract just the proposition and confidence:
+
+```haskell
+explainMinimal :: BeliefValue -> String
+explainMinimal bv = prettyValue (bvValue bv) ++ " (confidence: " ++ prettyConfidence (bvConf bv) ++ ")"
+```
+
+Output: `"Paris is capital of France (confidence: 0.8)"`
+
+#heading(level: 4)[Standard Explanation]
+
+Include direct justifications (one level):
+
+```haskell
+explainStandard :: BeliefValue -> String
+explainStandard bv =
+  explainMinimal bv ++
+  (if null (bvJustify bv) then ""
+   else "\n  Justified by: " ++ unwords (map prettyValue (bvJustify bv)))
+```
+
+Output:
+```
+Paris is capital of France (confidence: 0.8)
+  Justified by: [Belief("Geography textbook", 0.95) Belief("Atlas confirmation", 0.9)]
+```
+
+#heading(level: 4)[Full Explanation]
+
+Recursively expand the entire derivation chain:
+
+```haskell
+explainFull :: BeliefValue -> String
+explainFull bv = go 0 bv
+  where
+    go indent (BeliefValue v c j inv) =
+      replicate (indent * 2) ' ' ++ prettyValue v ++ " (c: " ++ prettyConfidence c ++ ")" ++
+      (if inv then " [DEFEATED]" else "") ++
+      (if null j then ""
+       else "\n" ++ unwords (map (go (indent + 1)) (filter isBeliefValue j)))
+```
+
+Output:
+```
+Paris is capital of France (c: 0.8)
+  Geography textbook (c: 0.95)
+    Verified by publisher (c: 0.9)
+  Atlas confirmation (c: 0.9)
+    Cross-referenced with online source (c: 0.85)
+```
+
+#heading(level: 3)[10.8.4 Export Formats for Tool Integration]
+
+For integration with external auditing tools, the implementation supports structured export:
+
+```haskell
+-- | Export belief as JSON for external processing
+beliefToJSON :: BeliefValue -> Value
+beliefToJSON bv = object
+  [ "value" .= bvValue bv
+  , "confidence" .= bvConf bv
+  , "justification" .= bvJustify bv
+  , "invalidated" .= bvInvalidated bv
+  ]
+
+-- | Export justification DAG as GraphViz for visualization
+justificationToDot :: BeliefValue -> String
+justificationToDot bv = "digraph Justification {\n" ++ nodes ++ edges ++ "}"
+  where
+    nodes = ...  -- Generate node declarations
+    edges = ...  -- Generate DAG edges
+```
+
+This enables:
+- #emph[Browser-based visualization] of justification graphs
+- #emph[Database storage] of reasoning traces for later audit
+- #emph[Differencing tools] to compare reasoning across model versions
+- #emph[Highlighting] low-confidence or defeated beliefs in UI
+
+#heading(level: 3)[10.8.5 Example: Auditing an LLM's Reasoning]
+
+Consider an LLM that produces CLAIR output for a math word problem:
+
+```haskell
+-- LLM-generated CLAIR (simplified)
+let premise1 = belief("John has 5 apples", 1.0, [axiomJ("problem-statement")])
+    premise2 = belief("Mary gives John 3 apples", 1.0, [axiomJ("problem-statement")])
+    premise3 = belief("5 + 3 = 8", 0.95, [axiomJ("arithmetic")])
+    conclusion = belief("John has 8 apples", 0.9, [premise1, premise2, premise3])
+```
+
+When audited, the explanation trace reveals:
+
+```
+Belief("John has 8 apples", 0.9)
+  justified by:
+  - Belief("John has 5 apples", 1.0) [axiom: problem-statement]
+  - Belief("Mary gives John 3 apples", 1.0) [axiom: problem-statement]
+  - Belief("5 + 3 = 8", 0.95) [axiom: arithmetic]
+```
+
+If the LLM had made an error (e.g., confidence 0.7 due to computation uncertainty), the auditor would see exactly which step introduced uncertainty.
+
+#heading(level: 3)[10.8.6 Limitations of Current Implementation]
+
+The current explanation extraction has several limitations that future work should address:
+
+1. #emph[No provenance expansion]: While `Provenance` is tracked, it is not yet expanded in explanations (e.g., showing "model: gpt-4" or "human: expert-reviewer")
+2. #emph[No invalidation detail]: Defeated beliefs show `[defeated]` but don't explain #emph[why] (which defeater applied, with what strength)
+3. #emph[No cyclic handling]: Cyclic justification graphs are not supported; cycles would cause infinite recursion in `explainFull`
+4. #emph[No summarization]: Long justification chains are not summarized (e.g., "based on 12 independent sources")
+5. #emph[No natural language generation]: Explanations are in structured form, not natural language prose
+
+Addressing these limitations would make CLAIR explanations more useful for non-technical auditors.
+
+#heading(level: 2)[10.9 Relation to Formalization]
 
 The Haskell implementation is #emph[consistent] with the Lean formalization in Appendix A:
 
@@ -468,7 +647,7 @@ Differences:
 - Lean has 5 `sorry` lemmas (substitution/weakening); Haskell is fully executable
 - Lean enforces stratification via `wellFormed`; Haskell enforces via type checker
 
-#heading(level: 2)[10.9 Summary]
+#heading(level: 2)[10.10 Summary]
 
 This chapter has documented the CLAIR reference implementation in Haskell. The implementation:
 
