@@ -115,8 +115,12 @@ infer ctx expr = case expr of
   EJustify _ -> return (TCResult TJustification ctx)
   EInvalidate _ -> return (TCResult TProvenance ctx)
 
-  -- Lambda must be checked (cannot synthesize type without annotation)
-  ELam{} -> Left (IllTyped "Cannot infer type for lambda without annotation")
+  -- Lambda with parameter type annotation can synthesize its type
+  -- If body type is inferrable, we can synthesize λx:τ₁.e as τ₁ → τ₂
+  ELam x argTy body -> do
+    let ctx' = extend x argTy ctx
+    TCResult bodyTy _ <- infer ctx' body
+    return (TCResult (TFun argTy bodyTy) ctx')
 
 -- | Check that an expression has the given type.
 --

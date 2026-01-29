@@ -252,10 +252,10 @@ parseApp = do
 -- | atom ::= variable | literal | belief | box | "(" expr ")"
 atom :: Parser Expr
 atom = choice
-  [ varExpr
-  , literalExpr
-  , beliefExpr
+  [ beliefExpr
   , boxExpr
+  , literalExpr
+  , varExpr
   , between (char '(') (char ')') expr
   , between (char '[') (char ']') expr
   ]
@@ -274,15 +274,21 @@ beliefExpr :: Parser Expr
 beliefExpr = do
   _ <- reserved "belief"
   _ <- char '('
+  spaces
   e <- expr
   _ <- char ','
+  spaces
   c <- floatLit
   _ <- char ','
+  spaces
   j <- justParser
   _ <- char ','
+  spaces
   i <- invParser
   _ <- char ','
+  spaces
   p <- provParser
+  spaces
   _ <- char ')'
   return (EBelief (Belief e c j i p))
   where
@@ -297,7 +303,9 @@ beliefExpr = do
     justParser = choice
       [ reserved "none" *> return JNone
       , between (char '[') (char ']') (do
-          es <- sepBy expr (char ',')
+          spaces
+          es <- sepBy expr (char ',' *> spaces)
+          spaces
           case es of
             [] -> return JNone
             [e] -> return (JSingle e)
@@ -309,15 +317,20 @@ beliefExpr = do
       , do
           _ <- reserved "undercut"
           _ <- char '('
+          spaces
           d <- floatLit
+          spaces
           _ <- char ')'
           return (IUndercut (Defeat (toDouble d)))
       , do
           _ <- reserved "rebut"
           _ <- char '('
+          spaces
           d <- floatLit
           _ <- char ','
+          spaces
           e <- expr
+          spaces
           _ <- char ')'
           return (IRebut (Defeat (toDouble d)) e)
       ]
@@ -328,7 +341,9 @@ beliefExpr = do
       , do
           _ <- reserved "model"
           _ <- char '('
+          spaces
           s <- stringLit
+          spaces
           _ <- char ')'
           return (PModel (T.pack s))
       ]

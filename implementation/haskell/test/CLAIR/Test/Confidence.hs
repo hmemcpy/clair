@@ -23,8 +23,11 @@ prop_oplus_commutative :: C.Confidence -> C.Confidence -> Bool
 prop_oplus_commutative a b = oplus a b == oplus b a
 
 -- | oplus is associative: (a ⊕ b) ⊕ c = a ⊕ (b ⊕ c)
+-- Uses approximate equality due to floating-point precision
 prop_oplus_associative :: C.Confidence -> C.Confidence -> C.Confidence -> Bool
-prop_oplus_associative a b c = oplus (oplus a b) c == oplus a (oplus b c)
+prop_oplus_associative a b c = approxEq (oplus (oplus a b) c) (oplus a (oplus b c))
+  where
+    approxEq (C.Confidence x) (C.Confidence y) = abs (x - y) < 1e-12
 
 -- | oplus has identity 0: a ⊕ 0 = a
 prop_oplus_identity :: C.Confidence -> Bool
@@ -35,8 +38,11 @@ prop_otimes_commutative :: C.Confidence -> C.Confidence -> Bool
 prop_otimes_commutative a b = otimes a b == otimes b a
 
 -- | otimes is associative: (a ⊗ b) ⊗ c = a ⊗ (b ⊗ c)
+-- Uses approximate equality due to floating-point precision
 prop_otimes_associative :: C.Confidence -> C.Confidence -> C.Confidence -> Bool
-prop_otimes_associative a b c = otimes (otimes a b) c == otimes a (otimes b c)
+prop_otimes_associative a b c = approxEq (otimes (otimes a b) c) (otimes a (otimes b c))
+  where
+    approxEq (C.Confidence x) (C.Confidence y) = abs (x - y) < 1e-12
 
 -- | otimes has identity 1: a ⊗ 1 = a
 prop_otimes_identity :: C.Confidence -> Bool

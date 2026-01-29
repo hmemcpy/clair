@@ -1,0 +1,21 @@
+-- CLAIR Hello World - Simplified
+-- A minimal program demonstrating belief-based computation
+-- using the core CLAIR expression language
+
+-- Main entry point: a simple greeting belief
+-- This demonstrates the belief constructor with confidence tracking
+belief("Hello, world!", 1.0, none, none, none)
+
+-- The belief constructor takes 5 arguments:
+-- 1. The content (string value)
+-- 2. Confidence level (1.0 = certain)
+-- 3. Justification (none = axiom/foundation)
+-- 4. Invalidation (none = no defeaters)
+-- 5. Provenance (none = no source tracking)
+
+-- Alternative: using box notation for self-reference
+-- □0.99 "Hello, world!"
+
+-- Alternative: using belief with justification
+-- let msg = belief("Hello", 0.9, none, none, none)
+-- belief(msg, 0.95, [msg], none, none)

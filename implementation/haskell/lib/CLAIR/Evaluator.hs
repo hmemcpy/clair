@@ -196,20 +196,16 @@ step env expr = case expr of
     case me' of
       Just e' -> return (Just (EBelief (Belief e' c j i p)))
       Nothing -> do
-        -- Fully evaluated: convert to value
-        v <- evalExpr env e
-        let jVals = evalJustification env j
-        let invd = isInvalidated env i
-        return (Just (toValue (VBelief (BeliefValue v c jVals invd))))
+        -- Fully evaluated: this is now a value, no further reduction
+        return Nothing  -- EBelief is a value when its content is fully evaluated
 
   -- E-Box: □_c e → Belief(e, c, [], none, none)
+  -- When e is fully evaluated, EBox becomes a value (no further reduction)
   EBox c e -> do
     me' <- step env e
     case me' of
       Just e' -> return (Just (EBox c e'))
-      Nothing -> do
-        v <- evalExpr env e
-        return (Just (toValue (VBelief (BeliefValue v c [] False))))
+      Nothing -> return Nothing  -- EBox is a value when its content is fully evaluated
 
   -- Already a value - no reduction
   _ | isValue expr -> return Nothing
@@ -255,6 +251,16 @@ evalExpr env = \case
   ELit (LBool b) -> Right (VBool b)
   ELit (LString s) -> Right (VString s)
   ELit LUnit -> Right VUnit
+
+  ELam{} -> Left (ETypeError "Cannot evaluate lambda to value directly (use evaluation)")
+  EBox c e -> do
+    v <- evalExpr env e
+    return (VBelief (BeliefValue v c [] False))
+  EBelief (Belief e c j i p) -> do
+    v <- evalExpr env e
+    let jVals = evalJustification env j
+    let invd = isInvalidated env i
+    return (VBelief (BeliefValue v c jVals invd))
 
   EAnn e _ -> evalExpr env e
 
@@ -346,11 +352,14 @@ subst x v = go
 -- ============================================================================
 
 -- | Check if expression is a value.
+-- VBelief expressions are values when fully evaluated.
 isValue :: Expr -> Bool
 isValue = \case
   ELit{} -> True
   ELam{} -> True
+  EBox{} -> True  -- Box expressions are values (syntactic sugar for Belief)
   EVar{} -> False  -- Variables need to be looked up
+  EBelief{} -> True  -- Belief expressions are values (only created when content is a value)
   _ -> False
 
 -- | Convert Value to Expr.

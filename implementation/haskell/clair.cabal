@@ -73,6 +73,7 @@ test-suite clair-test
     CLAIR.Test.Confidence
     CLAIR.Test.TypeChecker
     CLAIR.Test.Evaluator
+    CLAIR.Test.HelloWorld
 
 executable clair-repl
   import:           shared-properties
