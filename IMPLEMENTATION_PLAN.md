@@ -198,7 +198,7 @@ No evaluation chapter or empirical results exist.
 
 ## Phase 10: Related Work Expansion (Chapter 2)
 
-- [ ] **10.1 Add graded justification logic section** - Artemov extensions with confidence
+- [x] **10.1 Add graded justification logic section** - Milnikel (2014) and Fan & Liau (2015) work on uncertain justifications (DONE 2026-01-29)
 - [ ] **10.2 Add many-valued modal logic section** - Bou, Vidal, Hájek connections
 - [ ] **10.3 Add weighted argumentation section** - Amgoud & Ben-Naim, Bonzon
 - [ ] **10.4 Position CLAIR explicitly** - How it differs from each, why approach chosen
@@ -309,8 +309,8 @@ Total tasks: 89
 - Phase 7 (Haskell): 12 tasks (11 complete, 1 remaining)
 - Phase 8 (Evaluation): 10 tasks (0 complete, 10 remaining)
 - Phase 9 (Theorem Audit): 5 tasks (5 complete, 0 remaining)
-- Phase 10 (Related Work): 4 tasks (0 complete, 4 remaining)
+- Phase 10 (Related Work): 4 tasks (1 complete, 3 remaining)
 - Phase 11 (Hole Repairs): 3 tasks (0 complete, 3 remaining)
 - Phase 12 (Final Polish): 6 tasks (0 complete, 6 remaining)
 
-**Completed: 72/89 tasks (81%)**
+**Completed: 73/89 tasks (82%)**
