@@ -200,8 +200,8 @@ No evaluation chapter or empirical results exist.
 
 - [x] **10.1 Add graded justification logic section** - Milnikel (2014) and Fan & Liau (2015) work on uncertain justifications (DONE 2026-01-29)
 - [x] **10.2 Add many-valued modal logic section** - Bou, Vidal, Hájek connections (DONE 2026-01-29)
-- [ ] **10.3 Add weighted argumentation section** - Amgoud & Ben-Naim, Bonzon
-- [ ] **10.4 Position CLAIR explicitly** - How it differs from each, why approach chosen
+- [x] **10.3 Add weighted argumentation section** - Amgoud & Ben-Naim, Bonzon (DONE 2026-01-29)
+- [x] **10.4 Position CLAIR explicitly** - How it differs from each, why approach chosen (DONE 2026-01-29)
 
 ---
 

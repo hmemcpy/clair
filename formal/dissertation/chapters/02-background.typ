@@ -245,17 +245,60 @@ CLAIR's Confidence-Bounded Provability Logic (CPL) operates at the intersection 
 
 #heading(level: 5)[Weighted Argumentation Semantics]
 
-Amgoud, Ben-Naim, Vesic, and colleagues develop weighted and gradual semantics for argumentation frameworks. These assign numerical strengths to arguments and compute acceptability degrees via continuous functions.
+Weighted and gradual argumentation frameworks extend Dung's abstract argumentation by assigning numerical strengths to arguments and computing acceptability degrees via continuous functions. Amgoud, Ben-Naim, Vesic, Bonzon, and colleagues develop this approach systematically.
 
-Key contributions include:
-- #strong[Hierarchy-based semantics]: Arguments inherit strength from their position in a hierarchy
-- #strong[Parameterised gradual semantics]: Handling varied degrees of compensation between strong and weak arguments
-- #strong[Complete rankings]: Producing total orderings over arguments rather than binary accepted/rejected classifications
+#heading(level: 6)[Bipolar Weighted Argumentation]
+
+Amgoud and Ben-Naim introduce #emph[bipolar] argumentation graphs where:
+- #strong[Support edges] connect arguments that reinforce each other
+- #strong[Attack edges] connect arguments that defeat each other
+- #strong[Weights] $w(a) in [0,1]$ assign intrinsic strength to each argument
+
+The acceptability degree of an argument aggregates support and attack:
+$
+  cal("deg")(a) = w(a) + sum_(b " supports" a) cal("deg")(b) - sum_(c " attacks" a) cal("deg")(c)
+$
+
+#heading(level: 6)[Comparative Analysis]
+
+Bonzon, Lagasquie-Schiex, and others provide a systematic comparison of gradual semantics for argumentation. They identify key properties:
+- #strong[Directionality]: Does increasing a premise's strength increase or decrease the conclusion?
+- #strong[Non-dictatorship]: No single argument should determine all outcomes
+- #strong[Independence of irrelevant alternatives]: Adding a weak argument shouldn't reverse strong preferences
+
+These properties provide a framework for evaluating different aggregation functions, analogous to social choice theory.
+
+#heading(level: 6)[Parameterised Gradual Semantics]
+
+Amgoud, Doder, and Vesic introduce parameterised semantics that handle varied degrees of compensation:
+- #strong[High compensation]: Weak arguments can combine to overcome a strong objection
+- #strong[Low compensation]: Strong objections dominate regardless of how much weak support accumulates
+
+The parameter $alpha in [0,1]$ controls the interpolation between these extremes:
+$
+  cal("deg")(a) = alpha × cal("support") + (1-alpha) × (1 - cal("attack"))
+$
+
+#heading(level: 6)[Relation to CLAIR]
 
 The gradual semantics share with CLAIR the intuition that reasoning support should be graded rather than binary. However:
-- Weighted argumentation focuses on acceptability of arguments, not truth of propositions
-- The semantics are typically defined extensionally (via fixed points over the argument graph) rather than intensionally (via graded modal operators)
-- Self-reference and Löb-style constraints are not addressed
+
+#strong[Conceptual differences.] Weighted argumentation focuses on #emph[argument acceptability]---should this argument be accepted in the debate?---while CLAIR focuses on #emph[belief confidence]---how strongly should we hold this proposition? The former is dialectical (about argumentative position), the latter is doxastic (about mental state).
+
+#strong[Semantic differences.] Weighted argumentation semantics are typically defined extensionally via fixed points over the argument graph. CLAIR's semantics are intensional: each belief carries its confidence intrinsically, and operations (⊕, ⊗, undercut, rebut) combine confidences directly.
+
+#strong[Defeat vs. attack.] Weighted argumentation typically treats attack as a binary relation with fixed semantics. CLAIR distinguishes two defeat types:
+- #strong[Undercut]: Attacks the inference link, modeled multiplicatively as $c' = c × (1 - d)$
+- #strong[Rebut]: Attacks the conclusion, modeled competitively as $c' = c_(cal("for")) / (c_(cal("for")) + c_(cal("against")))$
+
+This distinction, following Pollock, allows CLAIR to represent nuanced defeat scenarios (e.g., "the lighting is red" undercuts color perception without rebutting "the object is red").
+
+#strong[Self-reference.] Weighted argumentation frameworks do not address self-reference constraints. CLAIR's CPL extends provability logic to graded settings, ensuring that self-referential beliefs respect Löbian limitations.
+
+#strong[Parameter interpretation.] In weighted argumentation, parameters like $alpha$ are typically tuned for domain-specific performance. In CLAIR, operations have principled justifications:
+- `+ with circle` as probabilistic sum (assuming independence)
+- `times with circle` as product (confidence in conjunction)
+- $g(c) = c^2$ as the discount preventing bootstrapping in CPL
 
 #strong[The gap CLAIR fills.] Despite extensive work on fuzzy/graded modal logics and weighted argumentation, no prior system combines:
 1. Graded truth values in $[0,1]$ interpreted as epistemic confidence
@@ -617,3 +660,74 @@ limitations.
 
 CLAIR is not a rejection of this prior work but a synthesis that combines their
 insights into a coherent type-theoretic framework.
+
+#heading(level: 3)[Positioning: How CLAIR Differs]
+#label("sec:positioning")
+
+We conclude this chapter by explicitly positioning CLAIR relative to the major related traditions surveyed above, explaining why our design choices diverge from each.
+
+#heading(level: 4)[vs. Probabilistic Approaches]
+
+#emph[Divide]: Probability theory and probabilistic logic model aleatory uncertainty---uncertainty about the state of the world. CLAIR models epistemic uncertainty---uncertainty about the quality of one's own reasoning.
+
+#emph[Why CLAIR differs]. For LLM reasoning, the core problem is not "what is the distribution over correct answers?" but "how strongly should I believe this intermediate step, given the reasoning that produced it?" Probability cannot represent low confidence in both $phi$ and $not phi$ simultaneously (without violating normalization). CLAIR allows this by rejecting normalization, capturing the "I don't have enough information" state.
+
+#emph[What we adopt]. CLAIR adopts the probabilistic sum operation $c_1 ⊕ c_2 = 1 - (1-c_1)(1-c_2)$ for combining independent supports, but we make the independence assumption explicit and track provenance to detect violations.
+
+#heading(level: 4)[vs. Subjective Logic]
+
+#emph[Divide]: Subjective Logic uses three-component opinions $(b, d, u)$ with constraint $b + d + u = 1$. CLAIR uses a single confidence value $c in [0,1]$.
+
+#emph[Why CLAIR differs]. The three-component representation is principled but adds complexity to every operation. For CLAIR's target use case (LLM intermediate reasoning), we prioritize simplicity and composability. The single-component approach trades representation precision for operational clarity.
+
+#emph[What we adopt]. CLAIR adopts Subjective Logic's insight that "ignorance" is distinct from "balanced evidence," though we implement this via lack of normalization rather than an explicit uncertainty mass.
+
+#heading(level: 4)[vs. Weighted Argumentation]
+
+#emph[Divide]: Weighted argumentation frameworks compute argument acceptability degrees via fixed points over attack/support graphs. CLAIR computes belief confidences via local algebraic operations.
+
+#emph[Why CLAIR differs]. Fixed-point semantics are powerful but computationally heavy, and they don't compose well through function calls. CLAIR's local operations (⊕, ⊗, undercut, rebut) enable modular reasoning: the confidence of a complex expression depends only on the confidences of its subexpressions.
+
+#emph[What we adopt]. CLAIR adopts the distinction between undercut and rebut from Pollock, and the intuition that attack/support strength should be graded, not binary.
+
+#heading(level: 4)[vs. Fuzzy Modal Logic]
+
+#emph[Divide]: Fuzzy modal logics interpret $square phi$ as "in all accessible worlds, $phi$ holds to at least degree $theta$." CLAIR's $square_c phi$ means "the system has confidence $c$ in its justification for $phi$."
+
+#emph[Why CLAIR differs]. Fuzzy modal logic's graded accessibility relation $R : W × W -> [0,1]$ is elegant but adds significant complexity to the semantics. For CLAIR's application (LLM reasoning traces), we prioritize having a simple, implementable semantics over maximal generality.
+
+#emph[What we adopt]. CLAIR adopts product logic operations ($⊗$ as multiplication) and shares the insight that many-valued generalization of classical operators is useful for graded reasoning.
+
+#heading(level: 4)[vs. Graded Justification Logic]
+
+#emph[Divide]: Milnikel and Fan & Liau add uncertainty degrees to justification terms. CLAIR adds confidence to the propositions themselves and treats justifications as data structures.
+
+#emph[Why CLAIR differs]. Justification Logic focuses on #emph[explicit proof terms]---t ("this term justifies $phi$"). CLAIR focuses on #emph[explicit justifications as graphs]---a data structure tracking which beliefs supported which, with provenance and invalidation.
+
+#emph[What we adopt]. CLAIR adopts the core idea that justification should be first-class and tracked, and that justification strength can be graded.
+
+#heading(level: 4)[vs. Belief Revision (AGM)]
+
+#emph[Divide]: AGM operates on deductively closed belief sets (sets of sentences). CLAIR operates on justification graphs with annotated beliefs.
+
+#emph[Why CLAIR differs]. AGM's postulates (especially Recovery) fail when beliefs have graded strength and structured justification. Retracting a belief loses the specific evidence that supported it, not just the belief itself. CLAIR's revision algorithm explicitly modifies the justification DAG and recomputes confidences, which correctly handles Recovery failure.
+
+#emph[What we adopt]. CLAIR adopts AGM's core operations (expansion, contraction, revision) but extends them to graded, structured beliefs.
+
+#heading(level: 4)[vs. Type Theory]
+
+#emph[Divide]: Standard type systems track types (e.g., "this variable is an integer"). CLAIR tracks epistemic metadata (confidence, justification, provenance, invalidation).
+
+#emph[Why CLAIR differs]. Information flow types and refinement types track #emph[security properties] (who can access this data) and #emph[constraints on values] (this integer is positive). CLAIR tracks #emph[reasoning properties] (how strongly do we believe this, where did it come from, why do we believe it, when should we reconsider?). This is a new dimension of typing.
+
+#emph[What we adopt]. CLAIR adopts type-theoretic discipline: all metadata is statically checked, composition preserves metadata, and the Curry-Howard correspondence extends to beliefs-with-justifications.
+
+#heading(level: 4)[The Pragmatic Rationale]
+
+These design choices are driven by CLAIR's target use case: making LLM reasoning auditable and trustworthy. For this application, we prioritize:
+1. #strong[Interpretability]: Humans should be able to understand why the system believes what it believes.
+2. #strong[Compositionality]: Complex reasoning should build from simple, composable operations.
+3. #strong[Formal verifiability]: The core system should have machine-checked proofs of key properties.
+4. #strong[Implementability]: A reference implementation should be straightforward to build and reason about.
+
+Different applications might justify different choices. A system for scientific modeling, for example, might benefit from Subjective Logic's three-component opinions. A system for formal verification might benefit from full dependent types. CLAIR's design is optimized for #emph[AI reasoning trace auditing], and our divergence from each related tradition reflects that optimization.
