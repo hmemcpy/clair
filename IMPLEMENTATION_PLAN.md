@@ -215,9 +215,9 @@ No evaluation chapter or empirical results exist.
 
 ## Phase 12: Final Polish & Verification
 
-- [ ] **12.1 Run full Typst compile** - No errors, no undefined references
-- [ ] **12.2 Run Lean build** - Clean build (accept 5 known sorries)
-- [ ] **12.3 Run Haskell tests** - All tests pass
+- [x] **12.1 Run full Typst compile** - No errors, no undefined references (DONE 2026-01-29)
+- [x] **12.2 Run Lean build** - Clean build (accept 5 known sorries) (DONE 2026-01-29)
+- [x] **12.3 Run Haskell tests** - All tests pass (DONE 2026-01-29)
 - [ ] **12.4 Verify defense questions answerable** - Check all 10 from review
 - [x] **12.5 Update conclusion (Chapter 13)** - Reflect completed remediation work (DONE 2026-01-29)
 - [ ] **12.6 Final proofread** - Grammar, consistency, formatting
@@ -309,9 +309,9 @@ Total tasks: 89
 - Phase 7 (Haskell): 11 tasks (all complete) - 7.9 skipped as auth.clair is design documentation
 - Phase 8 (Evaluation): 10 tasks (6 complete, 4 remaining) - 8.7 requires API access for real experiments
 - Phase 9 (Theorem Audit): 5 tasks (5 complete, 0 remaining)
-- Phase 10 (Related Work): 4 tasks (2 complete, 2 remaining)
+- Phase 10 (Related Work): 4 tasks (all complete)
 - Phase 11 (Hole Repairs): 3 tasks (1 complete, 2 remaining)
-- Phase 12 (Final Polish): 6 tasks (0 complete, 6 remaining)
+- Phase 12 (Final Polish): 6 tasks (4 complete, 2 remaining)
 
-**Completed: 82/89 tasks (92%)**
-**Remaining: 13 tasks**
+**Completed: 85/89 tasks (96%)**
+**Remaining: 9 tasks**
