@@ -10,7 +10,7 @@ This appendix documents the CLAIR reference interpreter as formalized in Lean 4.
 The CLAIR interpreter follows a standard pipeline architecture for programming language implementation:
 
 +---+---+---+
-| **Component** | **Purpose** | **Lean Module** |
+| *Component* | *Purpose* | *Lean Module* |
 +---+---+---+
 | Parser | Convert surface syntax to AST | `CLAIR.Parser` |
 | Type Checker | Verify well-typedness and stratification | `CLAIR.Typing.HasType` |
@@ -295,7 +295,7 @@ The Lean formalization proves five key properties that demonstrate CLAIR's corre
 The Lean interpreter is designed as a #emph[reference implementation], not a production system. Key design decisions:
 
 +---+---+
-| **Aspect** | **Decision** | **Rationale** |
+| *Aspect* | *Decision* | *Rationale* |
 +---+---+
 | Fuel | 1000 steps default | Prevents infinite loops while allowing reasonable programs |
 | Evaluation Order | Call-by-value | Matches intuition about belief formation |
@@ -323,7 +323,7 @@ In addition to the Lean formalization, a complete Haskell reference implementati
 The Haskell implementation is organized as a Cabal project with the following structure:
 
 +---+---+
-| **Module** | **Purpose** |
+| *Module* | *Purpose* |
 +---+---+
 | `CLAIR.Syntax` | Abstract syntax trees (AST) for CLAIR expressions |
 | `CLAIR.Confidence` | Confidence algebra: ⊕, ⊗, undercut, rebut |
@@ -478,10 +478,10 @@ step env expr = case expr of
 ```
 
 Key features:
-- **Fuel**: 1,000,000 steps default prevents infinite loops
-- **Call-by-value**: Arguments evaluated before application
-- **Capture-avoiding substitution**: Preserves variable hygiene
-- **Error recovery**: Detailed error messages for debugging
+- *Fuel*: 1,000,000 steps default prevents infinite loops
+- *Call-by-value*: Arguments evaluated before application
+- *Capture-avoiding substitution*: Preserves variable hygiene
+- *Error recovery*: Detailed error messages for debugging
 
 #heading(level: 3)[B.8.6 REPL Usage]
 
@@ -513,7 +513,7 @@ The REPL provides:
 The implementation includes 35 QuickCheck and HUnit tests covering:
 
 +---+---+---+
-| **Module** | **Tests** | **Coverage** |
+| *Module* | *Tests* | *Coverage* |
 +---+---+---+
 | `CLAIR.Test.Confidence` | 12 | Algebraic laws: ⊕ associativity, ⊗ identity, undercut monotonicity |
 | `CLAIR.Test.Evaluator` | 14 | Beta reduction, primitive operations, belief evaluation |

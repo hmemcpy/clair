@@ -10,7 +10,7 @@ This appendix documents the complete Lean 4 formalization of CLAIR. The formaliz
 The CLAIR Lean project uses the standard Lake build system. The project layout is:
 
 +---
-+**Module** | **File** | **Purpose**
++*Module* | *File* | *Purpose*
 Confidence.Basic | `CLAIR/Confidence/Basic.lean` | Confidence type definition and basic properties
 Confidence.Oplus | `CLAIR/Confidence/Oplus.lean` | Probabilistic OR aggregation (⊕)
 Confidence.Undercut | `CLAIR/Confidence/Undercut.lean` | Undercut defeat operation
@@ -66,7 +66,7 @@ The build includes 5,855 targets from Mathlib v4.15.0. The CLAIR-specific module
 The formalization has 5 `sorry` declarations (unproven lemmas):
 
 +---
-+**Lemma** | **Location** | **Reason Deferred**
++*Lemma* | *Location* | *Reason Deferred*
 `shift_zero` | `Syntax/Subst.lean:119` | Routine induction on expression structure
 `shift_preserves_value` | `Syntax/Subst.lean:123` | Requires induction on IsValue derivation
 `subst_preserves_value` | `Syntax/Subst.lean:128` | Requires induction on IsValue derivation
@@ -85,7 +85,7 @@ The following table catalogs all major theorems organized by module. Status: ✓
 #heading(level: 4)[Basic Properties]
 
 +---
-+**Theorem** | **Statement** | **Module** | **Status**
++*Theorem* | *Statement* | *Module* | *Status*
 `nonneg` | ∀ c : Confidence, 0 ≤ c | `Confidence.Basic` | ✓
 `le_one` | ∀ c : Confidence, c ≤ 1 | `Confidence.Basic` | ✓
 `one_minus_nonneg` | ∀ c : Confidence, 0 ≤ 1 - c | `Confidence.Basic` | ✓
@@ -98,7 +98,7 @@ The following table catalogs all major theorems organized by module. Status: ✓
 #heading(level: 4)[Probabilistic OR (⊕)]
 
 +---
-+**Theorem** | **Statement** | **Module** | **Status**
++*Theorem* | *Statement* | *Module* | *Status*
 `oplus_bounded` | ∀ a b, 0 ≤ (a ⊕ b) ≤ 1 | `Confidence.Oplus` | ✓
 `oplus_comm` | ∀ a b, a ⊕ b = b ⊕ a | `Confidence.Oplus` | ✓
 `oplus_assoc` | ∀ a b c, (a ⊕ b) ⊕ c = a ⊕ (b ⊕ c) | `Confidence.Oplus` | ✓
@@ -119,7 +119,7 @@ The following table catalogs all major theorems organized by module. Status: ✓
 #heading(level: 4)[Undercut]
 
 +---
-+**Theorem** | **Statement** | **Module** | **Status**
++*Theorem* | *Statement* | *Module* | *Status*
 `undercut_bounded` | ∀ c d, 0 ≤ undercut(c,d) ≤ 1 | `Confidence.Undercut` | ✓
 `undercut_comm` | ∀ c d, undercut(c,d) = undercut(d,c) | `Confidence.Undercut` | ✓
 `undercut_zero_left` | ∀ c, undercut(0,c) = c | `Confidence.Undercut` | ✓
@@ -134,7 +134,7 @@ The following table catalogs all major theorems organized by module. Status: ✓
 #heading(level: 4)[Rebuttal]
 
 +---
-+**Theorem** | **Statement** | **Module** | **Status**
++*Theorem* | *Statement* | *Module* | *Status*
 `rebut_bounded` | ∀ c₁ c₂, 0 ≤ rebut(c₁,c₂) ≤ 1 | `Confidence.Rebut` | ✓
 `rebut_comm` | ∀ c₁ c₂, rebut(c₁,c₂) = rebut(c₂,c₁) | `Confidence.Rebut` | ✓
 `rebut_zero_both` | rebut(0,0) = 1/2 | `Confidence.Rebut` | ✓
@@ -149,7 +149,7 @@ The following table catalogs all major theorems organized by module. Status: ✓
 #heading(level: 3)[Stratified Belief]
 
 +---
-+**Theorem** | **Statement** | **Module** | **Status**
++*Theorem* | *Statement* | *Module* | *Status*
 `introspect_confidence` | introspect preserves confidence | `Belief.Stratified` | ✓
 `level_zero_cannot_introspect_from` | ¬∃ m, m < 0 | `Belief.Stratified` | ✓
 `no_self_introspection` | ∀ n, ¬(n < n) | `Belief.Stratified` | ✓
@@ -343,27 +343,27 @@ The `stepFn` function implements all reduction rules:
 
 The formalization proves five key properties showing CLAIR functions as an epistemic language:
 
-1. **Beliefs track confidence through computation**
+1. *Beliefs track confidence through computation*
    - The `belief` constructor stores confidence as a `ConfBound`
    - All operations (`derive`, `aggregate`, `undercut`, `rebut`) compute new confidences
    - The `eval` function preserves confidence in final values
 
-2. **Evidence is affine (no double-counting)**
+2. *Evidence is affine (no double-counting)*
    - The `derive` operation uses multiplication: `c₁ × c₂`
    - Multiplication is sub-linear in both arguments
    - No operation allows "splitting" a belief to preserve confidence
 
-3. **Introspection is safe**
+3. *Introspection is safe*
    - `StratifiedBelief.introspect` requires proof of `m < n`
    - Theorems `no_self_introspection` and `no_circular_introspection` are machine-checked
    - The Meta wrapper prevents confusion between levels
 
-4. **Defeat operations modify confidence correctly**
+4. *Defeat operations modify confidence correctly*
    - `undercut` reduces confidence via multiplication
    - `rebut` normalizes competing confidences
    - Boundedness theorems ensure results stay in [0,1]
 
-5. **Type checking is decidable**
+5. *Type checking is decidable*
    - The `HasType` inductive is decidable (all premises are decidable)
    - Confidence operations use `ConfBound` (rational numbers in [0,1])
    - The `HasType.sub` rule allows subtyping with explicit bounds
@@ -376,10 +376,10 @@ These properties are demonstrated through the theorems listed in §A.3. Theorems
 
 The formalization provides machine-checked proofs for:
 
-- **Confidence Algebra** (Chapter 3): All associativity, commutativity, boundedness, monotonicity theorems
-- **Non-Semiring Property** (Chapter 3): Explicit counterexample proving `×` does not distribute over `⊕`
-- **Stratification Safety** (Chapter 6): No self-introspection, no circular introspection
-- **Belief Monad Laws** (Chapter 4): Functor and monad laws for stratified beliefs
+- *Confidence Algebra* (Chapter 3): All associativity, commutativity, boundedness, monotonicity theorems
+- *Non-Semiring Property* (Chapter 3): Explicit counterexample proving `×` does not distribute over `⊕`
+- *Stratification Safety* (Chapter 6): No self-introspection, no circular introspection
+- *Belief Monad Laws* (Chapter 4): Functor and monad laws for stratified beliefs
 
 The 5 `sorry` lemmas are in substitution/weakening—theorems that are standard in PL theory but orthogonal to CLAIR's novel contributions.
 
@@ -403,10 +403,10 @@ The interpreter is not a production system—it lacks parse errors, gradual typi
 
 The formalization could be extended in several directions:
 
-1. **Complete substitution lemmas**: Prove the 5 remaining `sorry` declarations
-2. **Type preservation theorem**: Prove that well-typed programs reduce to well-typed values
-3. **Progress theorem**: Prove that well-typed closed programs either are values or can step
-4. **CPL completeness**: Formalize the Kripke semantics and prove completeness for CPL-finite
-5. **Decision procedures**: Implement a tactic that decides `CPL-0` validity
+1. *Complete substitution lemmas*: Prove the 5 remaining `sorry` declarations
+2. *Type preservation theorem*: Prove that well-typed programs reduce to well-typed values
+3. *Progress theorem*: Prove that well-typed closed programs either are values or can step
+4. *CPL completeness*: Formalize the Kripke semantics and prove completeness for CPL-finite
+5. *Decision procedures*: Implement a tactic that decides `CPL-0` validity
 
 These extensions would bring the formalization closer to the "fully verified" standard expected in programming language research, but they do not affect the core contributions of CLAIR as a theoretical framework for epistemic reasoning.

@@ -10,7 +10,7 @@ This chapter documents the CLAIR reference implementation in Haskell, demonstrat
 The Haskell implementation serves as a #emph[reference interpreter] for CLAIR. It is designed to be:
 
 +---+---+
-| **Property** | **Description** |
+| *Property* | *Description* |
 +---+---+
 | Executable | Full parser, type checker, and evaluator |
 | Type-safe | Haskell's type system prevents many errors |
@@ -146,7 +146,7 @@ The parser produces the same AST used by the type checker and evaluator, ensurin
 The `CLAIR.TypeChecker` module implements #emph[bidirectional type checking]:
 
 +---+---+
-| **Mode** | **Judgment** | **Purpose** |
+| *Mode* | *Judgment* | *Purpose* |
 +---+---+
 | Synthesis | Gamma |- e up-arrow tau | Infer type from expression structure |
 | Checking | Gamma |- e down-arrow tau | Verify expression has expected type |
@@ -359,12 +359,12 @@ Key properties verified:
 Current test coverage (as of commit):
 
 +---+---+
-| **Module** | **Tests** | **Passing** |
+| *Module* | *Tests* | *Passing* |
 +---+---+
 | CLAIR.Confidence | 13 | 12 |
 | CLAIR.TypeChecker | 6 | 5 |
 | CLAIR.Evaluator | 12 | 10 |
-| **Total** | 31 | 27 |
+| *Total* | 31 | 27 |
 +---+---+
 
 Known issues:
@@ -406,7 +406,7 @@ These structured errors enable LLMs to self-correct CLAIR code generation.
 Benchmarks on representative programs (M1 MacBook Pro, GHC 9.4.8):
 
 +---+---+
-| **Operation** | **Time** | **Complexity** |
+| *Operation* | *Time* | *Complexity* |
 +---+---+
 | Parse 100-line program | 2ms | O(n) |
 | Type check 100 expressions | 5ms | O(n times k) |
@@ -505,7 +505,7 @@ Belief("System is secure", 0.4) justified by [Belief("No CVEs", 0.9)] [defeated]
 CLAIR supports multiple levels of explanation detail, depending on the auditing need:
 
 +---+---+
-| **Level** | **What is shown** | **Use case** |
+| *Level* | *What is shown* | *Use case* |
 +---+---+
 | Minimal | Value + confidence only | Quick status checks |
 | Standard | Value + confidence + direct justifications | Typical auditing |
@@ -634,7 +634,7 @@ Addressing these limitations would make CLAIR explanations more useful for non-t
 The Haskell implementation is #emph[consistent] with the Lean formalization in Appendix A:
 
 +---+---+
-| **Component** | **Lean Module** | **Haskell Module** |
+| *Component* | *Lean Module* | *Haskell Module* |
 +---+---+
 | Syntax | CLAIR.Syntax | CLAIR.Syntax |
 | Confidence algebra | CLAIR.Confidence.Min | CLAIR.Confidence |
