@@ -127,8 +127,8 @@ Chapter 3 already has semantic commitments and rejects "0.5 = ignorance". Minor 
 
 - [x] **4.1 Verify calibration definition** - Add explicit definition of "calibrated reliability" (DONE 2026-01-29)
 - [x] **4.2 Add independence assumptions discussion** - When ⊕ is valid, when it breaks (DONE 2026-01-29)
-- [ ] **4.3 Add falsifiability section** - What would falsify CLAIR as better than alternatives?
-- [ ] **4.4 Document rebut normalization limitation** - c_for/(c_for+c_against) collapses absolute strength
+- [x] **4.3 Add falsifiability section** - What would falsify CLAIR as better than alternatives? (DONE 2026-01-29)
+- [x] **4.4 Document rebut normalization limitation** - c_for/(c_for+c_against) collapses absolute strength (DONE 2026-01-29)
 
 ---
 

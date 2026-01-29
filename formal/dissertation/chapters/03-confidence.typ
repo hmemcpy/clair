@@ -440,6 +440,56 @@ The formula treats evidence symmetrically: the resulting confidence is the
   ]
 ]
 
+#heading(level: 3)[Rebut Normalization Limitation]
+
+The rebut operation has an important limitation that must be stated explicitly:
+it #emph[normalizes away absolute strength information].
+
+#definition[
+  #strong[Rebut Normalization Property.]
+  For all #emph[k > 0]:
+  #emph[rebut(k times a, k times b) = rebut(a, b)]
+]
+
+#proof[
+  When #emph[a, b] are not both zero:
+  #emph[rebut(k a, k b) = (k a) / (k a + k b) = k a / (k(a+b)) = a/(a+b) = rebut(a,b)]
+  The #emph[k] cancels from numerator and denominator.
+]
+
+This means rebut only captures the #emph[relative balance] of evidence, not the
+#emph[absolute magnitude]. Consider:
+
+#example[
+  #strong[Normalization Loses Absolute Strength.]
+  Two scenarios with very different absolute evidence strengths:
+
+  + #strong[Scenario A]: #emph[c_for = 0.1, c_against = 0.1]
+    Result: #emph[rebut(0.1, 0.1) = 0.1/(0.1+0.1) = 0.5]
+
+  + #strong[Scenario B]: #emph[c_for = 0.9, c_against = 0.9]
+    Result: #emph[rebut(0.9, 0.9) = 0.9/(0.9+0.9) = 0.5]
+
+  Both scenarios yield confidence 0.5 despite Scenario B having #emph[nine times more]
+  total evidence. The rebut operation cannot distinguish "weak balanced evidence"
+  from "strong balanced evidence."
+]
+
+#block[
+  #emph[Implications for CLAIR.]
+
+  The normalization limitation means rebut is appropriate for #emph[competitive
+  evaluation] (comparing opposing arguments) but insufficient for #emph[absolute
+  assessment]. When absolute strength matters, CLAIR should:
+  + Track total evidence magnitude separately: #emph[total = c_for + c_against]
+  + Use #emph[undercut] instead when the goal is to reduce confidence proportionally
+    to attack strength
+  + Apply confidence thresholds to distinguish "weak 0.5" from "strong 0.5"
+]
+
+This is a deliberate design trade-off: rebut prioritizes interpretability
+("market share" of evidence) over preserving absolute magnitude.
+
 #heading(level: 2)[Independence Assumptions for Aggregation]
 
 The #emph[oplus] operation assumes independence of evidence sources. This is a critical
