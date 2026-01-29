@@ -47,20 +47,14 @@ We showed that reinstatement (when a defeater is itself defeated) emerges compos
 + A working interpreter with fuel-based evaluation
 + Theorem inventory documenting proven versus deferred results
 
-#strong[6. Haskell reference interpreter.] We designed and implemented a complete reference interpreter demonstrating that CLAIR is implementable, not merely theoretical. The implementation features:
+#strong[6. Thinker+Assembler architecture.] We introduced the Thinker+Assembler architecture where CLAIR serves as an intermediate representation between two LLMs: a Thinker that reasons and produces CLAIR traces, and an Assembler that interprets traces and produces executable code. This separates reasoning from implementation while preserving auditability.
 
-+ Parser for CLAIR surface syntax
-+ Bidirectional type checker with confidence grades
-+ Small-step operational semantics
-+ REPL for interactive evaluation
-+ Comprehensive test suite (35 tests passing)
+#strong[7. IR specification.] We provided the complete formal specification of CLAIR as an intermediate representation for reasoning traces:
 
-#strong[7. Language specification.] We provided the complete formal specification of CLAIR as a programming language:
-
-+ BNF grammar for types, expressions, and programs
-+ Sixteen typing rules in bidirectional judgment form
-+ Operational semantics as small-step reduction rules
-+ Well-formedness constraints (DAG requirement, stratification, confidence bounds)
++ Minimal format for beliefs: id, confidence, level, source, justifications, invalidations, content
++ DAG structure requirements (acyclicity, grounding)
++ Stratification rules for safe self-reference
++ Confidence bounds and propagation semantics
 
 #heading(level: 3)[Conceptual Contributions]
 
@@ -68,7 +62,7 @@ We showed that reinstatement (when a defeater is itself defeated) emerges compos
 
 + Enables paraconsistent reasoning (both #emph[P] and #emph[not P] can have low confidence)
 + Provides graceful degradation (confidence decreases smoothly with weakening evidence)
-+ Makes uncertainty explicit in the type system
++ Makes uncertainty explicit in the belief structure
 + Supports auditable reasoning (every belief carries its justification)
 
 #strong[9. Stratified coherentism.] We addressed Agrippa's trilemma by proposing #emph[stratified coherentism]---a coherentist justification structure with pragmatic foundations. Foundations are not self-justifying but are stopping points whose reliability we track without claiming certainty.
@@ -108,7 +102,7 @@ This may be appropriate for dialectical contexts (argument acceptability) but lo
 Full CPL is likely undecidable, following Vidal's undecidability result for transitive fuzzy modal logics with graded accessibility. While we identified decidable fragments (CPL-finite, CPL-0), this limits what can be automatically verified. Practical implementations must either:
 
 + Restrict themselves to decidable fragments
-+ Accept that some well-formed programs may not terminate during verification
++ Accept that some well-formed traces may not terminate during verification
 + Use heuristic or approximate methods for full CPL reasoning
 
 #heading(level: 3)[Evaluation Scope]
@@ -142,11 +136,11 @@ The current stance is that CLAIR does not attempt to represent "ignorance" as a 
 
 + #strong[LLM integration.] Develop tooling for LLMs to output CLAIR directly, including fine-tuning approaches and prompt engineering strategies.
 
-+ #strong[IDE support.] Build language server protocol (LSP) support for CLAIR, including syntax highlighting, type checking, and visualization of justification graphs.
++ #strong[Visualization tools.] Build tools for visualizing CLAIR traces, including DAG rendering, confidence propagation inspection, and justification path highlighting.
 
 + #strong[Explanation extraction.] Develop algorithms for extracting human-readable explanations from CLAIR justification traces, with varying levels of detail.
 
-+ #strong[Compiler optimization.] Investigate optimizations for confidence propagation (e.g., memoization, algebraic simplification) without changing semantics.
++ #strong[Trace optimization.] Investigate optimizations for confidence propagation in CLAIR traces (e.g., memoization, algebraic simplification) without changing semantics.
 
 #heading(level: 3)[Applications]
 
@@ -195,7 +189,7 @@ The fact that this question can even be asked---that we have a framework in whic
 
 We began with four research questions:
 
-1. #emph[Can beliefs be formalized as typed values?] Yes---we demonstrated a coherent type system for beliefs carrying confidence, provenance, justification, and invalidation.
+1. #emph[Can beliefs be formalized as first-class values?] Yes---we demonstrated a coherent structure for beliefs carrying confidence, provenance, justification, and invalidation as an intermediate representation.
 
 2. #emph[What is the structure of justification?] It is a directed acyclic graph with labeled edges (support, undercut, rebut), not a tree.
 
@@ -203,7 +197,7 @@ We began with four research questions:
 
 4. #emph[How should beliefs be revised?] Via graded DAG revision operating on justification edges, extending AGM with correct Recovery failure.
 
-The thesis statement stands: beliefs #emph[can] be formalized as typed values carrying epistemic metadata, with coherent algebraic structure, DAG justification with defeat semantics, and principled self-reference constraints. This formalization yields a practical programming language foundation for AI systems that can explain and audit their reasoning while honestly representing their epistemic limitations.
+The thesis statement stands: beliefs #emph[can] be formalized as first-class values carrying epistemic metadata, with coherent algebraic structure, DAG justification with defeat semantics, and principled self-reference constraints. This formalization yields CLAIR: an intermediate representation for reasoning traces that enables one LLM (the Thinker) to produce auditable reasoning that another LLM (the Assembler) can transform into executable code---preserving the chain of reasoning for human audit while honestly representing epistemic limitations.
 
 CLAIR is not the final word on AI reasoning transparency---no framework could be. But it is, we believe, a coherent step toward AI systems that are not only powerful but #emph[comprehensible].
 

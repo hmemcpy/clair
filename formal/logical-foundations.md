@@ -2,6 +2,25 @@
 
 This document traces CLAIR's connections to foundational work in logic, proof theory, and type theory beyond Church-Turing-Gödel-Gentzen.
 
+> **⚠️ Paradigm Shift Note (2026-01-29)**
+>
+> This document was written when CLAIR was conceived as a programming language.
+> CLAIR is now an **IR for reasoning traces** (see `clair-spec.md`).
+>
+> **Still Applies:**
+> - §1 BHK Interpretation (conceptually—beliefs have constructive evidence)
+> - §5 Epistemic Modal Logic (graded belief operators map directly to CLAIR)
+> - §6 Paraconsistent Logic (CLAIR can track contradictory beliefs)
+> - §7 Relevance Logic (justifications must be relevant)
+>
+> **Overkill / Obsolete:**
+> - §2 Curry-Howard (full machinery not needed—content is opaque NL)
+> - §3 Martin-Löf Judgments (dependent type machinery not needed)
+> - §4 Linear Logic (resource tracking is over-engineered for an IR)
+> - §8 Intuitionistic Type Theory (dependent types not applicable)
+> - §9 Sequent Calculus (formal proof structure not needed)
+> - §10 Category Theory (see archived `categorical-structure.md`)
+
 ## 1. BHK Interpretation (Brouwer-Heyting-Kolmogorov)
 
 ### The Constructive View

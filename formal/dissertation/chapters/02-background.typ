@@ -519,8 +519,7 @@ framework suitable for machine-checkable verification and LLM integration.
 #heading(level: 3)[Type-Theoretic Approaches to Uncertainty]
 #label("sec:type-theory-bg")
 
-Type theory provides the programming language substrate for CLAIR. We survey
-approaches to tracking metadata through computation.
+Type theory informs CLAIR's formal foundations, though CLAIR itself is an intermediate representation rather than a programming language. We survey approaches to tracking metadata through computation that influenced CLAIR's design.
 
 #heading(level: 4)[Information Flow Types]
 #label("subsec:info-flow")
@@ -567,12 +566,11 @@ verification:
 ```
 The proof is a value, checked by the type system.
 
-#strong[Relevance to CLAIR.] CLAIR extends Curry-Howard: programs are not just proofs but #emph[beliefs with
-justifications]. A CLAIR program carries:
-- The value (what is believed)
+#strong[Relevance to CLAIR.] While CLAIR does not directly implement Curry-Howard (CLAIR's content is opaque natural language, not typed terms), the correspondence informs CLAIR's design: justifications are analogous to proof terms, and the DAG structure captures the dependency structure of evidence. A CLAIR belief carries:
+- The content (what is believed---opaque natural language)
 - Confidence (how strongly)
 - Provenance (from where)
-- Justification (why)
+- Justification (backward edges to supporting beliefs)
 - Invalidation conditions (when to reconsider)
 
 #heading(level: 4)[Probabilistic Programming]
@@ -632,7 +630,7 @@ extends it to:
   [Provenance], [Database provenance], [Computation provenance + invalidation],
   [Justification], [Justification Logic], [DAGs with labeled edges, defeat],
   [Belief revision], [TMS, AGM], [Graded, justification-based revision],
-  [Design rationale], [IBIS/QOC], [First-class decisions in language],
+  [Design rationale], [IBIS/QOC], [First-class decisions in IR],
   [Refinements], [Liquid Types], [+ confidence + invalidation],
   [Effects], [Effect systems], [+ intent + semantic meaning],
   [Self-reference], [Provability Logic (GL)], [Graded Löb (CPL)],
@@ -640,7 +638,7 @@ extends it to:
 )
 
 #strong[The gap.] No prior work combines:
-1. Beliefs as first-class typed values with epistemic metadata
+1. Beliefs as first-class values with epistemic metadata
 2. Confidence as non-probabilistic epistemic commitment
 3. Justification as labeled DAGs with defeat semantics
 4. Self-reference constraints derived from provability logic
@@ -720,7 +718,7 @@ We conclude this chapter by explicitly positioning CLAIR relative to the major r
 
 #emph[Why CLAIR differs]. Information flow types and refinement types track #emph[security properties] (who can access this data) and #emph[constraints on values] (this integer is positive). CLAIR tracks #emph[reasoning properties] (how strongly do we believe this, where did it come from, why do we believe it, when should we reconsider?). This is a new dimension of typing.
 
-#emph[What we adopt]. CLAIR adopts type-theoretic discipline: all metadata is statically checked, composition preserves metadata, and the Curry-Howard correspondence extends to beliefs-with-justifications.
+#emph[What we adopt]. CLAIR adopts the insight that justifications are analogous to proof terms: they provide evidence for beliefs, and the DAG structure captures dependency relationships. However, since CLAIR's content is opaque natural language (interpreted by LLMs, not type-checked), the full Curry-Howard machinery does not apply.
 
 #heading(level: 4)[The Pragmatic Rationale]
 

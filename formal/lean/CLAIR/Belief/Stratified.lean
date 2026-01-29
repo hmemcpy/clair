@@ -1,25 +1,30 @@
 /-
-CLAIR Stratified Belief Type - Level-Indexed Beliefs
+CLAIR Stratified Belief Type - Level-Indexed Beliefs with Löb Discount
 
 Stratified beliefs add an introspection level parameter to the basic Belief type.
 This formalizes Tarski's hierarchy: level-n beliefs can only reference level-m
 beliefs where m < n, preventing Liar-like paradoxes.
 
-Design approach (Thread 8.11, Session 49):
-- Phase 3 of belief formalization
-- Extends Phase 1 (basic Belief) with level indexing
-- Implements Layer 1 of Thread 3.19's anti-bootstrapping design
-- Layer 2 (finite confidence caps) deferred to future work
+Key innovation (2026-01-29): Löb discount for meta-beliefs.
+When introspecting (forming beliefs about beliefs), confidence is squared: c → c².
+This prevents confidence bootstrapping through meta-reasoning.
+
+Example: Starting at 0.9 confidence:
+- Level 0: c = 0.9
+- Level 1: c² = 0.81
+- Level 2: c⁴ ≈ 0.65
+- Level 3: c⁸ ≈ 0.43
 
 Key properties:
 - Level 0 is ground level (no introspection possible)
 - Introspection requires proof that m < n
+- Löb discount: introspectWithLoeb applies c → c²
 - Level-preserving operations: map, derive, aggregate, defeat
 - Well-foundedness via Nat.lt
+- Anti-bootstrapping theorem: no_confidence_bootstrap
 
-See: exploration/thread-8.11-stratified-belief-lean.md
-     exploration/thread-3.19-type-anti-bootstrapping.md
-     exploration/thread-3-self-reference.md
+See: notes/exploration-2026-01-29-minimal-spec.md
+     notes/reassessment-2026-01-29.md
 -/
 
 import CLAIR.Confidence.Basic
@@ -110,8 +115,11 @@ Introspection produces a belief about a lower-level belief.
 The proof obligation h : m < n ensures well-foundedness.
 -/
 
-/-- Introspect a lower-level belief from a higher level.
-    This is the key operation enforcing Tarski's hierarchy.
+/-- Introspect a lower-level belief from a higher level (WITHOUT Löb discount).
+    This is the basic operation enforcing Tarski's hierarchy.
+
+    NOTE: For meta-beliefs (beliefs about beliefs), use `introspectWithLoeb`
+    which applies the Löb discount to prevent confidence bootstrapping.
 
     - Source: belief at level m
     - Target: belief about that belief, at level n where n > m
@@ -123,27 +131,135 @@ def introspect (_h : m < n) (b : StratifiedBelief m α) : StratifiedBelief n (Me
   { value := ⟨b.value, none⟩
     confidence := b.confidence }
 
-/-- Introspect with a description -/
+/-- Introspect with a description (WITHOUT Löb discount) -/
 def introspectWithDesc (_h : m < n) (b : StratifiedBelief m α) (desc : String) :
     StratifiedBelief n (Meta α) :=
   { value := ⟨b.value, some desc⟩
     confidence := b.confidence }
 
 /-!
+### Löb Discount
+
+The Löb discount prevents confidence bootstrapping through meta-levels.
+When reasoning about one's own beliefs (introspection), confidence must decrease.
+
+Formula: c → c² (squaring)
+
+This ensures that confidence strictly decreases through meta-levels:
+- Level 0: c = 0.9
+- Level 1 (about L0): c² = 0.81
+- Level 2 (about L1): c⁴ ≈ 0.65
+- Level 3 (about L2): c⁸ ≈ 0.43
+
+No finite chain of meta-reasoning can bootstrap confidence back up.
+-/
+
+/-- Apply the Löb discount: c → c²
+    This is the confidence penalty for meta-level reasoning. -/
+def loebDiscount (c : Confidence) : Confidence :=
+  ⟨(c : ℝ) * (c : ℝ), mul_mem' c c⟩
+
+/-- Löb discount reduces confidence (unless already at 0 or 1) -/
+theorem loebDiscount_le (c : Confidence) : (loebDiscount c : ℝ) ≤ (c : ℝ) :=
+  mul_le_left c c
+
+/-- Löb discount of 1 is 1 -/
+theorem loebDiscount_one : loebDiscount 1 = 1 := by
+  apply Subtype.ext
+  simp only [loebDiscount, Subtype.coe_mk, coe_one, mul_one]
+
+/-- Löb discount of 0 is 0 -/
+theorem loebDiscount_zero : loebDiscount 0 = 0 := by
+  apply Subtype.ext
+  simp only [loebDiscount, Subtype.coe_mk, coe_zero, mul_zero]
+
+/-- Löb discount is strictly decreasing for 0 < c < 1 -/
+theorem loebDiscount_strict_lt (c : Confidence) (h0 : 0 < (c : ℝ)) (h1 : (c : ℝ) < 1) :
+    (loebDiscount c : ℝ) < (c : ℝ) := by
+  simp only [loebDiscount, Subtype.coe_mk]
+  have : (c : ℝ) * (c : ℝ) < (c : ℝ) * 1 := by
+    apply mul_lt_mul_of_pos_left h1 h0
+  linarith
+
+/-- Introspect with Löb discount (RECOMMENDED for meta-beliefs).
+    Applies c → c² to prevent confidence bootstrapping.
+
+    Use this when forming beliefs about beliefs to ensure
+    that meta-reasoning cannot inflate confidence. -/
+def introspectWithLoeb (_h : m < n) (b : StratifiedBelief m α) : StratifiedBelief n (Meta α) :=
+  { value := ⟨b.value, none⟩
+    confidence := loebDiscount b.confidence }
+
+/-- Introspect with Löb discount and description -/
+def introspectWithLoebDesc (_h : m < n) (b : StratifiedBelief m α) (desc : String) :
+    StratifiedBelief n (Meta α) :=
+  { value := ⟨b.value, some desc⟩
+    confidence := loebDiscount b.confidence }
+
+/-!
 ### Introspection Theorems
 -/
 
-/-- Introspection preserves confidence -/
+/-- Basic introspection preserves confidence -/
 theorem introspect_confidence (h : m < n) (b : StratifiedBelief m α) :
     (introspect h b).confidence = b.confidence := rfl
+
+/-- Löb introspection squares confidence -/
+theorem introspectWithLoeb_confidence (h : m < n) (b : StratifiedBelief m α) :
+    (introspectWithLoeb h b).confidence = loebDiscount b.confidence := rfl
+
+/-- Löb introspection reduces confidence -/
+theorem introspectWithLoeb_le (h : m < n) (b : StratifiedBelief m α) :
+    ((introspectWithLoeb h b).confidence : ℝ) ≤ (b.confidence : ℝ) :=
+  loebDiscount_le b.confidence
 
 /-- Level 0 cannot be introspected from (no m < 0 exists) -/
 theorem level_zero_cannot_introspect_from (h : m < 0) : False :=
   Nat.not_lt_zero m h
 
-/-- Convenient constructor for introspecting to the next level -/
+/-- Convenient constructor for introspecting to the next level (without Löb) -/
 def introspectSucc (b : StratifiedBelief n α) : StratifiedBelief (n + 1) (Meta α) :=
   introspect (Nat.lt_succ_self n) b
+
+/-- Convenient constructor for introspecting to the next level WITH Löb discount -/
+def introspectSuccWithLoeb (b : StratifiedBelief n α) : StratifiedBelief (n + 1) (Meta α) :=
+  introspectWithLoeb (Nat.lt_succ_self n) b
+
+/-!
+### Anti-Bootstrapping Theorem
+
+The combination of stratification and Löb discount prevents confidence bootstrapping.
+
+Key insight: An agent cannot increase its confidence in X by reasoning about
+its own reliability, because:
+1. Reasoning about reliability requires going to a higher level
+2. Going to a higher level applies the Löb discount (c → c²)
+3. c² ≤ c for all c ∈ [0,1], with strict inequality for 0 < c < 1
+-/
+
+/-- Chain of k Löb discounts: c^(2^k)
+    After k levels of meta-reasoning, confidence is c^(2^k) -/
+def loebChain (c : Confidence) : Nat → Confidence
+  | 0 => c
+  | k + 1 => loebDiscount (loebChain c k)
+
+/-- Löb chain is monotonically decreasing -/
+theorem loebChain_decreasing (c : Confidence) (k : Nat) :
+    (loebChain c (k + 1) : ℝ) ≤ (loebChain c k : ℝ) := by
+  simp only [loebChain]
+  exact loebDiscount_le (loebChain c k)
+
+/-- Anti-bootstrapping: No finite chain of meta-reasoning can increase confidence.
+    For any starting confidence c and any depth k of meta-reasoning,
+    the final confidence is at most c. -/
+theorem no_confidence_bootstrap (c : Confidence) (k : Nat) :
+    (loebChain c k : ℝ) ≤ (c : ℝ) := by
+  induction k with
+  | zero => simp only [loebChain]; rfl
+  | succ k ih =>
+    calc (loebChain c (k + 1) : ℝ)
+      _ ≤ (loebChain c k : ℝ) := loebChain_decreasing c k
+      _ ≤ (c : ℝ) := ih
 
 /-!
 ## Level-Preserving Operations

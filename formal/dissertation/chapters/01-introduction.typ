@@ -110,13 +110,15 @@ This dissertation addresses four central research questions:
 This dissertation defends the following thesis:
 
 #block[
-  #strong[Thesis.] #emph[Beliefs can be formalized as typed values carrying epistemic
+  #strong[Thesis.] #emph[Beliefs can be formalized as first-class values carrying epistemic
   metadata (confidence, provenance, justification, invalidation), with a coherent
   algebraic structure for confidence propagation, directed acyclic graphs for
   justification including defeasible reasoning, and principled constraints on
-  self-reference derived from provability logic. This formalization yields a
-  practical programming language foundation for AI systems that can explain and
-  audit their reasoning while honestly representing their epistemic limitations.]
+  self-reference derived from provability logic. This formalization yields CLAIR:
+  an intermediate representation for reasoning traces that enables one LLM (the Thinker)
+  to produce auditable reasoning that another LLM (the Assembler) can transform into
+  executable code---preserving the chain of reasoning for human audit while honestly
+  representing epistemic limitations.]
 ]
 
 The key elements of this thesis are:
@@ -134,7 +136,8 @@ The key elements of this thesis are:
   theoretical foundation for safe introspection.
 
 + #strong[Practical foundation]: The formalism admits implementation as
-  a programming language, not just a theoretical construct.
+  an intermediate representation consumed by LLMs, not a programming language
+  for humans.
 
 + #strong[Honest limitations]: Impossibilities are features, not bugs---they
   inform design rather than being hidden.
@@ -205,11 +208,13 @@ This dissertation makes the following novel contributions:
   definitions. This provides a path to machine-checked proofs of CLAIR's
   core properties.
 
-+ #strong[Reference interpreter design.]
++ #strong[Thinker+Assembler architecture.]
 
-  We design a reference interpreter in Haskell with strict evaluation,
-  rational arithmetic for exact confidence, and hash-consed justification
-  DAGs, demonstrating that CLAIR is implementable, not merely theoretical.
+  We introduce the Thinker+Assembler architecture where CLAIR serves as
+  an intermediate representation between two LLMs: a Thinker that reasons
+  and produces CLAIR traces, and an Assembler that interprets traces and
+  produces executable code. This separates reasoning from implementation
+  while preserving auditability.
 
 + #strong[Phenomenological analysis with honest uncertainty.]
 
@@ -269,6 +274,53 @@ This approach enables several capabilities that proof systems lack:
 + #strong[Auditable reasoning]: Every belief carries its justification,
   enabling inspection of #emph[why] something is believed.
 
+#heading(level: 2)[The Thinker+Assembler Architecture]
+#label("sec:architecture")
+
+CLAIR is not a programming language for humans. It is an #emph[intermediate representation]
+for LLM reasoning traces. The key architectural insight is the separation of reasoning
+from implementation:
+
+#figure(
+  ```
+  ┌─────────────────────┐
+  │   User Request      │
+  └──────────┬──────────┘
+             │
+             ▼
+  ┌─────────────────────┐
+  │   Thinker LLM       │  ← Reasons, produces CLAIR
+  │   (e.g., Opus)      │
+  └──────────┬──────────┘
+             │ CLAIR trace (DAG of beliefs)
+             ▼
+  ┌─────────────────────┐
+  │   Assembler LLM     │  ← Interprets CLAIR, produces code
+  │   (e.g., Haiku)     │
+  └──────────┬──────────┘
+             │ Executable code
+             ▼
+  ┌─────────────────────┐
+  │   Runtime           │  ← Executes
+  └─────────────────────┘
+  ```,
+  caption: [The Thinker+Assembler architecture]
+)
+
+#emph[Both LLMs understand CLAIR.] The Thinker produces a DAG of beliefs---capturing
+what it concluded and why. The Assembler reads this trace and produces executable
+code, using natural language understanding to interpret the belief content.
+
+This architecture provides:
+
++ #strong[Separation of concerns]: Thinker optimized for reasoning; Assembler for code gen
++ #strong[Swappable assemblers]: Same CLAIR trace can target Python, JavaScript, LLVM, etc.
++ #strong[Auditability]: The reasoning trace is preserved regardless of target language
++ #strong[Debugging]: When code is wrong, the trace shows where reasoning went astray
+
+Programming languages existed for humans to communicate with compilers. CLAIR exists
+for LLMs to communicate with each other---and for humans to audit that communication.
+
 #heading(level: 2)[Document Roadmap]
 #label("sec:roadmap")
 
@@ -312,8 +364,8 @@ to Arrow's impossibility.
 #strong[Chapter 9, Verification] presents the Lean 4 formalization, demonstrating
 machine-checkable proofs of core properties and a working interpreter.
 
-#strong[Chapter 10, Implementation] presents the reference interpreter design,
-demonstrating that CLAIR is implementable.
+#strong[Chapter 10, Implementation] presents the Thinker+Assembler architecture,
+the minimal CLAIR format, and the Lean formalization status.
 
 #heading(level: 3)[Part V: Reflection]
 

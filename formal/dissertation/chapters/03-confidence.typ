@@ -559,9 +559,9 @@ When independence is violated, CLAIR provides alternatives:
 + #strong[Min-based aggregation]: When sources may be completely dependent,
   use #emph[max(a, b)] instead of #emph[oplus] to avoid overcounting.
 
-+ #strong[Affine type system]: Evidence usage is tracked at type level, preventing
++ #strong[Provenance tracking]: Evidence usage is tracked via provenance, preventing
   the same source from being counted twice in a derivation. This is enforced
-  by CLAIR's linear type system (Chapter 10).
+  by CLAIR's DAG structure and source tracking (Chapter 10).
 
 #block[
   #emph[Independence Detection.]
@@ -569,7 +569,7 @@ When independence is violated, CLAIR provides alternatives:
   In practice, determining whether evidence sources are independent requires
   domain knowledge and provenance tracking. CLAIR does #strong[not] automatically
   detect dependence---it provides the algebraic machinery for #emph[manually]
-  specifying correlation or preventing double-counting through the type system.
+  specifying correlation or preventing double-counting through provenance tracking.
 ]
 
 #heading(level: 3)[Interval-Based Confidence: Dependency Bounds]

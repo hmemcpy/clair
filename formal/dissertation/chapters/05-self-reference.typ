@@ -154,29 +154,20 @@ We apply this to beliefs:
 #example[
   #strong[Stratified Beliefs in CLAIR.]
 
+  In the CLAIR IR format, each belief has an explicit level field:
+
   ```clair
-  -- Level 0: beliefs about the world (no introspection)
-  type Belief_0<A>
+  ; Level 0: beliefs about the world (no introspection)
+  b1 .9 L0 @self "user is authenticated"
 
-  -- Level n: beliefs that may reference level-(n-1) beliefs
-  type Belief<n : Nat, A> where
-    n > 0 implies A may mention Belief<m, B> for any m < n
+  ; Level 1: beliefs about level-0 beliefs
+  b2 .95 L1 @self <b1 "my auth belief b1 has high confidence"
 
-  -- Examples:
-  let auth : Belief<0, Bool> = belief("user authenticated", 0.9, ...)
-
-  let meta_auth : Belief<1, String> = belief(
-    "my auth belief has confidence " ++ show(auth.confidence),
-    0.95,
-    derives_from: [auth]
-  )
-
-  let meta_meta : Belief<2, String> = belief(
-    "my level-1 introspection seems accurate",
-    0.9,
-    derives_from: [meta_auth]
-  )
+  ; Level 2: beliefs about level-1 beliefs
+  b3 .9 L2 @self <b2 "my introspection in b2 seems accurate"
   ```
+
+  The level constraint is: a belief at level $n$ can only justify beliefs at level $≥ n$, and a belief #emph[about] another belief must be at a higher level.
 ]
 
 #theorem[
@@ -211,14 +202,12 @@ Stratification is safe but restrictive. Some legitimate self-referential
 reasoning is blocked:
 
 ```clair
--- Legitimate but blocked: calibration beliefs
-let calibrated = belief(
-  "my confidence estimates match empirical accuracy",
-  0.8,
-  ...
-)
--- This is self-referential (talks about own confidences)
--- but intuitively safe (no paradox)
+; Legitimate but blocked: calibration beliefs
+; This would be self-referential (talks about own confidences)
+; but is intuitively safe (no paradox)
+b1 .8 L? @self "my confidence estimates match empirical accuracy"
+; What level should this be? It references "all my confidences"
+; which spans all levels---cannot be expressed at any finite level
 ```
 
 This motivates a more permissive approach for certain cases.
@@ -294,27 +283,22 @@ consistent confidence assignments---while others do not.
 
 CLAIR provides a controlled mechanism for self-reference:
 
-```clair
--- Self-referential belief constructor
-self_ref_belief :
-  {A : Type} ->
-  (compute : Belief<infinity, A> -> BeliefContent<A>) ->
-  SelfRefResult<A>
+When a CLAIR trace analyzer encounters self-referential beliefs that escape finite stratification, it classifies them:
 
-data SelfRefResult<A> =
-  | WellFormed (Belief<infinity, A>)      -- unique fixed point
-  | IllFormed (reason : SelfRefError)    -- no fixed point
-  | Underdetermined (points : List<Confidence>)  -- multiple fixed points
+```
+Self-Reference Analysis Result:
+  - WellFormed: unique fixed point exists (safe)
+  - IllFormed: no fixed point (Liar-like, Curry-like, or Löbian trap)
+  - Underdetermined: multiple fixed points (policy choice needed)
 
-data SelfRefError =
-  | NoFixedPoint        -- Liar-like
-  | CurryLike           -- proves anything
-  | LobianTrap          -- self-soundness
-  | Timeout             -- computation did not terminate
+Error Types:
+  - NoFixedPoint: Liar-like paradox
+  - CurryLike: proves anything
+  - LobianTrap: self-soundness claim
+  - Timeout: analysis did not terminate
 ```
 
-The #emph[Belief<$infinity$, A>] type indicates beliefs that escape the stratification
-hierarchy---they exist "outside" all finite levels.
+Beliefs that escape finite stratification exist "outside" all levels and require special analysis.
 
 #heading(level: 3)[Classification of Self-Reference]
 
