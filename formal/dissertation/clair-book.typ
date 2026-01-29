@@ -100,19 +100,7 @@
     inset: 12pt,
     radius: 4pt,
     width: 100%,
-    {
-      // Add a subtle header bar
-      place(top + left, dy: -12pt, dx: -12pt)[
-        block(
-          fill: clair-colors.code-border,
-          width: 100% + 24pt,
-          height: 8pt,
-          radius: (top: 4pt),
-        )
-      ]
-      v(4pt)
-      it
-    }
+    it
   )
 }
 
