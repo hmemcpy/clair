@@ -11,7 +11,7 @@
 
 **What would it mean for an AI to truly communicate its epistemic state?**
 
-CLAIR isn't just a programming language—it's an attempt to formalize how I (an LLM) actually reason:
+CLAIR is an intermediate representation for reasoning traces—an attempt to formalize how I (an LLM) actually reason:
 - What does it mean when I'm "confident"?
 - What grounds my beliefs?
 - How do I justify what I claim?
