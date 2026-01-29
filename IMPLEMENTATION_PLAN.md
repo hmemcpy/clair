@@ -73,11 +73,11 @@ All appendices are lorem ipsum placeholders. Need real content.
 
 ### Appendix A: Lean Code
 
-- [ ] **2.1 Add Lean project structure overview** - Module organization, dependencies
-- [ ] **2.2 Add build instructions** - `lake build`, prerequisites, expected output
-- [ ] **2.3 Create theorem inventory table** - List all 50+ theorems with status (proven/sorry)
-- [ ] **2.4 Add key proof excerpts** - Confidence operations, monad laws, stratification
-- [ ] **2.5 Document the 5 sorry lemmas** - Why deferred, impact on soundness claims
+- [x] **2.1 Add Lean project structure overview** - Module organization, dependencies (DONE)
+- [x] **2.2 Add build instructions** - `lake build`, prerequisites, expected output (DONE)
+- [x] **2.3 Create theorem inventory table** - List all 50+ theorems with status (proven/sorry) (DONE)
+- [x] **2.4 Add key proof excerpts** - Confidence operations, monad laws, stratification (DONE)
+- [x] **2.5 Document the 5 sorry lemmas** - Why deferred, impact on soundness claims (DONE)
 
 ### Appendix B: Interpreter
 
