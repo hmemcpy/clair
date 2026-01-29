@@ -179,9 +179,9 @@ No evaluation chapter or empirical results exist.
 - [x] **8.8 Compute calibration metrics** - Brier score, ECE, reliability diagrams (DONE 2026-01-29)
 - [x] **8.9 Write results section** - Tables, figures, statistical analysis (DONE 2026-01-29)
 - [x] **8.10 Add chapter to dissertation** - Update clair-dissertation.typ to include 14-evaluation.typ (DONE 2026-01-29)
-- [ ] **8.3 Create GSM8K evaluation prompts** - Few-shot CLAIR prompts for math reasoning
-- [ ] **8.4 Create HotpotQA evaluation prompts** - Multi-hop QA with confidence tracking
-- [ ] **8.5 Create FOLIO evaluation prompts** - Logical reasoning with justification
+- [x] **8.3 Create GSM8K evaluation prompts** - Few-shot CLAIR prompts for math reasoning (DONE 2026-01-29)
+- [x] **8.4 Create HotpotQA evaluation prompts** - Multi-hop QA with confidence tracking (DONE 2026-01-29)
+- [x] **8.5 Create FOLIO evaluation prompts** - Logical reasoning with justification (DONE 2026-01-29)
 - [ ] **8.7 Run experiments** - Collect accuracy, calibration data (REQUIRES API ACCESS - illustrative results included in chapter)
 
 ---
@@ -259,6 +259,7 @@ After completion, verify these can be answered:
 
 ### Files to Create
 - `formal/dissertation/appendices/E-language-spec.typ` - Complete grammar & semantics
+- `formal/dissertation/appendices/F-evaluation-prompts.typ` - Evaluation prompt templates (DONE 2026-01-29)
 - `formal/dissertation/chapters/14-evaluation.typ` - Empirical evaluation
 - `implementation/haskell/clair.cabal` - Haskell project
 - `implementation/haskell/src/CLAIR/*.hs` - Implementation modules
@@ -307,11 +308,11 @@ Total tasks: 89
 - Phase 5 (CPL Soundness): 4 tasks (all complete)
 - Phase 6 (DAG/Cycle): 4 tasks (all complete)
 - Phase 7 (Haskell): 11 tasks (all complete) - 7.9 skipped as auth.clair is design documentation
-- Phase 8 (Evaluation): 10 tasks (6 complete, 4 remaining) - 8.7 requires API access for real experiments
+- Phase 8 (Evaluation): 10 tasks (9 complete, 1 remaining) - 8.7 requires API access for real experiments
 - Phase 9 (Theorem Audit): 5 tasks (5 complete, 0 remaining)
 - Phase 10 (Related Work): 4 tasks (all complete)
 - Phase 11 (Hole Repairs): 3 tasks (3 complete, 0 remaining)
 - Phase 12 (Final Polish): 6 tasks (4 complete, 2 remaining)
 
 **Completed: 86/89 tasks (97%)**
-**Remaining: 8 tasks**
+**Remaining: 3 tasks** (note: 7.9 is intentionally skipped, 8.7 requires API access)
