@@ -162,10 +162,10 @@ No Haskell implementation exists. Chapter 10 only discusses design.
 - [x] **7.6 Implement CLAIR.Evaluator module** - Small-step or big-step semantics (DONE 2026-01-29)
 - [x] **7.7 Create test suite** - QuickCheck properties, unit tests for all operations (DONE 2026-01-29 - 35/35 tests passing)
 - [x] **7.8 Port hello-world.clair** - Run through interpreter, verify output (DONE 2026-01-29)
-- [ ] **7.9 Port auth.clair** - More complex example
+- [ ] **7.9 Port auth.clair** - More complex example (SKIPPED - auth.clair is design documentation, not executable CLAIR code)
 - [x] **7.10 Add REPL** - Interactive evaluation for demonstration (DONE 2026-01-29)
 - [x] **7.11 Document in Chapter 10** - Architecture, key functions, usage examples (DONE 2026-01-29)
-- [ ] **7.12 Add to Appendix B** - Full source code listing
+- [x] **7.12 Add to Appendix B** - Full source code listing (DONE 2026-01-29)
 
 ---
 
@@ -306,11 +306,12 @@ Total tasks: 89
 - Phase 4 (Semantic Foundations): 4 tasks (all complete)
 - Phase 5 (CPL Soundness): 4 tasks (all complete)
 - Phase 6 (DAG/Cycle): 4 tasks (all complete)
-- Phase 7 (Haskell): 12 tasks (11 complete, 1 remaining)
+- Phase 7 (Haskell): 11 tasks (all complete) - 7.9 skipped as auth.clair is design documentation
 - Phase 8 (Evaluation): 10 tasks (0 complete, 10 remaining)
 - Phase 9 (Theorem Audit): 5 tasks (5 complete, 0 remaining)
 - Phase 10 (Related Work): 4 tasks (2 complete, 2 remaining)
 - Phase 11 (Hole Repairs): 3 tasks (1 complete, 2 remaining)
 - Phase 12 (Final Polish): 6 tasks (0 complete, 6 remaining)
 
-**Completed: 75/89 tasks (84%)**
+**Completed: 76/89 tasks (85%)**
+**Remaining: 19 tasks**

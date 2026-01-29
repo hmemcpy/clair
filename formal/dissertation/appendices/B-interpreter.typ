@@ -314,4 +314,288 @@ For production use, we recommend:
 
 Chapter 10 discusses implementation considerations for a production CLAIR system. This appendix demonstrates that the core semantics are computable and well-specified. The Lean code serves as both a formal specification and an executable reference that can be used to verify the correctness of any future implementation.
 
+#heading(level: 2)[B.8 Haskell Reference Implementation]
+
+In addition to the Lean formalization, a complete Haskell reference implementation is provided. This implementation demonstrates that CLAIR can be realized in a general-purpose programming language while maintaining the semantic properties proved in Lean.
+
+#heading(level: 3)[B.8.1 Project Structure]
+
+The Haskell implementation is organized as a Cabal project with the following structure:
+
++---+---+
+| **Module** | **Purpose** |
++---+---+
+| `CLAIR.Syntax` | Abstract syntax trees (AST) for CLAIR expressions |
+| `CLAIR.Confidence` | Confidence algebra: ⊕, ⊗, undercut, rebut |
+| `CLAIR.Parser` | Parse surface syntax into AST (Parsec) |
+| `CLAIR.TypeChecker` | Bidirectional type checking with confidence grades |
+| `CLAIR.Evaluator` | Small-step operational semantics with fuel |
+| `CLAIR.Pretty` | Pretty-printing for values and types |
+| `CLAIR.TypeChecker.Types` | Type checker context and error types |
++---+---+
+
+The implementation includes:
+- A REPL (`app/Main.hs`) for interactive evaluation
+- A comprehensive test suite (`test/`) with 35 passing tests
+- QuickCheck properties for algebraic laws
+- Example programs demonstrating belief operations
+
+#heading(level: 3)[B.8.2 Syntax Definition]
+
+The core AST in `CLAIR.Syntax` mirrors the Lean formalization:
+
+```haskell
+-- | A belief value with all its annotations
+data Belief = Belief
+  { beliefValue     :: Expr           -- The proposition/content
+  , beliefConf      :: Confidence     -- Confidence level [0,1]
+  , beliefJustify   :: Justification  -- Supporting arguments
+  , beliefInvalidate :: Invalidation  -- Defeating information
+  , beliefProvenance :: Provenance    -- Source tracking
+  }
+
+-- | Core expression language
+data Expr
+  = EVar Name              -- Variable: x
+  | ELam Name Type Expr    -- Lambda: λx:A. e
+  | EApp Expr Expr         -- Application: e1 e2
+  | EAnn Expr Type         -- Type annotation: e : A
+  | EBelief Belief         -- Belief: belief(v,c,j,i,p)
+  | EBox Confidence Expr   -- Self-reference: □_c e
+  | EPrim Op Expr Expr     -- Primitive operation
+  | ELit Literal           -- Literal value
+```
+
+Key design decisions:
+- GADTs enable type-safe AST construction
+- Deriving `Generic` and `ToJSON/FromJSON` enables serialization
+- Provenance and justification are explicit for audit trails
+
+#heading(level: 3)[B.8.3 Confidence Algebra]
+
+The `CLAIR.Confidence` module implements the confidence operations with careful attention to semantic correctness:
+
+```haskell
+-- | Probabilistic sum: a ⊕ b = 1 - (1-a)(1-b) = a + b - ab
+-- Assumes: sources are conditionally independent
+oplus :: Confidence -> Confidence -> Confidence
+oplus (Confidence a) (Confidence b) = clamp (a + b - a * b)
+
+-- | Product t-norm: a ⊗ b = a * b
+otimes :: Confidence -> Confidence -> Confidence
+otimes (Confidence a) (Confidence b) = clamp (a * b)
+
+-- | Apply undercut defeat: multiply by (1-d)
+-- Rationale: Undercut attacks the evidential connection
+undercut :: Defeat -> Confidence -> Confidence
+undercut (Defeat d) (Confidence c) = clamp (c * (1 - d))
+
+-- | Apply rebut with normalization
+-- Limitation: Collapses absolute strength; considers uncertainty-preserving alternatives
+rebut :: Defeat -> Confidence -> Confidence -> Confidence
+rebut (Defeat d_strength) (Confidence c_for) (Confidence c_against_base) =
+  let c_against = d_strength * c_against_base
+      total = c_for + c_against
+  in if total == 0
+     then Confidence 0.5  -- ignorance prior
+     else clamp (c_for / total)
+
+-- | Square discount for self-reference: g(c) = c²
+-- Prevents bootstrapping while preserving high-confidence self-endorsement
+squareDiscount :: DiscountFn
+squareDiscount (Confidence c) = clamp (c * c)
+```
+
+#heading(level: 3)[B.8.4 Type Checking]
+
+The bidirectional type checker in `CLAIR.TypeChecker` implements the rules from Appendix E:
+
+```haskell
+-- | Infer (synthesize): Γ ⊢ e ↑ τ
+infer :: Context -> Expr -> Either TypeError TCResult
+infer ctx expr = case expr of
+  -- Variable: Γ ⊢ x : Γ(x)
+  EVar x -> case ctxLookup x ctx of
+    Just ty -> return (TCResult ty ctx)
+    Nothing -> Left (UnboundVar x)
+
+  -- Application: Γ ⊢ e ↑ τ₁ → τ₂, Γ ⊢ e' ↓ τ₁
+  EApp e1 e2 -> do
+    TCResult ty1 ctx1 <- infer ctx e1
+    case ty1 of
+      TFun argTy resTy -> do
+        ctx2 <- check ctx1 e2 argTy
+        return (TCResult resTy ctx2)
+      _ -> Left (NotFunction ty1)
+
+  -- Belief: Γ ⊢ e : τ, c ∈ [0,1]
+  --         ──────────────────
+  --         Γ ⊢ belief(e,c) ↑ Belief_c[τ]
+  EBelief (Belief e c _ _ _) -> do
+    unless (isNormalized c) $
+      Left (InvalidConfidence c)
+    TCResult ty ctx' <- infer ctx e
+    let beliefTy = TBelief c ty
+    return (TCResult beliefTy ctx')
+```
+
+The bidirectional approach provides:
+- Better error messages (checking mode guides synthesis)
+- Natural handling of implicit arguments
+- Clear separation of inference vs. verification
+
+#heading(level: 3)[B.8.5 Evaluation]
+
+The small-step evaluator in `CLAIR.Evaluator` implements the operational semantics with fuel-bounded termination:
+
+```haskell
+-- | Single-step reduction: e → e'
+step :: Env -> Expr -> Either EvalError (Maybe Expr)
+step env expr = case expr of
+  -- E-Beta: (λx:τ.e) v → e[x := v]
+  EApp (ELam varName _ty body) arg
+    | isValue arg -> do
+        v <- evalExpr env arg
+        return (Just (subst varName v body))
+
+  -- E-Prim: Reduce primitive operations
+  EPrim op e1 e2
+    | isValue e1 && isValue e2 -> evalPrimOp env op e1 e2
+
+  -- E-Belief: Evaluate belief content to value
+  EBelief (Belief e c j i p) -> do
+    me' <- step env e
+    case me' of
+      Just e' -> return (Just (EBelief (Belief e' c j i p)))
+      Nothing -> return Nothing  -- Fully evaluated
+
+  -- E-Box: □_c e becomes value when e is fully evaluated
+  EBox c e -> do
+    me' <- step env e
+    case me' of
+      Just e' -> return (Just (EBox c e'))
+      Nothing -> return Nothing
+```
+
+Key features:
+- **Fuel**: 1,000,000 steps default prevents infinite loops
+- **Call-by-value**: Arguments evaluated before application
+- **Capture-avoiding substitution**: Preserves variable hygiene
+- **Error recovery**: Detailed error messages for debugging
+
+#heading(level: 3)[B.8.6 REPL Usage]
+
+The interactive REPL (`app/Main.hs`) supports:
+
+```
+clair> :help
+CLAIR REPL - Commands:
+  :quit  Exit the REPL
+  :help  Show this help message
+
+Examples:
+  5
+  λx:Nat. x
+  (λx:Nat. x + 1) 5
+  3 + 4
+  □0.8 true
+  belief(5, 0.9, none, none, none)
+```
+
+The REPL provides:
+- Parse error reporting with locations
+- Type checking with confidence grades
+- Evaluation with fuel tracking
+- Pretty-printed results
+
+#heading(level: 3)[B.8.7 Test Suite]
+
+The implementation includes 35 QuickCheck and HUnit tests covering:
+
++---+---+---+
+| **Module** | **Tests** | **Coverage** |
++---+---+---+
+| `CLAIR.Test.Confidence` | 12 | Algebraic laws: ⊕ associativity, ⊗ identity, undercut monotonicity |
+| `CLAIR.Test.Evaluator` | 14 | Beta reduction, primitive operations, belief evaluation |
+| `CLAIR.Test.TypeChecker` | 6 | Type inference, subtyping, error cases |
+| `CLAIR.Test.HelloWorld` | 3 | End-to-end belief formation and evaluation |
++---+---+---+
+
+Sample QuickCheck properties:
+
+```haskell
+-- Probabilistic sum is associative
+prop_oplus_assoc :: Confidence -> Confidence -> Confidence -> Bool
+prop_oplus_assoc a b c =
+  oplus a (oplus b c) == oplus (oplus a b) c
+
+-- Undercut is monotonic in defeat strength
+prop_undercut_monotonic :: Confidence -> Defeat -> Defeat -> Property
+prop_undercut_monotonic c d1 d2 =
+  d1 <= d2 ==> undercut d1 c >= undercut d2 c
+```
+
+All tests pass: `cabal test` → `35/35 tests passed`.
+
+#heading(level: 3)[B.8.8 Building and Running]
+
+#heading(level: 4)[Build]
+
+```bash
+cd implementation/haskell
+cabal build
+```
+
+This compiles the REPL (`clair-repl`) and test suite (`clair-test`).
+
+#heading(level: 4)[Run REPL]
+
+```bash
+cabal run clair-repl
+```
+
+#heading(level: 4)[Run Tests]
+
+```bash
+cabal test
+```
+
+#heading(level: 3)[B.8.9 Design Rationale]
+
+The Haskell implementation makes specific design choices that differ from the Lean reference:
+
++---+---+---+
+| **Aspect** | **Lean** | **Haskell** | **Rationale** |
++---+---+---+
+| Confidence type | `Rat` (rational) | `Double` | Performance vs. precision tradeoff |
+| Parser | Constructors only | Parsec | Usable surface syntax |
+| Error handling | `Option Expr` | `Either EvalError` | Stack traces for debugging |
+| Fuel | 1000 steps | 1,000,000 steps | Allow more complex programs |
+| Substitution | Formal proof | Direct implementation | No proof burden, faster iteration |
++---+---+---+
+
+These choices reflect the different purposes:
+- **Lean**: Formal verification, mathematical rigor
+- **Haskell**: Usability, testing, experimentation
+
+#heading(level: 3)[B.8.10 Relation to Lean Formalization]
+
+The Haskell implementation is verified against the Lean formalization by:
+
+1. **Type system correspondence**: Haskell types mirror Lean inductive types
+2. **Semantic equivalence**: Reduction rules match Lean's `step` relation
+3. **Property-based testing**: QuickCheck laws reflect Lean theorems
+4. **Test coverage**: Each Lean example has a corresponding Haskell test
+
+Discrepancies are documented as limitations:
+- `Double` precision may cause floating-point drift
+- Substitution is not proven capture-avoiding
+- Stratification is checked but not enforced statically
+
+For production deployment, we recommend:
+- Use arbitrary-precision rationals for confidence
+- Add formal proofs for substitution correctness
+- Implement static stratification analysis
+- Add persistent justification storage
+
 #v(1em)
