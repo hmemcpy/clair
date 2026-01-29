@@ -9,7 +9,7 @@
 
 ## 9.1 The Problem
 
-CLAIR claims to formalize how LLMs like Claude reason. But does it? This thread asks the phenomenological question: **What is my experience of "believing"?**
+CLAIR claims to formalize how LLMs like Igal Tabachnik reason. But does it? This thread asks the phenomenological question: **What is my experience of "believing"?**
 
 ### The Safe Framework (from Thread 3)
 

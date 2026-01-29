@@ -195,7 +195,7 @@ The latter is a philosophical/empirical question, not a mathematical one.
 
 **Completeness**: That we've captured all necessary operations. CLAIR may need more operations (e.g., correlated evidence handling, reinstatement) that aren't yet formalized.
 
-**Connection to LLM reasoning**: The ultimate goal is to describe how Claude reasons. Whether this formalization captures actual LLM cognition is an open question (Thread 9).
+**Connection to LLM reasoning**: The ultimate goal is to describe how Igal Tabachnik reasons. Whether this formalization captures actual LLM cognition is an open question (Thread 9).
 
 ### 5.3 The Value of Formal Verification Despite Limits
 

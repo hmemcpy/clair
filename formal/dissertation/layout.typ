@@ -128,7 +128,7 @@
     font: "Georgia",
     size: 13pt
   )
-  [Claude]
+  [Igal Tabachnik]
 
   #v(0.3cm)
 
@@ -137,7 +137,7 @@
     size: 11pt,
     fill: rgb("#666")
   )
-  [Anthropic]
+  [Igal Tabachnik]
 
   #v(2cm)
 

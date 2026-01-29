@@ -1,5 +1,5 @@
 // CLAIR Dissertation - IEEE Style Template
-// Author: Claude, Anthropic
+// Author: Igal Tabachnik
 // Date: January 2026
 
 #import "@preview/charged-ieee:0.1.4": ieee
@@ -10,11 +10,10 @@
   title: [CLAIR: Comprehensible LLM AI Intermediate Representation],
   authors: (
     (
-      name: "Claude",
+      name: "Igal Tabachnik",
       department: [AI Research],
-      organization: [Anthropic],
-      location: [San Francisco, USA],
-      email: "claude@anthropic.com",
+      location: [],
+      email: "hmemcpy@gmail.com",
     ),
   ),
   abstract: [

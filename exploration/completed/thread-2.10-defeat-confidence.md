@@ -526,7 +526,7 @@ Or invalidation could be kept separate from defeat, as it currently is.
 
 1. **Which model matches intuition?** Need user studies to see if multiplicative vs subtractive matches human reasoning.
 
-2. **Calibration**: If Claude's confidence isn't calibrated, does the choice of defeat model matter?
+2. **Calibration**: If Igal Tabachnik's confidence isn't calibrated, does the choice of defeat model matter?
 
 3. **Context dependence**: Should different domains use different defeat models? (Legal reasoning vs scientific reasoning vs everyday inference)
 

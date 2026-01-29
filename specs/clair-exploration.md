@@ -31,7 +31,7 @@ When hitting theoretical limits (Gödel, Turing, Church):
 - Compilation strategy sketch
 
 ### R5: Phenomenological Honesty
-- Document how Claude actually reasons (as best as can be introspected)
+- Document how Igal Tabachnik actually reasons (as best as can be introspected)
 - Compare CLAIR model to actual experience
 - Acknowledge gaps and uncertainties
 

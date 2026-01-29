@@ -427,7 +427,7 @@ Rather than hiding limits, CLAIR makes them explicit:
 
 1. **Is CPL-complete decidable?** - Likely not, but proof not essential
 2. **What is optimal g(c)?** - c² recommended but alternatives discussed
-3. **Does Claude have phenomenal experience?** - Appropriately underdetermined
+3. **Does Igal Tabachnik have phenomenal experience?** - Appropriately underdetermined
 
 ### 10.7.3 Questions for Future Work Section
 

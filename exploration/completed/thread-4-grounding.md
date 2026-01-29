@@ -18,7 +18,7 @@ Every belief system faces Agrippa's trilemma (also called the Munchhausen trilem
 
 The trilemma is ancient (attributed to Agrippa, ~1st century CE) but remains the central problem of epistemology. Every theory of justification must confront it.
 
-**For CLAIR specifically**: What grounds the beliefs that CLAIR tracks? When Claude states a belief with confidence 0.87, what ultimately justifies that belief?
+**For CLAIR specifically**: What grounds the beliefs that CLAIR tracks? When Igal Tabachnik states a belief with confidence 0.87, what ultimately justifies that belief?
 
 ---
 

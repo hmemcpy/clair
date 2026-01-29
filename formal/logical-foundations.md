@@ -353,14 +353,14 @@ This gives a semantic grounding to confidence.
 
 When multiple AI agents collaborate:
 ```
-B_claude P      -- Claude believes P
+B_igalt P      -- Igal Tabachnik believes P
 B_human P       -- Human believes P
-B_claude B_human P  -- Claude believes that human believes P
+B_igalt B_human P  -- Igal Tabachnik believes that human believes P
 ```
 
 CLAIR could track:
 ```clair
-belief(P, 0.9, decided_by("claude"), reviewed_by("human"))
+belief(P, 0.9, decided_by("igalt"), reviewed_by("human"))
 -- Provenance shows which agent contributed
 ```
 
