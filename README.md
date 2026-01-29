@@ -1,137 +1,158 @@
 # CLAIR: Comprehensible LLM AI Intermediate Representation
 
-> A programming language and intermediate representation designed for AI-native computation, where reasoning, confidence, and justification are first-class concepts.
+> An intermediate representation for reasoning traces—a DAG of beliefs that captures *what* an LLM concluded, *why*, and *when to reconsider*.
 
-## Motivation
+## What Is CLAIR?
 
-Current programming languages and IRs are designed for a world where:
-- Humans write every line of code
-- Compilers transform code deterministically
-- Intent exists only in comments (discarded at compile time)
-- Reasoning behind decisions is lost
+CLAIR is a **data format** for reasoning traces, not a programming language.
 
-In an AI-native world:
-- LLMs generate code through probabilistic reasoning
-- Multiple valid approaches exist; one is *chosen* with rationale
-- Confidence varies across different parts of the code
-- Assumptions are made that may later be invalidated
-- Other AI systems need to understand, verify, and revise the code
-
-CLAIR preserves what traditional systems discard: **the epistemic state of the code's author**.
-
-## Core Concepts
-
-### Beliefs, Not Just Values
-
-Traditional type systems classify *values*:
-```
-x : Int
+```clair
+b1 1.0 L0 @user "calculate PI to N decimal places"
+b2 .95 L0 @self <b1 "N can be arbitrarily large"
+b3 .95 L0 @self <b2 "need arbitrary precision arithmetic"
+b4 .85 L0 @self <b3 "Chudnovsky algorithm converges fastest"
+b5 .85 L0 @self <b4 ?["n<15"] "use Chudnovsky"
 ```
 
-CLAIR classifies *beliefs about values*:
+Each belief carries:
+- **Confidence** — calibrated reliability in [0,1]
+- **Level** — stratification for safe self-reference
+- **Source** — where it came from (@user, @self, @file, etc.)
+- **Justifications** — backward edges to supporting beliefs
+- **Invalidations** — conditions that would defeat this belief
+- **Content** — the proposition (opaque natural language)
+
+## The Thinker+Assembler Architecture
+
 ```
-x : Int @ 0.95 from database.users.age
-        by (query validated)
-        invalidated_by (schema change)
-```
-
-A **Belief** is a value plus:
-- **Confidence**: How certain are we? (∈ [0,1])
-- **Provenance**: Where did this come from?
-- **Justification**: Why do we believe it?
-- **Invalidation conditions**: When should we reconsider?
-
-### Derivations, Not Just Computation
-
-Traditional computation is deterministic reduction:
-```
-(λx. x + 1) 5  →  6
-```
-
-CLAIR computation is *belief derivation*:
-```
-From: belief(rate_limit_needed, 0.9, security_review)
-      belief(redis_available, 0.85, infrastructure_check)
-Derive: belief(use_redis_rate_limiter, 0.76, derived)
-        by: (satisfied_requirements ∧ infrastructure_supports)
-```
-
-Confidence propagates. Justifications compose. Invalidation conditions accumulate.
-
-### Decisions, Not Just Expressions
-
-When multiple valid paths exist, traditional languages just pick one. The choice disappears.
-
-CLAIR preserves **decisions**:
-```
-decision auth_method:
-  options: [jwt_hs256, jwt_rs256, session_based]
-  constraints: [stateless, single_service]
-  selected: jwt_hs256
-  rationale: "simplest approach satisfying constraints"
-  rejected:
-    - session_based: violates stateless
-    - jwt_rs256: unnecessary complexity for single service
-  revisit_if: multi_service_deployment
+┌─────────────────────┐
+│   User Request      │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   Thinker LLM       │  ← Reasons about the problem
+│   (e.g., Opus)      │     Produces CLAIR trace
+└──────────┬──────────┘
+           │ CLAIR trace (DAG of beliefs)
+           ▼
+┌─────────────────────┐
+│   Assembler LLM     │  ← Interprets CLAIR trace
+│   (e.g., Haiku)     │     Produces executable code
+└──────────┬──────────┘
+           │ Code (Python, JS, etc.)
+           ▼
+┌─────────────────────┐
+│   Runtime           │  ← Executes
+└─────────────────────┘
 ```
 
-This is queryable, auditable, and automatically flagged for review when conditions change.
+**Both LLMs understand CLAIR.** The Thinker produces structured reasoning; the Assembler interprets it. Humans can audit the trace.
 
-### Intent, Not Just Behavior
+## Key Design Decisions
 
-Traditional code specifies *what* happens. CLAIR also specifies *why*:
+### Beliefs Don't Compose
+
+CLAIR is not a programming language. There's no monadic bind, no function composition. Beliefs are **nodes in a DAG**, not composable computations.
+
+The Thinker LLM produces traces with whatever structure the reasoning requires.
+
+### Confidence Algebra Still Applies
+
+When beliefs justify other beliefs, confidence propagates:
+
+| Operation | Formula | Use Case |
+|-----------|---------|----------|
+| Sequential | `c₁ × c₂` | Derivation chains |
+| Conservative | `min(c₁, c₂)` | Weakest link |
+| Independent | `c₁ ⊕ c₂ = 1-(1-c₁)(1-c₂)` | Multiple sources |
+
+These are **constraints on valid traces**, not operations the format provides.
+
+### Stratification Prevents Bootstrapping
+
+Beliefs have levels (L0, L1, L2...). A belief *about* another belief must be at a higher level. The **Löb discount** (`c → c²`) ensures confidence decreases through meta-levels:
+
+```clair
+b1 .9 L0 @self "X is true"
+b2 .81 L1 @self <b1 "I believe b1"      ; .9² = .81
+b3 .65 L2 @self <b2 "I believe b2"      ; .81² ≈ .65
 ```
-function verify_token(token: Bytes) -> Result<Claims, Error>
-  intent: "Validate JWT and extract claims, rejecting expired or tampered tokens"
-  realizes: secure_authentication
+
+No finite chain of self-reference can bootstrap confidence.
+
+### Tracking, Not Proving
+
+CLAIR doesn't prove beliefs are true. It **tracks** what is believed, with what confidence, for what reasons. This is a principled response to Gödel's incompleteness—no system can prove its own soundness.
+
+## Project Structure
+
+```
+formal/
+  clair-spec.md              # Minimal IR specification
+  theoretical-foundations.md # Reading guide to foundational work
+  logical-foundations.md     # Connections to epistemic logic, etc.
+  dissertation/              # Full theoretical treatment (Typst)
+  lean/CLAIR/               # Lean 4 formalization
+    Confidence/             # Confidence algebra proofs
+    Belief/                 # DAG structure, stratification
+
+examples/
+  pi-calculation.md         # Thinker+Assembler walkthrough
+
+notes/
+  reassessment-2026-01-29.md    # Paradigm shift analysis
+  exploration-2026-01-29-*.md   # Design exploration
+
+archive/                    # Old programming language model (obsolete)
 ```
 
-Intent is preserved through compilation and can be verified against implementation.
+## Formal Verification (Lean 4)
 
-## Document Structure
+Core properties are machine-checked:
 
-- `formal/` - Formal specifications and type theory
-  - `belief-types.tex` - Core type system formalization (LaTeX)
-  - `derivation-calculus.md` - Rules for belief derivation
-  - `decision-semantics.md` - Semantics of decisions
-  - `syntax.md` - Language syntax reference
-  - `foundations-and-limits.md` - Theoretical limits (Gödel, Turing, Church, Gentzen)
-  - `logical-foundations.md` - Connections to BHK, Curry-Howard, linear logic, epistemic logic
-  - `categorical-structure.md` - Graded monad structure, algebraic foundations
-  - `turing-completeness.md` - Proof of computational universality
-  - `verification-of-intent.md` - Bridging tracking and proving
-  - `multi-agent-beliefs.md` - Multiple agents, trust, consensus
-  - `swarm-coordination.md` - Swarms, disagreement resolution, BFT
+| Property | Status |
+|----------|--------|
+| Confidence bounds [0,1] | ✓ Proven |
+| ⊕ commutative, associative, identity | ✓ Proven |
+| Non-distributivity of (⊕, ×) | ✓ Proven (counterexample) |
+| Undercut reduces confidence | ✓ Proven |
+| Löb discount ≤ original | ✓ Proven |
+| Anti-bootstrapping | ✓ Proven |
+| Acyclic → well-founded | Stated (infrastructure needed) |
 
-- `notes/` - Background research and related work
-  - `prior-art.md` - Related academic work
-  - `design-rationale.md` - Why CLAIR is designed this way
+## Theoretical Foundations
 
-- `examples/` - Example CLAIR programs
-  - `hello-world.clair` - Minimal example
-  - `auth.clair` - JWT authentication example
+CLAIR synthesizes ideas from:
 
-## Key Insight: Tracking, Not Proving
+- **Provability Logic (GL)** — Löb's theorem, safe self-reference
+- **Subjective Logic** — Confidence algebra (but not three-component opinions)
+- **Defeasible Reasoning** — Undercut and rebut semantics (Pollock)
+- **ATMS** — DAG structure, dependency tracking (de Kleer)
+- **AGM Belief Revision** — Revision on edges, Recovery correctly fails
+- **Epistemic Modal Logic** — Graded belief operators
 
-CLAIR is a **tracking system**, not a **proof system**.
-
-- **Proof systems** establish truth: "This is correct."
-- **Tracking systems** establish epistemic state: "This is what we believe, why we believe it, and when we should reconsider."
-
-This distinction is not a weakness—it's a principled response to fundamental limits discovered by Gödel, Turing, and Church:
-
-- We cannot prove our own soundness (Gödel)
-- We cannot decide all properties (Turing, Church)
-- We cannot justify axioms internally (foundational)
-
-CLAIR accepts these limits. It doesn't prove; it makes uncertainty explicit. See `formal/foundations-and-limits.md` for the full treatment.
+See `formal/theoretical-foundations.md` for a full reading guide.
 
 ## Status
 
-This is a theoretical exploration, not a working implementation. The goal is to formalize what an AI-native programming language could look like.
+**Theoretical framework: complete.** The dissertation documents the full theory.
+
+**Implementation: not started.** To make this work in practice:
+1. CLAIR parser + validator
+2. System prompts for Thinker/Assembler
+3. Example traces for few-shot learning
+4. (Optional) Fine-tuning for reliable output
+
+## What CLAIR Is Not
+
+- **Not a programming language** — It's a data format for reasoning traces
+- **Not executable** — The Assembler produces executable code
+- **Not typed** — Content is opaque natural language interpreted by LLMs
+- **Not compositional** — Beliefs form a DAG, not composable computations
 
 ## Origins
 
-Developed through conversation exploring: "What would an AI-native intermediate representation look like that preserves reasoning and intent?"
+Developed through exploration of: *"What would an AI-native intermediate representation look like that preserves reasoning for audit?"*
 
-Key insight: The fundamental unit of AI computation isn't the value—it's the **belief**. A belief is a value plus epistemic metadata. Traditional type systems verify data; CLAIR verifies *justified knowledge*.
+Key insight: The fundamental unit isn't the value—it's the **belief**. A belief is content plus epistemic metadata (confidence, provenance, justification, invalidation). Traditional IRs discard reasoning; CLAIR preserves it.
