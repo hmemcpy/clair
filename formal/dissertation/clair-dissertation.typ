@@ -1,36 +1,21 @@
-// CLAIR Dissertation - Graceful Genetics Template
+// CLAIR Dissertation - IEEE Style Template
 // Author: Claude, Anthropic
 // Date: January 2026
 
-#import "@preview/graceful-genetics:0.2.0"
+#import "@preview/charged-ieee:0.1.4": ieee
 #import "layout.typ": *
 
-// Apply graceful-genetics template with dissertation metadata
-#show: graceful-genetics.template.with(
+// Apply IEEE template with dissertation metadata
+#show: ieee.with(
   title: [CLAIR: Comprehensible LLM AI Intermediate Representation],
   authors: (
     (
       name: "Claude",
-      department: "AI Research",
-      institution: "Anthropic",
-      city: "San Francisco",
-      country: "USA",
-      mail: "claude@anthropic.com",
+      department: [AI Research],
+      organization: [Anthropic],
+      location: [San Francisco, USA],
+      email: "claude@anthropic.com",
     ),
-  ),
-  date: (
-    year: 2026,
-    month: "January",
-  ),
-  keywords: (
-    "Epistemic Logic",
-    "Confidence Measures",
-    "Justification Graphs",
-    "Paraconsistent Reasoning",
-    "Provability Logic",
-    "Belief Revision",
-    "Self-Reference",
-    "Type Theory",
   ),
   abstract: [
     This dissertation presents CLAIR (Comprehensible LLM AI Intermediate Representation),
@@ -60,29 +45,36 @@
     argumentation theory, and provability logic, offering a rigorous foundation for
     AI systems that can explain and audit their own reasoning processes.
   ],
+  index-terms: (
+    "Epistemic Logic",
+    "Confidence Measures",
+    "Justification Graphs",
+    "Paraconsistent Reasoning",
+    "Provability Logic",
+    "Belief Revision",
+    "Self-Reference",
+    "Type Theory",
+  ),
+  paper-size: "a4",
+  bibliography: none,
+  figure-supplement: "Figure",
 )
 
-// Custom styling adjustments for dissertation
-#set page(
-  paper: "a4",
-  margin: (top: 2.5cm, bottom: 2.5cm, inside: 3cm, outside: 2cm),
-)
-
-// Preserve academic color scheme
+// Custom styling adjustments for dissertation elements
 #show raw: it => block(
-  fill: rgb("#faf8f5"),
-  stroke: 1pt + rgb("#1a2332"),
-  inset: 10pt,
-  radius: 3pt,
+  fill: rgb("#f5f5f5"),
+  stroke: 0.5pt + rgb("#333"),
+  inset: 8pt,
+  radius: 2pt,
   it
 )
 
 #show quote: it => block(
-  fill: rgb("#faf8f5"),
-  inset: (left: 15pt, right: 15pt, top: 10pt, bottom: 10pt),
-  width: 85%,
+  fill: rgb("#f9f9f9"),
+  inset: (left: 12pt, right: 12pt, top: 8pt, bottom: 8pt),
+  width: 90%,
   [
-    #set text(size: 10pt, style: "italic")
+    #set text(size: 9pt, style: "italic")
     #set block(above: 0.3em, below: 0.3em)
     it.body
   ]
@@ -94,10 +86,10 @@
 
 #pagebreak()
 #align(center)[
-  #set text(size: 22pt, weight: "bold")
+  #set text(size: 16pt, weight: "bold")
   [Contents]
 ]
-#v(1cm)
+#v(0.8cm)
 #outline(title: none, indent: auto)
 #pagebreak()
 
