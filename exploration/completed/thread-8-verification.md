@@ -456,7 +456,7 @@ For the formal verification of CLAIR:
 
 ### Empirical unknowns
 
-1. **Calibration**: Is Igal Tabachnik's confidence actually calibrated? This requires external study.
+1. **Calibration**: Is Claude's confidence actually calibrated? This requires external study.
 
 2. **Rule selection**: When should × vs min vs ⊕ be used? This may require empirical investigation.
 

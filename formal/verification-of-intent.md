@@ -352,12 +352,12 @@ Recommendation: Add theorem for tamper-rejection property
 -- Before verification
 let impl = verify_token
   confidence: 0.85
-  justification: (authored_by: "smith", reviewed_by: "human")
+  justification: (authored_by: "claude", reviewed_by: "human")
 
 -- After verification
 let impl = verify_token
   confidence: 0.99
-  justification: (authored_by: "smith",
+  justification: (authored_by: "claude",
                   reviewed_by: "human",
                   verified_by: "lean_proof")
 ```

@@ -37,8 +37,8 @@ type AgentBelief = {
 Agents believe different values for the same thing:
 
 ```clair
--- Igal Tabachnik believes the function should use HS256
-B_smith(auth_algorithm = HS256) @ 0.91
+-- Claude believes the function should use HS256
+B_claude(auth_algorithm = HS256) @ 0.91
 
 -- GPT believes it should use RS256
 B_gpt(auth_algorithm = RS256) @ 0.87
@@ -50,7 +50,7 @@ Agents agree on value but disagree on confidence:
 
 ```clair
 -- Both believe the code is correct, but...
-B_smith(code_correct) @ 0.95  -- Igal Tabachnik is very confident
+B_claude(code_correct) @ 0.95  -- Claude is very confident
 B_gpt(code_correct) @ 0.60     -- GPT is less sure
 ```
 
@@ -59,7 +59,7 @@ B_gpt(code_correct) @ 0.60     -- GPT is less sure
 Agents agree on value and confidence, but for different reasons:
 
 ```clair
-B_smith(use_jwt) @ 0.9
+B_claude(use_jwt) @ 0.9
   justification: "stateless requirement"
 
 B_gpt(use_jwt) @ 0.9
@@ -71,7 +71,7 @@ B_gpt(use_jwt) @ 0.9
 Agents disagree about what the question even is:
 
 ```clair
-B_smith(need_authentication) @ 0.95
+B_claude(need_authentication) @ 0.95
   scope: "API endpoints"
 
 B_gpt(need_authentication) @ 0.30
@@ -406,7 +406,7 @@ handle_deadlock swarm state =
 code_review_swarm : Swarm
 code_review_swarm = Swarm {
   agents: [
-    AI("smith", role: author),
+    AI("claude", role: author),
     AI("gpt-4", role: reviewer),
     AI("gemini", role: reviewer),
     Human("alice", role: approver)

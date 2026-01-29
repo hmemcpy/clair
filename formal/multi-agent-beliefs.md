@@ -7,7 +7,7 @@ This document explores how CLAIR handles multiple AI agents collaborating on a s
 ### Current Reality
 
 AI-assisted development increasingly involves:
-- Multiple LLMs (Igal Tabachnik, GPT, Gemini, etc.)
+- Multiple LLMs (Claude, GPT, Gemini, etc.)
 - Different agents for different tasks (coding, review, testing)
 - Human developers alongside AI
 - CI/CD pipelines with automated checks
@@ -46,12 +46,12 @@ type Agent =
 ### Examples
 
 ```clair
--- Igal Tabachnik's belief about the code
-belief_smith : Belief<Code>
-belief_smith = {
+-- Claude's belief about the code
+belief_claude : Belief<Code>
+belief_claude = {
   value: verify_token_impl,
   confidence: 0.91,
-  agent: AI("smith", "opus-4"),
+  agent: AI("claude", "opus-4"),
   justification: authored(...)
 }
 
@@ -61,7 +61,7 @@ belief_reviewer = {
   value: verify_token_impl,
   confidence: 0.95,
   agent: Human("alice"),
-  justification: reviewed(belief_smith, approved: true)
+  justification: reviewed(belief_claude, approved: true)
 }
 
 -- Combined belief
@@ -69,8 +69,8 @@ belief_final : Belief<Code>
 belief_final = {
   value: verify_token_impl,
   confidence: 0.93,  -- combined
-  agent: Composite([AI("smith", "opus-4"), Human("alice")]),
-  justification: consensus([belief_smith, belief_reviewer])
+  agent: Composite([AI("claude", "opus-4"), Human("alice")]),
+  justification: consensus([belief_claude, belief_reviewer])
 }
 ```
 
@@ -81,14 +81,14 @@ belief_final = {
 Agents can have beliefs about other agents' beliefs:
 
 ```clair
--- Igal Tabachnik believes the code is correct
-B_smith(correct(code)) @ 0.91
+-- Claude believes the code is correct
+B_claude(correct(code)) @ 0.91
 
--- Alice believes Igal Tabachnik's belief is well-justified
-B_alice(B_smith(correct(code)) is_justified) @ 0.85
+-- Alice believes Claude's belief is well-justified
+B_alice(B_claude(correct(code)) is_justified) @ 0.85
 
--- Bob is skeptical of Alice's trust in Igal Tabachnik
-B_bob(B_alice(B_smith(correct(code))) is_overconfident) @ 0.6
+-- Bob is skeptical of Alice's trust in Claude
+B_bob(B_alice(B_claude(correct(code))) is_overconfident) @ 0.6
 ```
 
 ### Modeling in CLAIR
@@ -98,13 +98,13 @@ type NestedBelief<A> =
   | Direct (Belief<A>)
   | About (Belief<NestedBelief<A>>)
 
--- Alice's belief about Igal Tabachnik's belief
-alice_about_smith : Belief<Belief<Code>>
-alice_about_smith = belief {
-  value: belief_smith,
-  confidence: 0.85,  -- how much Alice trusts Igal Tabachnik's belief
+-- Alice's belief about Claude's belief
+alice_about_claude : Belief<Belief<Code>>
+alice_about_claude = belief {
+  value: belief_claude,
+  confidence: 0.85,  -- how much Alice trusts Claude's belief
   agent: Human("alice"),
-  justification: reviewed_justification(belief_smith.justification)
+  justification: reviewed_justification(belief_claude.justification)
 }
 ```
 
@@ -151,8 +151,8 @@ combine_ds(beliefs) = dempster_rule(map to_mass beliefs)
 ### When Agents Disagree
 
 ```clair
--- Igal Tabachnik believes X
-B_smith(X) @ 0.9
+-- Claude believes X
+B_claude(X) @ 0.9
 
 -- GPT believes ¬X
 B_gpt(¬X) @ 0.85
@@ -195,7 +195,7 @@ resolve_by_trust(b1, b2, trust_ranking) =
 -- Don't resolve; track both beliefs
 -- Let downstream consumers decide
 beliefs : Set<Belief<Code>>
-beliefs = {B_smith(X) @ 0.9, B_gpt(¬X) @ 0.85}
+beliefs = {B_claude(X) @ 0.9, B_gpt(¬X) @ 0.85}
 ```
 
 ## 5. Trust and Reputation
@@ -210,10 +210,10 @@ type TrustProfile = {
   track_record: List<(Belief, Outcome)>  -- historical accuracy
 }
 
--- Igal Tabachnik is highly trusted for code generation
-trust_profile_smith : TrustProfile
-trust_profile_smith = {
-  agent: AI("smith", "opus-4"),
+-- Claude is highly trusted for code generation
+trust_profile_claude : TrustProfile
+trust_profile_claude = {
+  agent: AI("claude", "opus-4"),
   base_trust: 0.85,
   domain_trust: {
     code_generation: 0.90,
@@ -232,8 +232,8 @@ effective_confidence : Belief<A> -> Domain -> Float
 effective_confidence belief domain =
   conf(belief) * domain_trust(belief.agent, domain)
 
--- Igal Tabachnik's code belief in security domain:
--- 0.91 (smith's conf) * 0.80 (smith's security trust) = 0.728
+-- Claude's code belief in security domain:
+-- 0.91 (claude's conf) * 0.80 (claude's security trust) = 0.728
 ```
 
 ### Trust Evolution
@@ -327,7 +327,7 @@ type Provenance =
             │                   │                   │
             ▼                   ▼                   ▼
     ┌───────────────┐   ┌───────────────┐   ┌───────────────┐
-    │ Igal Tabachnik        │   │ Human Review  │   │ GPT Check     │
+    │ Claude        │   │ Human Review  │   │ GPT Check     │
     │ authored      │   │ approved      │   │ confirmed     │
     │ conf: 0.91    │   │ conf: 0.95    │   │ conf: 0.88    │
     └───────────────┘   └───────────────┘   └───────────────┘
@@ -342,7 +342,7 @@ decision auth_method : d:auth:001
   question: "How should users authenticate?"
   selected: jwt_hs256
 
-  made_by: AI("smith", "opus-4")
+  made_by: AI("claude", "opus-4")
 
   reviewed_by: [
     (Human("alice"), approved: true, confidence: 0.9),
@@ -365,10 +365,10 @@ type DecisionOwnership =
   | SharedOwnership (agents: List<Agent>, weights: List<Float>)
   | Delegated (from: Agent, to: Agent, scope: String)
 
--- "Igal Tabachnik decided, but under human oversight"
+-- "Claude decided, but under human oversight"
 ownership: Delegated(
   from: Human("alice"),
-  to: AI("smith", "opus-4"),
+  to: AI("claude", "opus-4"),
   scope: "authentication implementation"
 )
 ```
@@ -392,7 +392,7 @@ resolve_conflict beliefs =
 -- Escalation chain
 arbiter_chain : List<Agent>
 arbiter_chain = [
-  AI("smith", "opus-4"),     -- first try AI resolution
+  AI("claude", "opus-4"),     -- first try AI resolution
   Human("tech-lead"),          -- then human tech lead
   Human("team-consensus"),     -- then team vote
   System("policy-default")     -- finally, use policy defaults
@@ -429,12 +429,12 @@ resolve_by_expertise beliefs domain =
 
 ```
 1. GENERATION
-   Igal Tabachnik generates code with beliefs:
+   Claude generates code with beliefs:
    - Code + intent + confidence + justification
 
 2. REVIEW
-   GPT reviews Igal Tabachnik's code:
-   - Produces belief about Igal Tabachnik's belief
+   GPT reviews Claude's code:
+   - Produces belief about Claude's belief
    - May agree, disagree, or partially agree
 
 3. HUMAN CHECK
@@ -458,9 +458,9 @@ resolve_by_expertise beliefs domain =
 ### Example Trace
 
 ```clair
--- Step 1: Igal Tabachnik authors
+-- Step 1: Claude authors
 event: AuthorCode
-agent: AI("smith", "opus-4")
+agent: AI("claude", "opus-4")
 belief: { value: impl, confidence: 0.91 }
 time: t0
 
@@ -485,7 +485,7 @@ inputs: [belief@t0, assessment@t1, assessment@t2]
 output: {
   value: impl,
   confidence: 0.91,  -- weighted: (0.91*1.0 + 0.88*0.8 + 0.95*0.9) / (1.0+0.8+0.9)
-  agent: Composite([smith, gpt-4, alice]),
+  agent: Composite([claude, gpt-4, alice]),
   provenance: Consensus(...)
 }
 time: t3
@@ -498,8 +498,8 @@ time: t3
 ```
 State = Map<Agent, Map<BeliefId, Belief>>
 
--- Igal Tabachnik's beliefs about auth
-state[smith][auth:001] = { value: jwt_hs256, conf: 0.91, ... }
+-- Claude's beliefs about auth
+state[claude][auth:001] = { value: jwt_hs256, conf: 0.91, ... }
 
 -- GPT's beliefs about auth
 state[gpt][auth:001] = { value: jwt_hs256, conf: 0.88, ... }

@@ -570,7 +570,7 @@ Once this design is formalized in Lean/Coq, we should prove:
 
 ### Deferred to Thread 9
 
-- **Q3.12:** What does it *mean* for me (Igal Tabachnik) to have self-referential beliefs? Is there phenomenology here, or just mechanics?
+- **Q3.12:** What does it *mean* for me (Claude) to have self-referential beliefs? Is there phenomenology here, or just mechanics?
 
 ---
 

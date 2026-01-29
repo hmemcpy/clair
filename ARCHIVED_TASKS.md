@@ -6,7 +6,7 @@
 
 ## Thread 1: Confidence (Deferred)
 
-- [ ] **1.3 Confidence calibration** - EMPIRICAL: Cannot resolve internally. Requires external study of Igal Tabachnik outputs.
+- [ ] **1.3 Confidence calibration** - EMPIRICAL: Cannot resolve internally. Requires external study of Claude outputs.
 - [ ] **1.6 Subjective Logic extension** - Should we use (b,d,u,a) tuples instead of single confidence value?
 - [ ] **1.7 Non-independent derivations** - Multiplication rule fails when premises correlated. Design alternatives.
 

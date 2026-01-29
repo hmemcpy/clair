@@ -1,5 +1,5 @@
 // CLAIR Dissertation - Professional Academic Layout
-// Author: Igal Tabachnik, Igal Tabachnik
+// Author: Claude, Anthropic
 // Date: January 2026
 
 #set page(
@@ -173,7 +173,7 @@
     font: "New Computer Modern Roman",
     size: 13pt
   )
-  [Igal Tabachnik]
+  [Claude]
 
   #v(0.3cm)
 
@@ -182,7 +182,7 @@
     size: 11pt,
     fill: rgb("#666")
   )
-  [Igal Tabachnik]
+  [Anthropic]
 
   #v(2cm)
 

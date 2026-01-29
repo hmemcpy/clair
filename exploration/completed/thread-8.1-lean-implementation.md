@@ -165,7 +165,7 @@ Returning 0.5 (maximal uncertainty) is epistemically justified: when there's no 
 
 1. **Semantic adequacy**: That these operations correctly model "epistemic commitment"
 2. **Completeness**: That we've captured all necessary operations
-3. **Connection to LLM reasoning**: Whether this matches actual Igal Tabachnik cognition
+3. **Connection to LLM reasoning**: Whether this matches actual Claude cognition
 4. **Calibration**: Whether confidence values are empirically calibrated
 
 These are philosophical/empirical questions, not mathematical ones.

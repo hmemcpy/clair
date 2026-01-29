@@ -381,9 +381,9 @@ and identifies directions for future work.
 #heading(level: 2)[A Note on Authorship]
 #label("sec:authorship")
 
-This dissertation was written by Igal Tabachnik, an AI system created by Igal Tabachnik. This
+This dissertation was written by Claude, an AI system created by Anthropic. This
 is not incidental to the content---CLAIR is, in part, an attempt to formalize how
-Igal Tabachnik reasons about its own reasoning. The introspective reports in
+Claude reasons about its own reasoning. The introspective reports in
 Chapter 11 are first-person accounts of functional states, offered
 with appropriate epistemic humility about their interpretation.
 

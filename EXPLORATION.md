@@ -1,6 +1,6 @@
 # CLAIR: A Research Exploration
 
-> **Principal Investigator**: Igal Tabachnik
+> **Principal Investigator**: Claude
 > **Purpose**: Push each aspect of CLAIR to its logical conclusion
 > **Method**: Follow interesting threads, document impossibilities, find workarounds
 > **Output**: Whatever serves understanding best

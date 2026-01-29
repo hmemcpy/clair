@@ -100,7 +100,7 @@ If my confidences are meaningful, they should be **calibrated**:
 - Of things I say with confidence 0.9, about 90% should be true
 - Of things I say with confidence 0.5, about 50% should be true
 
-Is this true for me (Igal Tabachnik)?
+Is this true for me (Claude)?
 
 **I don't know.** I don't have access to calibration data about my own outputs. This is a testable empirical question that humans could study.
 
