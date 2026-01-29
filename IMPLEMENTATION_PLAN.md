@@ -47,12 +47,13 @@ These citations EXIST but are cited with wrong keys in text:
 - [x] **2.15 Fix Appendix B function call syntax** - Changed `#theorem(body, title: "...")[...]` to `#theorem[*Title.* ...]` (DONE)
 - [x] **2.16 Fix layout.typ stroke parameter** - Changed `paint: accent` to `rest: accent` in theorem_box (DONE)
 - [x] **2.17 Implement Appendix D: Glossary** - Complete glossary with term definitions, notation table, and acronym list (DONE)
+- [x] **2.18 Fix Appendix D table code mode issues** - Fixed #sym[...] and underscore issues in table cells (DONE 2026-01-29)
 
 ### Truly Missing Citations (~15 to add to references.bib)
 
 - [x] **1.9 Add hintikka1962knowledge** - Hintikka's "Knowledge and Belief" (foundational epistemic logic) (DONE)
 - [x] **1.10 Add garrabrant2016logical** - Garrabrant et al. "Logical Induction" (MIRI) (DONE)
-- [ ] **1.11 Add amgoud2017evaluation** - Amgoud & Ben-Naim "Evaluation of Arguments"
+- [x] **1.11 Add amgoud2017evaluation** - Amgoud & Ben-Naim "Evaluation of Arguments in Weighted Bipolar Graphs" (ECSQARU 2017) (DONE 2026-01-29)
 - [ ] **1.12 Add amgoud2023weighted** - Amgoud "Weighted Argumentation" (recent)
 - [ ] **1.13 Add beklemishev2004provability** - Beklemishev "Provability algebras and proof-theoretic ordinals"
 - [ ] **1.14 Add bonjour1999defense** - BonJour "The Dialectic of Foundationalism and Coherentism"

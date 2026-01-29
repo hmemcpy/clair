@@ -26,11 +26,11 @@ This appendix provides concise definitions of key terms, notation, and acronyms 
 +---
 +**Term** | **Definition** | **Chapter**
 +---
-+**Probabilistic OR (#sym[⊕])** | Aggregation operator for independent evidence: *a ⊕ b = a + b - ab*. This equals the probability that at least one of two independent events occurs. Satisfies commutativity, associativity, and has identity 0. | 3
-+**Undercut (#sym[⊸])** | Defeat operation that reduces confidence multiplicatively: *undercut(c, d) = c × (1-d)*. A defeater with confidence *d* reduces target confidence by factor *(1-d)*. | 4
++**Probabilistic OR (⊕)** | Aggregation operator for independent evidence: *a ⊕ b = a + b - ab*. This equals the probability that at least one of two independent events occurs. Satisfies commutativity, associativity, and has identity 0. | 3
++**Undercut (⊸)** | Defeat operation that reduces confidence multiplicatively: *undercut(c, d) = c × (1-d)*. A defeater with confidence *d* reduces target confidence by factor *(1-d)*. | 4
 +**Rebuttal** | Defeat operation for conflicting evidence: *rebut(c₁, c₂) = c₁ / (c₁ + c₂)*. Normalizes competing confidences to [0,1]; equal confidences yield 1/2. | 4
 +**Derivation** | Combining beliefs via rule application: *derive(b₁, b₂)* pairs the values and multiplies confidences *c₁ × c₂*. Tracks justification through rule application. | 4
-+**Aggregation** | Combining independent evidence using #sym[⊕]: *aggregate(b₁, b₂)* produces belief with confidence *c₁ ⊕ c₂*. Tracks justification through aggregation node. | 4
++**Aggregation** | Combining independent evidence using ⊕: *aggregate(b₁, b₂)* produces belief with confidence *c₁ ⊕ c₂*. Tracks justification through aggregation node. | 4
 +**Subtyping** | Confidence ordering: belief at confidence *c₁* can be used where belief at *c₂* is required iff *c₁ ≥ c₂*. Enables confidence weakening. | 10
 +---
 
@@ -49,9 +49,9 @@ This appendix provides concise definitions of key terms, notation, and acronyms 
 +---
 +**Term** | **Definition** | **Chapter**
 +---
-+**CPL (Confidence-Bounded Provability Logic)** | Graded extension of Gödel-Löb provability logic. Adds confidence grades to provability operator #sym[□]. Axiomatizes self-referential reasoning with confidence discounts. | 5
-+**Löb's Theorem** | Modal logic theorem: #sym[□](#sym[□]#sym[φ] → #sym[φ]) → #sym[□]#sym[φ]. In provability logic, enables self-reference; in CLAIR, motivates anti-bootstrapping constraint. | 5
-+**Graded Modality** | Modal operators with quantitative gradess. CLAIR's #sym[□]#sub[c] means "provable with confidence at least *c*." | 5
++**CPL (Confidence-Bounded Provability Logic)** | Graded extension of Gödel-Löb provability logic. Adds confidence grades to provability operator □. Axiomatizes self-referential reasoning with confidence discounts. | 5
++**Löb's Theorem** | Modal logic theorem: □(□φ → φ) → □φ. In provability logic, enables self-reference; in CLAIR, motivates anti-bootstrapping constraint. | 5
++**Graded Modality** | Modal operators with quantitative gradess. CLAIR's □₍c₎ means "provable with confidence at least *c*." | 5
 +**Anti-bootstrapping** | Principle that self-validating claims cannot increase confidence. Formally: *c* ≤ *g(c)* for some discount function *g*. CLAIR uses *g(c) = c²*. | 5
 +**Kripke Semantics** | Possible worlds framework for modal logic. CPL uses graded Kripke models where accessibility relations track confidence thresholds. | 5
 +---
@@ -98,29 +98,29 @@ This appendix provides concise definitions of key terms, notation, and acronyms 
 +**Symbol** | **Meaning** | **Type** | **Chapter**
 +---
 +*c* | Confidence value in [0,1] | Confidence | 3
-+#sym[⊕] | Probabilistic OR: *a ⊕ b = a + b - ab* | Binary operation | 3
-+#sym[⊸] | Undercut: *c ⊸ d = c × (1-d)* | Binary operation | 4
-+#sym[×] | Multiplication (conjunctive combination) | Binary operation | 3
++⊕ | Probabilistic OR: *a ⊕ b = a + b - ab* | Binary operation | 3
++⊸ | Undercut: *c ⊸ d = c × (1-d)* | Binary operation | 4
++× | Multiplication (conjunctive combination) | Binary operation | 3
 +*g(c)* | Löb discount function; CLAIR uses *c²* | Unary function | 5
-+#sym[□]#sub[c] #sym[φ] | Necessarily #sym[φ] with confidence at least *c* | Modal operator | 5
-+#sym[◇]#sub[c] #sym[φ] | Possibly #sym[φ] with confidence at least *c* | Modal operator | 5
-+#sym[⊢] | Typing judgment: #sym[Γ] #sym[⊢] *e* : *A* @ *c* | Relation | 10
-+#sym[→] | Small-step reduction: *e → e'* | Relation | 10
-+#sym[→*] | Multi-step reduction (reflexive transitive closure) | Relation | 10
-+#sym[Γ] | Typing context (list of variable: type pairs) | Context | 10
++□₍c₎ φ | Necessarily φ with confidence at least c | Modal operator | 5
++◇₍c₎ φ | Possibly φ with confidence at least c | Modal operator | 5
++⊢ | Typing judgment: Γ ⊢ e : A @ c | Relation | 10
++→ | Small-step reduction: e → e' | Relation | 10
++→* | Multi-step reduction (reflexive transitive closure) | Relation | 10
++Γ | Typing context (list of variable: type pairs) | Context | 10
 +*A* ⇒ *B* | Function type from *A* to *B* | Type | 10
 +Belief<*A*> | Belief type holding value of type *A* | Type constructor | 10
 +*b*.value | Extract value from belief *b* | Projection | 4
 +*b*.confidence | Extract confidence from belief *b* | Projection | 4
 +*b*.justification | Extract justification from belief *b* | Projection | 4
 +*m* <*n* | Stratification constraint: level *m* below *n* | Ordering | 6
-+#sym[∀] | Universal quantifier | Quantifier | Appendix A
-+#sym[∃] | Existential quantifier | Quantifier | Appendix A
-+#sym[∈] | Set membership | Relation | Appendix A
-+#sym[⊆] | Subset relation | Relation | Appendix A
-+#sym[∪] | Set union | Binary operation | Appendix A
-+#sym[∩] | Set intersection | Binary operation | Appendix A
-+#sym[λ]*x*:*A*. *e* | Lambda abstraction (anonymous function) | Expression | 10
++∀ | Universal quantifier | Quantifier | Appendix A
++∃ | Existential quantifier | Quantifier | Appendix A
++∈ | Set membership | Relation | Appendix A
++⊆ | Subset relation | Relation | Appendix A
++∪ | Set union | Binary operation | Appendix A
++∩ | Set intersection | Binary operation | Appendix A
++λ*x*:*A*. *e* | Lambda abstraction (anonymous function) | Expression | 10
 +*e*1 *e*2 | Function application | Expression | 10
 +---
 
