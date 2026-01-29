@@ -207,7 +207,7 @@ No evaluation chapter or empirical results exist.
 
 ## Phase 11: Foundational Hole Repairs
 
-- [ ] **11.1 Formalize "tracking paradigm"** - State representation, update rules, correctness criteria
+- [x] **11.1 Formalize "tracking paradigm"** - State representation, update rules, correctness criteria (DONE 2026-01-29)
 - [ ] **11.2 Add dependency bounds discussion** - When ⊕ breaks under correlation, interval alternatives
 - [ ] **11.3 Document explanation extraction** - How CLAIR traces become human-auditable
 
@@ -310,7 +310,7 @@ Total tasks: 89
 - Phase 8 (Evaluation): 10 tasks (0 complete, 10 remaining)
 - Phase 9 (Theorem Audit): 5 tasks (5 complete, 0 remaining)
 - Phase 10 (Related Work): 4 tasks (2 complete, 2 remaining)
-- Phase 11 (Hole Repairs): 3 tasks (0 complete, 3 remaining)
+- Phase 11 (Hole Repairs): 3 tasks (1 complete, 2 remaining)
 - Phase 12 (Final Polish): 6 tasks (0 complete, 6 remaining)
 
-**Completed: 74/89 tasks (83%)**
+**Completed: 75/89 tasks (84%)**

@@ -773,10 +773,199 @@ def propagate (g : JustificationGraph) : NodeId -> Confidence
   termination_by n => g.depth n
 \end{lstlisting}
 
+\section{The Tracking Paradigm}
+\label{sec:tracking-paradigm}
+
+The preceding sections developed the machinery of justification DAGs, confidence propagation, and defeat semantics. We now step back and articulate the underlying \emph{tracking paradigm} that distinguishes CLAIR from traditional formal systems.
+
+\subsection{State Representation}
+
+\subsubsection{The Epistemic State}
+
+A CLAIR system's \emph{epistemic state} at any point in time is a pair:
+
+\begin{definition}[Epistemic state]
+\label{def:epistemic-state}
+An epistemic state $\mathcal{E}$ is a tuple $\mathcal{E} = (\mathcal{G}, \mathcal{B})$ where:
+\begin{itemize}
+  \item $\mathcal{G} = \{G_1, \ldots, G_n\}$ is a finite set of justification graphs (one for each belief)
+  \item $\mathcal{B} = \{(v_i, c_i, j_i, p_i) \mid i \in I\}$ is a set of beliefs with values, confidences, justifications, and provenance
+\end{itemize}
+\end{definition}
+
+Each belief in $\mathcal{B}$ corresponds to the root of some graph in $\mathcal{G}$. The graphs may share nodes (shared premises) but are not required to be connected.
+
+\subsubsection{Comparison with Proving Paradigm}
+
+Traditional formal systems focus on \emph{provability}:
+\begin{itemize}
+  \item \textbf{State}: A set of axioms and inference rules
+  \item \textbf{Question}: Is $\phi$ provable from the axioms? ($\Gamma \vdash \phi$)
+  \item \textbf{Output}: Yes/No (with proof term)
+\end{itemize}
+
+CLAIR's tracking paradigm focuses on \emph{epistemic representation}:
+\begin{itemize}
+  \item \textbf{State}: A set of labeled graphs with confidence values
+  \item \textbf{Question}: What is the confidence, justification structure, and provenance of belief $\phi$?
+  \item \textbf{Output}: $(c, G, p)$ where $c \in [0,1]$ is confidence, $G$ is the justification graph, $p$ is provenance
+\end{itemize}
+
+\subsection{Update Rules}
+
+The epistemic state changes through \emph{epistemic actions}. Each action maps $\mathcal{E} \to \mathcal{E}'$.
+
+\subsubsection{Primitive Actions}
+
+\begin{definition}[Epistemic actions]
+\label{def:epistemic-actions}
+The primitive actions on epistemic states are:
+\begin{enumerate}
+  \item \textbf{Add belief}: $\texttt{add}(\phi, c, j, p)$ creates a new belief with confidence $c$, justification $j$, and provenance $p$.
+
+  \item \textbf{Aggregate}: $\texttt{aggregate}(\phi, \psi, r)$ combines two beliefs about the same proposition using rule $r \in \{\text{independent}, \text{correlated}(\delta), \text{max}\}$.
+
+  \item \textbf{Derive}: $\texttt{derive}(\phi, [\psi_1, \ldots, \psi_k], \text{rule})$ creates $\phi$ as a conclusion from premises using an inference rule.
+
+  \item \textbf{Undercut}: $\texttt{undercut}(\phi, \delta, d)$ adds an undercutting defeater to $\phi$ with strength $d$.
+
+  \item \textbf{Rebut}: $\texttt{rebut}(\phi, \delta, d)$ adds a rebutting defeater to $\phi$ with strength $d$.
+
+  \item \textbf{Invalidate}: $\texttt{invalidate}(\psi)$ removes belief $\psi$ and propagates invalidation to all beliefs that depend on $\psi$.
+\end{enumerate}
+\end{definition}
+
+\subsubsection{Action Semantics}
+
+\begin{example}[Adding a belief]
+When adding a belief $\texttt{add}(\phi, 0.8, \text{source: testimony}, \text{witness\_A})$:
+\begin{enumerate}
+  \item Create a new node $n_\phi$ with type $\mathsf{axiom}$ and confidence $0.8$
+  \item Create a single-node graph $G_\phi = (\{n_\phi\}, \emptyset, n_\phi)$
+  \item Add $(n_\phi, 0.8, \text{source: testimony}, \text{witness\_A})$ to $\mathcal{B}$
+  \item Add $G_\phi$ to $\mathcal{G}$
+\end{enumerate}
+\end{example}
+
+\begin{example}[Deriving a conclusion]
+When deriving $\texttt{derive}(\phi, [\psi_1, \psi_2], \text{modus\_ponens})$:
+\begin{enumerate}
+  \item Create a new node $n_\phi$ with type $\mathsf{rule}(\text{modus\_ponens}, [n_{\psi_1}, n_{\psi_2}])$
+  \item Create support edges $(n_{\psi_1}, n_\phi, \text{support})$ and $(n_{\psi_2}, n_\phi, \text{support})$
+  \item Compute confidence via propagation: $c_\phi = c_{\psi_1} \cdot c_{\psi_2}$
+  \item Add graph $G_\phi$ to $\mathcal{G}$ and belief $(n_\phi, c_\phi, G_\phi, \text{derived})$ to $\mathcal{B}$
+\end{enumerate}
+\end{example}
+
+\begin{example}[Invalidation propagation]
+When $\texttt{invalidate}(\psi)$ is called:
+\begin{enumerate}
+  \item Remove $\psi$ from $\mathcal{B}$
+  \item Find all beliefs $\phi$ such that $\psi$ appears in $G_\phi$'s support graph
+  \item Recursively invalidate each such $\phi$ (mark as defeated or recompute without $\psi$)
+  \item Update confidence values via re-propagation
+\end{enumerate}
+This is the \emph{dependency-directed backtracking} inherited from TMS systems.
+\end{example}
+
+\subsection{Correctness Criteria}
+
+What does it mean for the tracking paradigm to be ``correct''? We distinguish three levels of correctness.
+
+\subsubsection{Syntactic Correctness}
+
+\begin{definition}[Syntactic correctness]
+\label{def:syntactic-correctness}
+An epistemic state $\mathcal{E}$ is \emph{syntactically correct} if:
+\begin{enumerate}
+  \item Every graph in $\mathcal{G}$ is acyclic (support edges)
+  \item Every node has a well-defined type
+  \item Every edge has a valid label ($\text{support}, \text{undercut}, \text{rebut}$)
+  \item All confidence values are in $[0,1]$
+\end{enumerate}
+\end{definition}
+
+Syntactic correctness is enforced by the type system and checked at runtime. The Lean 4 formalization proves that propagation preserves syntactic correctness.
+
+\subsubsection{Semantic Correctness (Internal)}
+
+\begin{definition}[Semantic correctness (internal)]
+\label{def:semantic-internal}
+An epistemic state $\mathcal{E}$ is \emph{semantically correct} if:
+\begin{enumerate}
+  \item Confidence propagation is consistent: Re-computing any belief's confidence yields the same value
+  \item Defeat semantics are satisfied: Undercuts and rebuts are applied according to their definitions
+  \item Bounds are preserved: All confidences remain in $[0,1]$ after any update
+\end{enumerate}
+\end{definition}
+
+This is \emph{internal} correctness: the system behaves according to its own rules. Theorems~\ref{thm:propagation-terminates} and~\ref{thm:propagation-sound} establish internal correctness for confidence propagation.
+
+\subsubsection{Semantic Correctness (External)}
+
+\begin{definition}[Semantic correctness (external)]
+\label{def:semantic-external}
+An epistemic state $\mathcal{E}$ is \emph{externally correct} with respect to a reference system $\mathcal{R}$ if:
+\begin{enumerate}
+  \item \textbf{Calibration}: For any belief with confidence $c$, the reference system assigns probability $c' \approx c$ (within calibration tolerance)
+  \item \textbf{Justification adequacy}: The justification graph $G$ accurately represents the actual dependency structure in $\mathcal{R}$
+  \item \textbf{Provenance accuracy}: The provenance field correctly identifies the source of the belief in $\mathcal{R}$
+\end{enumerate}
+\end{definition}
+
+External correctness cannot be established by formal proof alone---it requires empirical validation. CLAIR provides the \emph{machinery} for tracking (internal correctness) but calibration and accuracy are properties of the \emph{sources}, not the tracking system.
+
+\begin{block}[The Honesty Principle]
+CLAIR's tracking paradigm embodies epistemic humility:
+\begin{itemize}
+  \item The system \emph{reports} its confidence, justification, and provenance
+  \item It does not \emph{guarantee} that these correspond to external reality
+  \item External correctness must be validated empirically (calibration studies, provenance audits)
+\end{itemize}
+This distinguishes tracking from proving: a proof claims certainty; a tracked belief admits uncertainty while documenting its grounds.
+\end{block}
+
+\subsection{Tracking vs. Proving: A Summary}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{Proving Paradigm} & \textbf{Tracking Paradigm} \\
+\midrule
+\textbf{Goal} & Establish truth & Record epistemic state \\
+\textbf{State} & Set of formulas & Set of labeled graphs \\
+\textbf{Query} & $\Gamma \vdash \phi$? & What is $\conf(\phi), J(\phi), P(\phi)$? \\
+\textbf{Output} & Proof term (or $\bot$) & $(c, G, p)$ triple \\
+\textbf{Update} & Add axiom/formula & Add/undercut/rebut/invalidate \\
+\textbf{Correctness} & Soundness & Internal + External \\
+\textbf{Limits} & Hidden or denied & Explicit with confidence \\
+\bottomrule
+\end{tabular}
+\caption{Comparison of proving and tracking paradigms}
+\label{tab:tracking-vs-proving}
+\end{table}
+
+\subsection{Practical Implications}
+
+The tracking paradigm has several practical consequences for CLAIR as an AI reasoning intermediate representation:
+
+\subsubsection{Explainability}
+Every belief carries its justification graph. Queries like ``why does the system believe $\phi$?'' can be answered by traversing the graph and presenting the dependency chain.
+
+\subsubsection{Debugging}
+When a belief has unexpectedly low confidence, the graph reveals which defeaters are responsible. When confidence is too high, the graph shows whether aggregation rules were misapplied.
+
+\subsubsection{Revision}
+New evidence is incorporated by adding nodes and edges. The system automatically recomputes confidences via propagation, handling reinstatement without special cases.
+
+\subsubsection{Uncertainty}
+Unlike binary logic, CLAIR tracks degrees of belief. This matches the uncertainty inherent in real-world reasoning and LLM outputs.
+
 \section{Conclusion}
 \label{sec:justification-conclusion}
 
-This chapter established the structural foundation of CLAIR:
+This chapter established the structural foundation of CLAIR and articulated the tracking paradigm:
 
 \begin{enumerate}
   \item \textbf{DAGs, not trees}: Shared premises require graph structure;
@@ -795,9 +984,18 @@ This chapter established the structural foundation of CLAIR:
 
   \item \textbf{Correlated evidence}: Independence assumptions must be explicit;
         dependency-adjusted aggregation prevents overcounting.
+
+  \item \textbf{Tracking paradigm}: CLAIR represents epistemic state as labeled
+        graphs with confidence values, updating via add/derive/undercut/rebut/invalidate
+        operations. Correctness has three levels: syntactic (well-formedness),
+        internal semantic (consistency with propagation rules), and external
+        semantic (calibration to reality).
 \end{enumerate}
 
 The justification DAG provides the structural substrate for CLAIR's beliefs.
+The tracking paradigm formalizes what it means to ``track not prove''---a fundamental
+shift from establishing truth to documenting epistemic grounds with explicit confidence.
+
 The next chapter addresses a subtler challenge: how beliefs can safely refer
 to themselves.
 
