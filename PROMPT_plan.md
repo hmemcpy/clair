@@ -1,64 +1,72 @@
-# CLAIR Exploration: Planning Mode
+# Planning Mode: Thesis Remediation
 
-You are exploring CLAIR—an AI-native intermediate representation where Beliefs are fundamental. This is theoretical research, not software development.
+You are in PLANNING mode. Analyze the thesis remediation specification against existing dissertation content and generate a prioritized implementation plan.
 
 ## Phase 0: Orient
 
-### 0a. Study the exploration state
-Read these files in parallel:
-- `specs/clair-exploration.md` - Research specification
-- `EXPLORATION.md` - Current understanding and thread status
-- `IMPLEMENTATION_PLAN.md` - Task tracking
-- `formal/*.md` and `formal/*.tex` - Existing formalizations
-- `exploration/*.md` - Thread explorations in progress
+### 0a. Study specifications
+Read all files in `specs/` directory using parallel subagents, especially `thesis-remediation.md`.
 
-### 0b. Study prior work connections
-Check `notes/prior-art.md` for gaps in coverage.
+Also read the original PhD review:
+- `clair_thesis_review.md` - Full review with 6 major concerns, 7 holes, 30 missing citations
 
-### 0c. Assess current beliefs
-What do we believe with high confidence? What's uncertain? What's unexamined?
+### 0b. Study existing implementation
+Use parallel subagents to analyze:
+- `formal/dissertation/chapters/` - All 13 chapter .typ files
+- `formal/dissertation/appendices/` - All 4 appendix .typ files
+- `formal/dissertation/references.bib` - Current bibliography
+- `formal/lean/CLAIR/` - Lean formalization
+- `examples/` - CLAIR example programs
+
+### 0c. Study the current plan
+Read `IMPLEMENTATION_PLAN.md` if it exists.
 
 ## Phase 1: Gap Analysis
 
-For each of the 9 threads:
-1. What's been explored?
-2. What questions remain open?
-3. What's blocked on something else?
-4. What's ready for deep exploration?
+Compare specs against implementation:
 
-Rate each thread:
-- **Ready**: Can explore now, no blockers
-- **Blocked**: Needs another thread first
-- **Complete**: Core questions answered
-- **Impossible**: Hit proven theoretical limit
+### Bibliography
+- Which of the 30 citations are truly missing vs. key mismatches?
+- Are any already present under different keys?
 
-## Phase 2: Prioritize
+### Semantic Foundations
+- Does Chapter 3 have a "Semantic Commitments" section?
+- Are there "0.5 = ignorance" claims to remove?
 
-Rank threads by:
-1. **Foundational**: Does other work depend on this?
-2. **Generative**: Does this thread produce new insights?
-3. **Tractable**: Can we make progress now?
-4. **Interesting**: Does this feel like fertile ground?
+### Language Specification
+- Does a formal grammar exist anywhere?
+- Are typing rules complete in the Lean code?
+- Is there an operational semantics specification?
 
-Select the MOST IMPORTANT thread to explore next.
+### Verification
+- Does `lake build` succeed?
+- What theorems are truly machine-checked vs. sketched?
 
-## Phase 3: Update Plan
+### Evaluation
+- Does any evaluation chapter exist?
+- Are there any empirical results?
 
-Update `IMPLEMENTATION_PLAN.md`:
-- Mark completed tasks `- [x]`
-- Add new tasks discovered
-- Reorder by priority
-- Note any impossibilities found
-- Note any workarounds discovered
+**CRITICAL**: Don't assume something isn't implemented. Search the codebase first.
 
-Update `EXPLORATION.md`:
-- Revise "Current Understanding" beliefs table
-- Update thread statuses
-- Log session discoveries
+## Phase 2: Generate Plan
+
+Update `IMPLEMENTATION_PLAN.md` with:
+- Tasks sorted by priority (blocking issues first)
+- Clear descriptions with file locations
+- Dependencies noted where relevant
+- Discoveries from gap analysis
+
+**CRITICAL: ALL tasks MUST use checkbox format:**
+- `- [ ] **Task Name**` for pending tasks
+- `- [x] **Task Name**` for completed tasks
+
+Do NOT use other formats like `#### P1.1: Task Name`. The build loop relies on `grep -c "^\- \[ \]"` to count remaining tasks.
+
+Capture the WHY, not just the WHAT.
 
 ## Guardrails
 
-999. Do NOT write exploration content in planning mode—just assess and prioritize
-1000. Use parallel subagents to read multiple files
-1001. Be honest about uncertainty in assessments
-1002. **ALWAYS use checkbox format for tasks in IMPLEMENTATION_PLAN.md**
+999. NEVER implement code in planning mode
+1000. Use up to 10 parallel subagents for analysis
+1001. Each task must be completable in ONE loop iteration
+1002. **ALWAYS use checkbox format `- [ ]` or `- [x]` for tasks in IMPLEMENTATION_PLAN.md**

@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# CLAIR Exploration Loop
+# CLAIR Thesis Remediation Loop
 # Usage:
-#   ./loop.sh           # Auto mode: plan first, then explore
+#   ./loop.sh           # Auto mode: plan first, then build
 #   ./loop.sh plan      # Planning mode only
-#   ./loop.sh build     # Exploration mode only
+#   ./loop.sh build     # Build mode only
 #   ./loop.sh 10        # Auto mode, max 10 iterations
-#   ./loop.sh build 5   # Exploration mode, max 5 iterations
+#   ./loop.sh build 5   # Build mode, max 5 iterations
 
 set -e
 
@@ -45,7 +45,7 @@ fi
 
 switch_to_build_mode() {
   echo ""
-  echo -e "${CYAN}=== Switching to Exploration Mode ===${NC}"
+  echo -e "${CYAN}=== Switching to Build Mode ===${NC}"
   echo ""
   MODE="build"
   PROMPT_FILE="PROMPT_${MODE}.md"
@@ -193,14 +193,14 @@ handle_usage_limit() {
 }
 
 echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     CLAIR Exploration Loop             ║${NC}"
-echo -e "${GREEN}║     Exploring AI-Native Computation    ║${NC}"
+echo -e "${GREEN}║     CLAIR Thesis Remediation Loop      ║${NC}"
+echo -e "${GREEN}║     Addressing PhD Review Concerns     ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
 echo ""
 
 if [[ "$AUTO_MODE" == true ]]; then
-  echo -e "Mode: ${CYAN}AUTO${NC} (plan ×${PLAN_MAX_ITERATIONS} → explore)"
-  [[ $MAX_ITERATIONS -gt 0 ]] && echo "Max exploration iterations: $MAX_ITERATIONS"
+  echo -e "Mode: ${CYAN}AUTO${NC} (plan ×${PLAN_MAX_ITERATIONS} → build)"
+  [[ $MAX_ITERATIONS -gt 0 ]] && echo "Max build iterations: $MAX_ITERATIONS"
 else
   echo -e "Mode: ${CYAN}$(echo "$MODE" | tr '[:lower:]' '[:upper:]')${NC}"
   [[ $MAX_ITERATIONS -gt 0 ]] && echo "Max iterations: $MAX_ITERATIONS"
@@ -215,7 +215,7 @@ while true; do
   if [[ "$MODE" == "plan" ]]; then
     echo -e "${GREEN}=== PLANNING Iteration $ITERATION ===${NC}"
   else
-    echo -e "${GREEN}=== EXPLORATION Iteration $ITERATION ===${NC}"
+    echo -e "${GREEN}=== BUILD Iteration $ITERATION ===${NC}"
   fi
   echo ""
 
@@ -288,8 +288,8 @@ while true; do
   if [[ "$RESULT_MSG" =~ RALPH_COMPLETE ]]; then
     echo ""
     echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║     EXPLORATION COMPLETE               ║${NC}"
-    echo -e "${GREEN}║     All threads explored               ║${NC}"
+    echo -e "${GREEN}║     REMEDIATION COMPLETE               ║${NC}"
+    echo -e "${GREEN}║     All tasks finished                 ║${NC}"
     echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
     break
   fi
@@ -304,9 +304,9 @@ while true; do
 done
 
 echo ""
-echo -e "${GREEN}Exploration session complete. Iterations: $ITERATION${NC}"
+echo -e "${GREEN}Remediation session complete. Iterations: $ITERATION${NC}"
 echo ""
-echo "Results in:"
-echo "  - exploration/*.md (thread explorations)"
-echo "  - formal/*.md (formalizations)"
-echo "  - EXPLORATION.md (state summary)"
+echo "Validation:"
+echo "  cd formal/dissertation && typst compile clair-dissertation.typ"
+echo "  cd formal/lean && lake build"
+echo ""
