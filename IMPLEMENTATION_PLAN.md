@@ -134,19 +134,19 @@ Chapter 3 already has semantic commitments and rejects "0.5 = ignorance". Minor 
 
 ## Phase 5: CPL Soundness Clarification (Chapter 5)
 
-- [ ] **5.1 Add explicit axiom status statement** - "Graded Löb is a DESIGN AXIOM, not semantic theorem"
-- [ ] **5.2 List modal axioms with status** - K ✓, 4 ✓, GL ✓, T ✗ with explanations
-- [ ] **5.3 Add consistency proof** - Exhibit non-trivial model satisfying CPL axioms
-- [ ] **5.4 Clarify "conservative over GL"** - Define precisely what this means, prove or remove
+- [x] **5.1 Add explicit axiom status statement** - "Graded Löb is a DESIGN AXIOM, not semantic theorem" (DONE - verified in chapters/05-self-reference.typ:481-496)
+- [x] **5.2 List modal axioms with status** - K ✓, 4 ✓, GL ✓, T ✗ with explanations (DONE - verified in chapters/05-self-reference.typ:567-586)
+- [x] **5.3 Add consistency proof** - Exhibit non-trivial model satisfying CPL axioms (DONE - verified in chapters/05-self-reference.typ:588-621)
+- [x] **5.4 Clarify "conservative over GL"** - Define precisely what this means, prove or remove (DONE - verified in chapters/05-self-reference.typ:784-802)
 
 ---
 
 ## Phase 6: DAG/Cycle Handling (Chapter 4)
 
-- [ ] **6.1 Add well-formedness constraint section** - Formal definition of isAcyclic predicate
-- [ ] **6.2 Formalize fixed-point semantics** - Kleene iteration with Banach fixed-point theorem
-- [ ] **6.3 Add convergence bounds** - When |weights| < λ < 1, convergence in O(log(1/ε)/log(1/λ)) steps
-- [ ] **6.4 State DAG-only vs cyclic choice** - Which is primary semantics, when cycles allowed
+- [x] **6.1 Add well-formedness constraint section** - Formal definition of isAcyclic predicate (DONE 2026-01-29)
+- [x] **6.2 Formalize fixed-point semantics** - Kleene iteration with Banach fixed-point theorem (DONE 2026-01-29)
+- [x] **6.3 Add convergence bounds** - When |weights| < λ < 1, convergence in O(log(1/ε)/log(1/λ)) steps (DONE 2026-01-29)
+- [x] **6.4 State DAG-only vs cyclic choice** - Which is primary semantics, when cycles allowed (DONE 2026-01-29)
 
 ---
 
