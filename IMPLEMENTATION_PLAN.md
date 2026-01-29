@@ -95,9 +95,9 @@ All appendices are lorem ipsum placeholders. Need real content.
 
 ### Appendix C: Additional Proofs
 
-- [ ] **2.9 Add detailed proof of DAG necessity** - Full formal argument
-- [ ] **2.10 Add CPL consistency proof sketch** - Non-trivial model construction
-- [ ] **2.11 Add defeat composition proofs** - Undercut and rebut algebra
+- [x] **2.9 Add detailed proof of DAG necessity** - Full formal argument (DONE 2026-01-29)
+- [x] **2.10 Add CPL consistency proof sketch** - Non-trivial model construction (DONE 2026-01-29)
+- [x] **2.11 Add defeat composition proofs** - Undercut and rebut algebra (DONE 2026-01-29)
 
 ### Appendix D: Glossary
 
