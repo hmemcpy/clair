@@ -92,7 +92,10 @@ formal/
   clair-spec.md              # Minimal IR specification
   theoretical-foundations.md # Reading guide to foundational work
   logical-foundations.md     # Connections to epistemic logic, etc.
-  dissertation/              # Full theoretical treatment (Typst)
+  dissertation/              # The CLAIR Book (PDF)
+    clair-book.pdf           # Full specification book
+    chapters/                # Book chapters
+    appendices/              # Appendices
   lean/CLAIR/               # Lean 4 formalization
     Confidence/             # Confidence algebra proofs
     Belief/                 # DAG structure, stratification
@@ -136,7 +139,7 @@ See `formal/theoretical-foundations.md` for a full reading guide.
 
 ## Status
 
-**Theoretical framework: complete.** The dissertation documents the full theory.
+**Theoretical framework: complete.** The [CLAIR Book](formal/dissertation/clair-book.pdf) documents the full specification.
 
 **Implementation: not started.** To make this work in practice:
 1. CLAIR parser + validator
