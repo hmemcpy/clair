@@ -219,7 +219,7 @@ No evaluation chapter or empirical results exist.
 - [ ] **12.2 Run Lean build** - Clean build (accept 5 known sorries)
 - [ ] **12.3 Run Haskell tests** - All tests pass
 - [ ] **12.4 Verify defense questions answerable** - Check all 10 from review
-- [ ] **12.5 Update conclusion (Chapter 13)** - Reflect completed remediation work
+- [x] **12.5 Update conclusion (Chapter 13)** - Reflect completed remediation work (DONE 2026-01-29)
 - [ ] **12.6 Final proofread** - Grammar, consistency, formatting
 
 ---
