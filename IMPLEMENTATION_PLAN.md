@@ -81,9 +81,9 @@ All appendices are lorem ipsum placeholders. Need real content.
 
 ### Appendix B: Interpreter
 
-- [ ] **2.6 Add interpreter architecture diagram** - Parser → TypeChecker → Evaluator pipeline
-- [ ] **2.7 Document Lean interpreter code** - The existing Semantics/Eval.lean with fuel
-- [ ] **2.8 Add example program walkthroughs** - Step-by-step evaluation of hello-world.clair
+- [x] **2.6 Add interpreter architecture diagram** - Parser → TypeChecker → Evaluator pipeline (DONE)
+- [x] **2.7 Document Lean interpreter code** - The existing Semantics/Eval.lean with fuel (DONE)
+- [x] **2.8 Add example program walkthroughs** - Step-by-step evaluation of hello-world.clair (DONE)
 
 ### Appendix C: Additional Proofs
 
