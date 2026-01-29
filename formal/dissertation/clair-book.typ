@@ -37,7 +37,7 @@
 )
 
 #set text(
-  font: "Source Serif Pro",
+  font: ("Palatino", "Georgia", "Times New Roman"),
   size: 11pt,
   fill: clair-colors.text,
   hyphenate: true,
@@ -57,7 +57,7 @@
 #set heading(numbering: "1.1.")
 
 #show heading: it => {
-  set text(font: "Source Sans Pro")
+  set text(font: ("Helvetica", "Arial"))
   set par(spacing: 0.8em)
 
   if it.level == 1 {
@@ -83,13 +83,32 @@
   }
 }
 
+// Override the chapter function from layout.typ
+#let chapter(num, title, epigraph: none) = [
+  #pagebreak()
+  #v(2cm)
+  #align(center)[
+    #text(size: 14pt, fill: clair-colors.text-light)[Chapter #num]
+    #v(0.5cm)
+    #text(size: 24pt, weight: "bold", fill: clair-colors.primary)[#title]
+  ]
+  #v(1cm)
+  #if epigraph != none [
+    #align(center)[
+      #set text(size: 10pt, style: "italic", fill: clair-colors.text-light)
+      #epigraph
+    ]
+    #v(1cm)
+  ]
+]
+
 // ============================================================================
 // CODE BLOCKS (Syntax Highlighting)
 // ============================================================================
 
 #show raw.where(block: true): it => {
   set text(
-    font: "Source Code Pro",
+    font: ("Menlo", "Monaco", "Courier New"),
     size: 9.5pt,
     fill: clair-colors.text,
   )
@@ -106,7 +125,7 @@
 
 #show raw.where(block: false): it => {
   set text(
-    font: "Source Code Pro",
+    font: ("Menlo", "Monaco", "Courier New"),
     size: 9.5pt,
     fill: clair-colors.accent,
   )
@@ -239,7 +258,7 @@
       radius: 8pt,
       width: 80%,
       {
-        set text(font: "Source Code Pro", size: 10pt)
+        set text(font: ("Menlo", "Monaco", "Courier New"), size: 10pt)
         ```clair
         b1 .95 L0 @user "Explain yourself"
         b2 .9  L0 @self <b1 "I track my reasoning"
