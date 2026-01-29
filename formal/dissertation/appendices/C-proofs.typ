@@ -21,10 +21,10 @@ a unique well-defined result?
 
 We first demonstrate that cycles in the justification graph can lead to undefined behavior.
 
-#theorem[*C.1 (Cyclic Undefinedness)*][
+#theorem([
 If a justification graph contains a directed cycle, confidence propagation may fail to converge
 to a unique fixed point.
-]
+], title: "C.1 (Cyclic Undefinedness)")
 
 #proof[
 Consider a simple cycle of two beliefs:
@@ -55,10 +55,10 @@ propagation without additional fixed-point infrastructure. ∎
 
 #heading(level: 3)[C.1.3 The DAG Well-Foundedness Theorem]
 
-#theorem[*C.2 (DAG Well-Foundedness)*][
+#theorem([
 If the justification graph G = (V, E) is a directed acyclic graph (DAG), then
 confidence propagation terminates with a unique fixed point after at most |V| iterations.
-]
+], title: "C.2 (DAG Well-Foundedness)")
 
 #proof[
 We proceed by induction on the topological ordering of the DAG.
@@ -108,13 +108,13 @@ The DAG necessity result has two important consequences for CLAIR's design:
 CPL (Confidence-Bounded Provability Logic) extends the graded modal logic K with
 two special axioms:
 
-#theorem[*Axiom 4 (Graded Transitivity)*][
+#theorem([
 The graded modal axiom 4: box_c(p) implies box_fc(box_c(p)) for some strictly increasing function f.
-]
+], title: "Axiom 4 (Graded Transitivity)")
 
-#theorem[*Axiom GL (Graded Löb)*][
+#theorem([
 The graded Löb axiom: box_c(box_c(p) → p) implies box_gc(p)
-]
+], title: "Axiom GL (Graded Löb)")
 
 The key question is whether this axiom system is #emph[consistent]—that is,
 whether there exists a non-trivial model satisfying all axioms.
@@ -123,10 +123,10 @@ whether there exists a non-trivial model satisfying all axioms.
 
 We construct an explicit finite model demonstrating consistency.
 
-#theorem[*C.3 (CPL Consistency)*][
+#theorem([
 There exists a finite Kripke model M = (W, R, V, c) satisfying all CPL axioms
 for f(c) = c and g(c) = c².
-]
+], title: "C.3 (CPL Consistency)")
 
 #proof[
 Let W = {0, 1, 2} be a set of three worlds. Define the accessibility relation
@@ -183,10 +183,10 @@ that yield different logics (GL vs. S4 vs. K).
 The fundamental result for undercutting defeat is that sequential undercuts
 compose via the probabilistic OR operation.
 
-#theorem[*C.4 (Undercut Composition)*][
+#theorem([
 For any confidences c, d_1, d_2 ∈ [0,1]:
 undercut(undercut(c, d_1), d_2) = undercut(c, d_1 ⊕ d_2)
-]
+], title: "C.4 (Undercut Composition)")
 
 #proof[
 We compute directly from the definition undercut(c, d) = c × (1 - d):
@@ -205,10 +205,10 @@ where we use the definition d_1 ⊕ d_2 = d_1 + d_2 - d_1 d_2. ∎
 
 #heading(level: 3)[C.3.2 Corollaries of Undercut Composition]
 
-#corollary[*C.5 (Commutative Composition)*][
+#corollary([
 Undercut composition is commutative:
 undercut(undercut(c, d_1), d_2) = undercut(undercut(c, d_2), d_1)
-]
+], title: "C.5 (Commutative Composition)")
 
 #proof[
 Immediate from Theorem C.4 and commutativity of ⊕:
@@ -216,19 +216,19 @@ undercut(undercut(c, d_1), d_2) = undercut(c, d_1 ⊕ d_2)
 = undercut(c, d_2 ⊕ d_1) = undercut(undercut(c, d_2), d_1). ∎
 ]
 
-#corollary[*C.6 (Identity)*][
+#corollary([
 Undercut with zero defeat leaves confidence unchanged:
 undercut(c, 0) = c
-]
+], title: "C.6 (Identity)")
 
 #proof[
 undercut(c, 0) = c × (1 - 0) = c × 1 = c. ∎
 ]
 
-#corollary[*C.7 (Annihilation)*][
+#corollary([
 Undercut with complete defeat eliminates confidence:
 undercut(c, 1) = 0
-]
+], title: "C.7 (Annihilation)")
 
 #proof[
 undercut(c, 1) = c × (1 - 1) = c × 0 = 0. ∎
@@ -238,10 +238,10 @@ undercut(c, 1) = c × (1 - 1) = c × 0 = 0. ∎
 
 The rebut operation models competing evidence with a "market share" normalization.
 
-#theorem[*C.8 (Rebut Symmetry)*][
+#theorem([
 For any c_for, c_against ∈ [0, 1] with c_for + c_against > 0:
 rebut(c_for, c_against) + rebut(c_against, c_for) = 1
-]
+], title: "C.8 (Rebut Symmetry)")
 
 #proof[
 From the definition rebut(c_for, c_against) = c_for / (c_for + c_against):
@@ -252,11 +252,11 @@ rebut(c_for, c_against) + rebut(c_against, c_for)
 = 1 ∎
 ]
 
-#theorem[*C.9 (Rebut Monotonicity)*][
+#theorem([
 Rebut is monotone in the first argument and antitone in the second:
 - If c_1 ≤ c_2, then rebut(c_1, c) ≤ rebut(c_2, c)
 - If d_1 ≤ d_2, then rebut(c, d_2) ≤ rebut(c, d_1)
-]
+], title: "C.9 (Rebut Monotonicity)")
 
 #proof[
 For the first claim: rebut(c_1, c) = c_1 / (c_1 + c) ≤ c_2 / (c_2 + c) = rebut(c_2, c)
@@ -282,10 +282,10 @@ link attackers. This ordering is reflected in CLAIR's evaluation semantics
 A key limitation of the rebut operation is that it normalizes away absolute
 evidence strength.
 
-#theorem[*C.10 (Rebut Collapse)*][
+#theorem([
 For any scaling factor λ > 0:
 rebut(λ c_for, λ c_against) = rebut(c_for, c_against)
-]
+], title: "C.10 (Rebut Collapse)")
 
 #proof[
 rebut(λ c_for, λ c_against) = λ c_for / (λ c_for + λ c_against)

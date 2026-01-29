@@ -111,13 +111,13 @@ All appendices are lorem ipsum placeholders. Need real content.
 
 Formal grammar and semantics do not exist as a standalone readable spec.
 
-- [ ] **3.1 Create appendices/E-language-spec.typ** - New file with proper Typst structure
-- [ ] **3.2 Write complete BNF/EBNF grammar** - Types: `T ::= Nat | Bool | String | Unit | Belief<T> | ...`
-- [ ] **3.3 Write expression grammar** - `e ::= x | λx:T.e | e e | belief(v,c,p,j,i) | ...`
-- [ ] **3.4 Write typing judgment rules** - All 16 rules: `Γ ⊢ e : A @ c` format with inference rules
-- [ ] **3.5 Write operational semantics** - Small-step reduction: `e → e'` rules
-- [ ] **3.6 Document well-formedness constraints** - DAG requirement, stratification, confidence bounds
-- [ ] **3.7 Add to main dissertation** - Update clair-dissertation.typ to include E-language-spec.typ
+- [x] **3.1 Create appendices/E-language-spec.typ** - New file with proper Typst structure (DONE 2026-01-29)
+- [x] **3.2 Write complete BNF/EBNF grammar** - Types: `T ::= Nat | Bool | String | Unit | Belief<T> | ...` (DONE 2026-01-29)
+- [x] **3.3 Write expression grammar** - `e ::= x | λx:T.e | e e | belief(v,c,p,j,i) | ...` (DONE 2026-01-29)
+- [x] **3.4 Write typing judgment rules** - All 16 rules: `Γ ⊢ e : A @ c` format with inference rules (DONE 2026-01-29)
+- [x] **3.5 Write operational semantics** - Small-step reduction: `e → e'` rules (DONE 2026-01-29)
+- [x] **3.6 Document well-formedness constraints** - DAG requirement, stratification, confidence bounds (DONE 2026-01-29)
+- [x] **3.7 Add to main dissertation** - Update clair-dissertation.typ to include E-language-spec.typ (DONE 2026-01-29)
 
 ---
 

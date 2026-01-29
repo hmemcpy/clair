@@ -108,3 +108,4 @@
 #include "appendices/B-interpreter.typ"
 #include "appendices/C-proofs.typ"
 #include "appendices/D-glossary.typ"
+#include "appendices/E-language-spec.typ"
