@@ -54,7 +54,7 @@ These citations EXIST but are cited with wrong keys in text:
 - [x] **1.9 Add hintikka1962knowledge** - Hintikka's "Knowledge and Belief" (foundational epistemic logic) (DONE)
 - [x] **1.10 Add garrabrant2016logical** - Garrabrant et al. "Logical Induction" (MIRI) (DONE)
 - [x] **1.11 Add amgoud2017evaluation** - Amgoud & Ben-Naim "Evaluation of Arguments in Weighted Bipolar Graphs" (ECSQARU 2017) (DONE 2026-01-29)
-- [ ] **1.12 Add amgoud2023weighted** - Amgoud "Weighted Argumentation" (recent)
+- [x] **1.12 Add amgoud2023parameterised** - Amgoud, Doder & Vesic "Parameterised Gradual Semantics Dealing with Varied Degrees of Compensation" (IJCAI 2023) (DONE 2026-01-29)
 - [ ] **1.13 Add beklemishev2004provability** - Beklemishev "Provability algebras and proof-theoretic ordinals"
 - [ ] **1.14 Add bonjour1999defense** - BonJour "The Dialectic of Foundationalism and Coherentism"
 - [ ] **1.15 Add bonzon2016comparative** - Bonzon et al. "Comparative analysis of weighted argumentation"
