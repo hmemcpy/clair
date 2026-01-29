@@ -62,13 +62,15 @@ The single-step reduction relation `#text(code)[e -> e']` is defined inductively
 
 #heading(level: 3)[B.2.1 Core Lambda Calculus Rules]
 
-#theorem(body, title: "Beta Reduction")[For any type `A`, expression `e`, and value `v`:
+#theorem[
+  *Beta Reduction.* For any type `A`, expression `e`, and value `v`:
   `#text(code)[app (lam A e) v -> subst0 v e]`
 
   This is the standard beta reduction: applying a lambda to a value substitutes the value into the function body.
 ]
 
-#theorem(body, title: "Application Contexts")[If `#text(code)[e1 -> e1']` then:
+#theorem[
+  *Application Contexts.* If `#text(code)[e1 -> e1']` then:
   `#text(code)[app e1 e2 -> app e1' e2']`
 
   If `#text(code)[e2 -> e2']` and `v1` is a value then:
@@ -81,19 +83,22 @@ The single-step reduction relation `#text(code)[e -> e']` is defined inductively
 
 The key innovation of CLAIR is that beliefs are first-class values with associated confidence and justification:
 
-#theorem(body, title: "Value Extraction")[For belief `#text(code)[belief v c j]` where `v` is a value:
+#theorem[
+  *Value Extraction.* For belief `#text(code)[belief v c j]` where `v` is a value:
   `#text(code)[val (belief v c j) -> v]`
 
   This extracts the underlying value from a belief, discarding confidence and justification.
 ]
 
-#theorem(body, title: "Confidence Extraction")[For belief `#text(code)[belief v c j]` where `v` is a value:
+#theorem[
+  *Confidence Extraction.* For belief `#text(code)[belief v c j]` where `v` is a value:
   `#text(code)[conf (belief v c j) -> belief v c j]`
 
   This returns the belief itself; the confidence is implicit in the belief structure.
 ]
 
-#theorem(body, title: "Justification Extraction")[For belief `#text(code)[belief v c j]` where `v` is a value:
+#theorem[
+  *Justification Extraction.* For belief `#text(code)[belief v c j]` where `v` is a value:
   `#text(code)[just (belief v c j) -> litString (toString j)]`
 
   This extracts the justification as a human-readable string for auditing.
@@ -103,13 +108,15 @@ The key innovation of CLAIR is that beliefs are first-class values with associat
 
 The defeat operations (undercut and rebut) are defined via their effect on confidence:
 
-#theorem(body, title: "Undercut Evaluation")[For beliefs `#text(code)[belief v c1 j1]` and `#text(code)[belief d c2 j2]` where both `v` and `d` are values:
+#theorem[
+  *Undercut Evaluation.* For beliefs `#text(code)[belief v c1 j1]` and `#text(code)[belief d c2 j2]` where both `v` and `d` are values:
   `#text(code)[undercut (belief v c1 j1) (belief d c2 j2) -> belief v (c1 * (1 - c2)) (undercut_j j1 j2)]`
 
   Undercut reduces confidence multiplicatively: a defeater with confidence `c2` reduces confidence by a factor of `#text(code)[1 - c2]`.
 ]
 
-#theorem(body, title: "Rebuttal Evaluation")[For beliefs `#text(code)[belief v1 c1 j1]` and `#text(code)[belief v2 c2 j2]` where both are values:
+#theorem[
+  *Rebuttal Evaluation.* For beliefs `#text(code)[belief v1 c1 j1]` and `#text(code)[belief v2 c2 j2]` where both are values:
   `#text(code)[rebut (belief v1 c1 j1) (belief v2 c2 j2) -> belief v1 (c1 / (c1 + c2)) (rebut_j j1 j2)]`
 
   Rebuttal normalizes by relative strength. When `#text(code)[c1 = c2]`, confidence becomes `#text(code)[1/2]`.
@@ -119,8 +126,8 @@ The defeat operations (undercut and rebut) are defined via their effect on confi
 
 To ensure termination, the evaluator uses a #emph[fuel] parameter that bounds the number of reduction steps:
 
-#definition(body, title: "Fuel-Bounded Evaluation")[
-  `#text(code)[evalFuel : Nat -> Expr -> Option Expr]`
+#definition[
+  *Fuel-Bounded Evaluation.* `#text(code)[evalFuel : Nat -> Expr -> Option Expr]`
 
   - `#text(code)[evalFuel 0 e]` returns `#text(code)[some e]` if `e` is a value, `#text(code)[none]` otherwise
   - `#text(code)[evalFuel (n+1) e]` returns `#text(code)[some e']` if `e` evaluates to a value in `n+1` steps, `#text(code)[none]` if stuck
@@ -135,8 +142,8 @@ We demonstrate the interpreter on three representative CLAIR programs.
 
 #heading(level: 3)[B.4.1 Simple Belief Formation]
 
-#example(body, title: "Direct Belief")[
-  *Surface syntax:*
+#example[
+  *Direct Belief.* Surface syntax:
   ```lisp
   (belief 42 0.9 "sensor-reading")
   ```
@@ -155,8 +162,8 @@ We demonstrate the interpreter on three representative CLAIR programs.
 
 #heading(level: 3)[B.4.2 Evidence Aggregation]
 
-#example(body, title: "Independent Evidence Combination")[
-  *Surface syntax:*
+#example[
+  *Independent Evidence Combination.* Surface syntax:
   ```lisp
   (aggregate
     (belief "Paris is capital of France" 0.5 "prior")
@@ -185,8 +192,8 @@ We demonstrate the interpreter on three representative CLAIR programs.
 
 #heading(level: 3)[B.4.3 Undercutting in Action]
 
-#example(body, title: "Defeasible Reasoning")[
-  *Scenario:* A sensor reports "temperature is 25°C" with confidence 0.8, but a calibration warning suggests the sensor may be malfunctioning with confidence 0.3.
+#example[
+  *Defeasible Reasoning.* Scenario: A sensor reports "temperature is 25°C" with confidence 0.8, but a calibration warning suggests the sensor may be malfunctioning with confidence 0.3.
 
   *Surface syntax:*
   ```lisp
@@ -215,8 +222,8 @@ We demonstrate the interpreter on three representative CLAIR programs.
 
 #heading(level: 3)[B.4.4 Rebuttal and Confidence Collapse]
 
-#example(body, title: "Conflicting Evidence")[
-  *Scenario:* Two sources disagree on whether a fact holds, with confidences 0.7 and 0.3 respectively.
+#example[
+  *Conflicting Evidence.* Scenario: Two sources disagree on whether a fact holds, with confidences 0.7 and 0.3 respectively.
 
   *Lean representation:*
   ```lean
@@ -237,8 +244,8 @@ We demonstrate the interpreter on three representative CLAIR programs.
 
 #heading(level: 3)[B.4.5 Derivation Chain]
 
-#example(body, title: "Multi-Step Derivation")[
-  *Scenario:* Derive a conclusion from two premises using the `derive` operator.
+#example[
+  *Multi-Step Derivation.* Scenario: Derive a conclusion from two premises using the `derive` operator.
 
   *Lean representation:*
   ```lean
@@ -261,26 +268,26 @@ We demonstrate the interpreter on three representative CLAIR programs.
 
 The Lean formalization proves five key properties that demonstrate CLAIR's correctness as an epistemic reasoning system:
 
-#definition(body, title: "Property 1: Beliefs Track Confidence")[
-  Confidence is preserved through computation: if a belief `#text(code)[b]` has confidence `#text(code)[c]`, then after any sequence of valid reductions `#text(code)[b ->* b']`, the resulting belief `#text(code)[b']` has a confidence value that is a deterministic function of `#text(code)[c]` and the operations applied.
+#definition[
+  *Property 1: Beliefs Track Confidence.* Confidence is preserved through computation: if a belief `#text(code)[b]` has confidence `#text(code)[c]`, then after any sequence of valid reductions `#text(code)[b ->* b']`, the resulting belief `#text(code)[b']` has a confidence value that is a deterministic function of `#text(code)[c]` and the operations applied.
 ]
 
-#definition(body, title: "Property 2: Evidence is Affine")[
-  No evidence is double-counted. The `#text(code)[aggregate]` operator uses probabilistic sum `#text(code)[a ⊕ b = a + b - a*b]`, which equals the probability of the union of independent events. This ensures that aggregating a belief with itself does not increase confidence: `#text(code)[c ⊕ c = c + c - c*c = c(2 - c)]` which is only equal to `#text(code)[c]` when `#text(code)[c = 0]` or `#text(code)[c = 1]`. In practice, justification tracking prevents exact duplicate aggregation.
+#definition[
+  *Property 2: Evidence is Affine.* No evidence is double-counted. The `#text(code)[aggregate]` operator uses probabilistic sum `#text(code)[a ⊕ b = a + b - a*b]`, which equals the probability of the union of independent events. This ensures that aggregating a belief with itself does not increase confidence: `#text(code)[c ⊕ c = c + c - c*c = c(2 - c)]` which is only equal to `#text(code)[c]` when `#text(code)[c = 0]` or `#text(code)[c = 1]`. In practice, justification tracking prevents exact duplicate aggregation.
 ]
 
-#definition(body, title: "Property 3: Introspection is Safe")[
-  The `#text(code)[introspect]` operator satisfies the stratification constraints defined in Chapter 6. It is impossible to form a belief about the current confidence of that same belief, preventing the formation of self-referential paradoxes.
+#definition[
+  *Property 3: Introspection is Safe.* The `#text(code)[introspect]` operator satisfies the stratification constraints defined in Chapter 6. It is impossible to form a belief about the current confidence of that same belief, preventing the formation of self-referential paradoxes.
 ]
 
-#definition(body, title: "Property 4: Defeat Operations are Correct")[
-  Undercut and rebut satisfy their specifications:
+#definition[
+  *Property 4: Defeat Operations are Correct.* Undercut and rebut satisfy their specifications:
   - Undercut is monotonic in both arguments: higher source confidence or higher defeater confidence yields predictable results
   - Rebuttal is symmetric: `#text(code)[rebut b1 b2]` and `#text(code)[rebut b2 b1]` yield beliefs about opposing values with complementary confidence
 ]
 
-#definition(body, title: "Property 5: Type Checking is Decidable")[
-  The bidirectional type checker in `CLAIR.Typing.HasType` terminates for all well-formed inputs. This is proven formally in the Lean code by showing that each recursive call decreases a measure (expression size or stratification level).
+#definition[
+  *Property 5: Type Checking is Decidable.* The bidirectional type checker in `CLAIR.Typing.HasType` terminates for all well-formed inputs. This is proven formally in the Lean code by showing that each recursive call decreases a measure (expression size or stratification level).
 ]
 
 #heading(level: 2)[B.6 Implementation Notes]

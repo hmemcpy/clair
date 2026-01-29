@@ -12,7 +12,9 @@
 - **76 citations in references.bib**: Many "missing" citations are actually key mismatches
 
 ### What's Actually Missing
-- **Appendices A-D**: All are PLACEHOLDER content (lorem ipsum) - need real content
+- **Appendix C**: Placeholder content (lorem ipsum) - needs real content
+- **Appendix D**: COMPLETED (glossary with term definitions, notation table, and acronym list)
+- **Appendices A-B**: Have substantial real content (verified during this iteration)
 - **Appendix E (language spec)**: Does not exist - needs grammar, typing rules, operational semantics
 - **Chapter 14 (evaluation)**: Does not exist - needs empirical results
 - **Haskell implementation**: Does not exist - only design discussion in Chapter 10
@@ -40,6 +42,11 @@ These citations EXIST but are cited with wrong keys in text:
 - [x] **1.2c Fix bou2011finite → bou2011minimum** - Update all @bou2011finite citations (DONE)
 - [x] **1.2d Fix bonjour1999dialectic → bonjour1999defense** - Standardize to bonjour1999defense (DONE)
 - [x] **1.2e Remove klein2003infinite, klein2005infinitism, klein2003regress** - Use only klein1999human (DONE)
+
+### Additional Fixes During Iteration (2026-01-29):
+- [x] **2.15 Fix Appendix B function call syntax** - Changed `#theorem(body, title: "...")[...]` to `#theorem[*Title.* ...]` (DONE)
+- [x] **2.16 Fix layout.typ stroke parameter** - Changed `paint: accent` to `rest: accent` in theorem_box (DONE)
+- [x] **2.17 Implement Appendix D: Glossary** - Complete glossary with term definitions, notation table, and acronym list (DONE)
 
 ### Truly Missing Citations (~15 to add to references.bib)
 
@@ -93,9 +100,9 @@ All appendices are lorem ipsum placeholders. Need real content.
 
 ### Appendix D: Glossary
 
-- [ ] **2.12 Create term definitions** - Confidence, Justification, Provenance, Invalidation, etc.
-- [ ] **2.13 Add notation table** - ⊕, ⊗, □_c, etc. with meanings
-- [ ] **2.14 Add acronym list** - CLAIR, CPL, AGM, DAG, etc.
+- [x] **2.12 Create term definitions** - Confidence, Justification, Provenance, Invalidation, etc. (DONE)
+- [x] **2.13 Add notation table** - ⊕, ⊗, □_c, etc. with meanings (DONE)
+- [x] **2.14 Add acronym list** - CLAIR, CPL, AGM, DAG, etc. (DONE)
 
 ---
 

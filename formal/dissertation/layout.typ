@@ -12,7 +12,7 @@
     fill: academic-cream,
     inset: (left: 12pt, right: 12pt, top: 8pt, bottom: 8pt),
     radius: 2pt,
-    stroke: (left: 2pt, paint: accent),
+    stroke: (left: 2pt, rest: accent),
     width: 100%,
     [
       #set text(weight: "bold", fill: accent, size: 9pt)
