@@ -69,8 +69,8 @@ Löb's theorem is a cornerstone of provability logic:
   #strong[Löb's Theorem.]
 
   In any sufficiently strong formal system #emph[T] containing arithmetic:
-  $prove_T(square(square(P) -> P)) -> square(P)$
-  where #emph[$square$] denotes provability in #emph[T].
+  $"prov"_T("prov"("prov"(P) -> P)) -> "prov"(P)$
+  where #emph[$"prov"$] denotes provability in #emph[T].
 ]
 
 In words: if a system can prove "if #emph[P] is provable, then #emph[P] is true," then
@@ -84,9 +84,9 @@ the system can prove #emph[P]. This has a startling consequence.
 ]
 
 #proof[
-  Suppose system #emph[T] proved $forall P, square(P) -> P$. Instantiating with #emph[P = false]
-  (falsity), we get $square(false) -> false$. Combining with consistency ($neg square(false)$),
-  we can derive $square(false)$, contradicting consistency.
+  Suppose system #emph[T] proved $forall P, square(P) -> P$. Instantiating with #emph[P = "false"]
+  (falsity), we get $"prov"("false") -> "false"$. Combining with consistency ($not "prov"("false")$),
+  we can derive $"prov"("false")$, contradicting consistency.
 ]
 
 #heading(level: 3)[Application to CLAIR]
@@ -130,7 +130,7 @@ the Liar paradox. Tarski's solution is stratification:
   columns: 3,
   align: (left, left, left),
   stroke: 0.5pt,
-  fill: (x, y) => if calc.mod(x + y, 2) == 0 { academic-cream },
+  fill: (x, y) => if calc.rem(x + y, 2) == 0 { academic-cream },
   table.header([*Level*], [*Can Express*], [*Cannot Express*]),
   [Level 0 (object)], [Facts about the world], [Truth of any sentence],
   [Level 1 (meta)], [$X_0$ is true for level-0 X], [Truth of level-1 sentences],
@@ -147,7 +147,7 @@ We apply this to beliefs:
 #definition[
   #strong[Stratified Belief Type.]
 
-  $Bel(n, A)$ for $n in NN$
+  $"Bel"(n, A)$ for $n in cal("N")cal("N")$
   where level-$n$ beliefs may reference level-$m$ beliefs only if $m < n$.
 ]
 
@@ -182,8 +182,8 @@ We apply this to beliefs:
 #theorem[
   #strong[Stratification Safety.]
 
-  If all beliefs respect the stratification constraint---$Bel(n, A)$ references
-  only $Bel(m, B)$ with $m < n$---then no Liar-like paradox can arise.
+  If all beliefs respect the stratification constraint---$"Bel"(n, A)$ references
+  only $"Bel"(m, B)$ with $m < n$---then no Liar-like paradox can arise.
 ]
 
 #proof[
@@ -237,7 +237,7 @@ consistent confidence assignments---while others do not.
 
   A self-referential belief #emph[b] with confidence function #emph[f : cal("D")cal("D")[0,1] -> cal("D")cal("D")[0,1]]
   (determining confidence from the assumed truth value) has a fixed point if
-  there exists #emph[c in cal("D")cal("D")[0,1]} such that:
+  there exists #emph[c in cal("D")cal("D")[0,1]] such that:
   $c = f(c)$
 ]
 
@@ -324,7 +324,7 @@ Combining Tarski and Kripke, we classify self-referential constructs:
   columns: 4,
   align: (left, left, left, left),
   stroke: 0.5pt,
-  fill: (x, y) => if calc.mod(x + y, 2) == 0 { academic-cream },
+  fill: (x, y) => if calc.rem(x + y, 2) == 0 { academic-cream },
   table.header([*Category*], [*Fixed Points*], [*Status*], [*Example*]),
   [Grounded], [Unique], [Safe], [Calibration beliefs],
   [Underdetermined], [Multiple], [Policy choice], [Truth-teller],
@@ -361,7 +361,7 @@ The standard modal logic of provability is GL (Gödel-Löb):
 #definition[
   #strong[GL Syntax.]
 
-  $phi ::= p | neg phi | phi and phi | phi or phi | phi -> phi | square phi$
+  $phi ::= p | not phi | phi and phi | phi or phi | phi -> phi | square phi$
   where $square phi$ means $phi$ is provable.
 ]
 
@@ -383,7 +383,7 @@ can prove false statements if its axioms are wrong.
   columns: 5,
   align: (left, center, center, center, center),
   stroke: 0.5pt,
-  fill: (x, y) => if calc.mod(x + y, 2) == 0 { academic-cream },
+  fill: (x, y) => if calc.rem(x + y, 2) == 0 { academic-cream },
   table.header([*Logic*], [*K*], [*T*], [*4*], [*5 or L*]),
   [K], [✓], [], [], [],
   [T], [✓], [✓], [], [],
@@ -406,7 +406,7 @@ CLAIR aligns with GL:
   #strong[Solovay Completeness.]
 
   GL is sound and complete with respect to:
-  1. Arithmetic provability: $GL |- phi$ iff $phi$ holds under all
+  1. Arithmetic provability: $"GL" |- phi$ iff $phi$ holds under all
      interpretations of $square$ as Gödel provability in PA.
   2. Finite transitive irreflexive Kripke frames.
 ]
@@ -444,7 +444,7 @@ CPL fills this gap.
 #definition[
   #strong[CPL Syntax.]
 
-  $phi ::= p | neg phi | phi and phi | phi or phi | phi -> phi | square_c phi$
+  $phi ::= p | not phi | phi and phi | phi or phi | phi -> phi | square_c phi$
   where $square_c phi$ means $phi$ is believed with confidence at least $c$.
 ]
 
@@ -458,7 +458,7 @@ CPL fills this gap.
   + $R : W times W -> cal("D")[0,1]$ is a graded accessibility relation
 
   satisfying:
-  + #strong[Transitivity]: $R(w,v) otimes R(v,u) <= R(w,u)$
+  + #strong[Transitivity]: $R(w,v) dot R(v,u) <= R(w,u)$
   + #strong[Converse well-foundedness]: No infinite sequence
     $w_0, w_1, w_2, ...$ with $R(w_(i+1), w_i) > 0$ for all $i$
 ]
@@ -468,10 +468,10 @@ CPL fills this gap.
 
   A #emph[graded valuation] on a frame $(W, R)$ assigns to each world $w$ and
   proposition $p$ a confidence value $V_w(p) in cal("D")[0,1]$. Extended to formulas:
-  + $V_w(neg phi) = 1 - V_w(phi)$
-  + $V_w(phi and psi) = V_w(phi) otimes V_w(psi)$
-  + $V_w(phi or psi) = V_w(phi) oplus V_w(psi)$
-  + $V_w(phi -> psi) = "sup"{c in cal("D")[0,1] : V_w(phi) otimes c <= V_w(psi)}$
+  + $V_w(not phi) = 1 - V_w(phi)$
+  + $V_w(phi and psi) = V_w(phi) dot V_w(psi)$
+  + $V_w(phi or psi) = V_w(phi) + V_w(psi) - V_w(phi) V_w(psi)$
+  + $V_w(phi -> psi) = "sup"{c in cal("D")[0,1] : V_w(phi) dot c <= V_w(psi)}$
   + $V_w(square_c phi) = "inf"_(v : R(w,v) >= c) V_v(phi)$
 ]
 
@@ -482,8 +482,8 @@ in all worlds accessible with strength at least #emph[c].
 
 The crucial innovation in CPL is the graded analogue of Löb's axiom.
 
-#note[
-  #strong[Axiom Status Statement.]
+#block[
+  #emph[Axiom Status Statement.]
 
   The Graded Löb axiom is a #strong[DESIGN AXIOM], not a semantic theorem derived
   from more basic principles. It is motivated by the requirement of anti-bootstrapping
@@ -495,11 +495,14 @@ The crucial innovation in CPL is the graded analogue of Löb's axiom.
   a non-trivial model satisfying all CPL axioms.
 ]
 
-#axiom[
+#definition[
   #strong[Graded Löb Axiom (Design Axiom).]
 
   $square_c(square_c phi -> phi) -> square_(g(c)) phi$
   where $g : cal("D")[0,1] -> cal("D")[0,1]$ is a #emph[discount function] satisfying $g(c) <= c$.
+
+  This is a #strong[DESIGN AXIOM]---not derived from more basic principles but posited
+  as part of CPL's definition. The axiom is motivated by anti-bootstrapping requirements.
 ]
 
 The function #emph[g] captures the #emph[cost] of self-soundness claims. If you believe
@@ -547,13 +550,13 @@ we recommend:
   #strong[Anti-Bootstrapping.]
 
   In CPL with $g(c) = c^2$:
-  $conf(square_c(square_c phi -> phi)) = c => conf(phi) <= c^2 < c$
+  $"conf"(square_c(square_c phi -> phi)) = c => "conf"(phi) <= c^2 < c$
   Consequently, no finite chain of self-soundness claims can increase confidence
   beyond the initial level.
 ]
 
 #proof[
-  Applying the Graded Löb axiom to the hypothesis yields $conf(square_(c^2) phi)
+  Applying the Graded Löb axiom to the hypothesis yields $"conf"(square_(c^2) phi)
   <= c^2$. Iterating: $c -> c^2 -> c^4 -> c^8 -> ...$. For any $c < 1$,
   this sequence converges to 0. Self-soundness claims can only decrease confidence.
 ]
@@ -673,8 +676,8 @@ Restrict confidence to a finite lattice instead of continuous $cal("D")[0,1]$:
 
   Let $L_n = {0, 1/(n-1), 2/(n-1), ..., 1}$. CPL-finite evaluates
   over $L_n$ with discretized operations:
-  + $a otimes b = floor(a times b)$
-  + $a oplus b = ceil(a + b - a times b)$
+  + $a times b = floor(a times b)$
+  + $a plus b = ceil(a + b - a times b)$
   + $g_L(c) = floor(c^2)$
 ]
 
@@ -684,7 +687,7 @@ For $L_5 = {0, 0.25, 0.5, 0.75, 1}$:
   columns: 3,
   align: (center, center, center),
   stroke: 0.5pt,
-  fill: (x, y) => if calc.mod(x + y, 2) == 0 { academic-cream },
+  fill: (x, y) => if calc.rem(x + y, 2) == 0 { academic-cream },
   table.header([$c$], [$c^2$], [$g_(L.5.)(c)$]),
   [0], [0], [0],
   [0.25], [0.0625], [0],
@@ -737,7 +740,7 @@ Restrict to stratified beliefs without any self-reference:
   columns: 4,
   align: (left, left, left, left),
   stroke: 0.5pt,
-  fill: (x, y) => if calc.mod(x + y, 2) == 0 { academic-cream },
+  fill: (x, y) => if calc.rem(x + y, 2) == 0 { academic-cream },
   table.header([*Fragment*], [*Decidable?*], [*Expressiveness*], [*Use Case*]),
   [Full CPL], [Likely no], [Full], [Theoretical analysis],
   [CPL-finite], [Yes], [Discrete confidence], [Type-level checks],
@@ -751,8 +754,8 @@ An alternative approach uses Gödel algebra (min/max) instead of product operati
 #definition[
   #strong[CPL-Gödel.]
 
-  + $a otimes b = min(a, b)$
-  + $a oplus b = max(a, b)$
+  + $a times b = min(a, b)$
+  + $a plus b = max(a, b)$
 ]
 
 #theorem[
@@ -765,21 +768,23 @@ An alternative approach uses Gödel algebra (min/max) instead of product operati
 However, CPL-Gödel is #emph[semantically inappropriate] for CLAIR:
 
 + #strong[max fails aggregation]: $max(0.6, 0.6) = 0.6$, but two independent
-  pieces of evidence should yield higher confidence (0.84 with $oplus$).
+  pieces of evidence should yield higher confidence (0.84 with $plus$).
 + #strong[min lacks degradation]: $min(a, a) = a$, but derivation should
   cost confidence.
 + #strong[No algebraic discount]: The $c^2$ discount becomes purely
   frame-based, losing the anti-bootstrapping semantics.
 
-#recommendation[
+#block[
+  #emph[Recommendation.]
+
   For CLAIR, use CPL-finite (with product operations), not CPL-Gödel. Accept the
   discretization rather than sacrifice semantic fidelity.
 ]
 
 #heading(level: 2)["Conservative Over GL": Clarification]
 
-#note[
-  #strong[On "Conservative Over GL" Claims.]
+#block[
+  #emph[On "Conservative Over GL" Claims.]
 
   The phrase "CPL is conservative over GL" requires careful definition. Two interpretations:
 
@@ -803,11 +808,11 @@ However, CPL-Gödel is #emph[semantically inappropriate] for CLAIR:
 CLAIR should implement a two-layer approach to self-reference:
 
 + #strong[Default: Stratification]. All beliefs are level-indexed.
-  $Bel(n, A)$ can only reference $Bel(m, B)$ with $m < n$. This is
+  $"Bel"(n, A)$ can only reference $"Bel"(m, B)$ with $m < n$. This is
   safe by construction and requires no runtime analysis.
 
 + #strong[Escape hatch: Kripke fixed points]. For legitimate self-reference
-  (calibration, uncertainty tracking), use #code[self_ref_belief] which
+  (calibration, uncertainty tracking), use `self_ref_belief` which
   computes fixed points at construction time. Ill-formed constructs are
   rejected.
 
