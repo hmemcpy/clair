@@ -218,7 +218,7 @@ No evaluation chapter or empirical results exist.
 - [x] **12.1 Run full Typst compile** - No errors, no undefined references (DONE 2026-01-29)
 - [x] **12.2 Run Lean build** - Clean build (accept 5 known sorries) (DONE 2026-01-29)
 - [x] **12.3 Run Haskell tests** - All tests pass (DONE 2026-01-29)
-- [ ] **12.4 Verify defense questions answerable** - Check all 10 from review
+- [x] **12.4 Verify defense questions answerable** - Check all 10 from review (DONE 2026-01-29)
 - [x] **12.5 Update conclusion (Chapter 13)** - Reflect completed remediation work (DONE 2026-01-29)
 - [ ] **12.6 Final proofread** - Grammar, consistency, formatting
 
