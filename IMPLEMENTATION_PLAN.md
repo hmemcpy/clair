@@ -44,7 +44,7 @@ These citations EXIST but are cited with wrong keys in text:
 ### Truly Missing Citations (~15 to add to references.bib)
 
 - [x] **1.9 Add hintikka1962knowledge** - Hintikka's "Knowledge and Belief" (foundational epistemic logic) (DONE)
-- [ ] **1.10 Add garrabrant2016logical** - Garrabrant et al. "Logical Induction" (MIRI)
+- [x] **1.10 Add garrabrant2016logical** - Garrabrant et al. "Logical Induction" (MIRI) (DONE)
 - [ ] **1.11 Add amgoud2017evaluation** - Amgoud & Ben-Naim "Evaluation of Arguments"
 - [ ] **1.12 Add amgoud2023weighted** - Amgoud "Weighted Argumentation" (recent)
 - [ ] **1.13 Add beklemishev2004provability** - Beklemishev "Provability algebras and proof-theoretic ordinals"
