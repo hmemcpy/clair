@@ -208,7 +208,7 @@ No evaluation chapter or empirical results exist.
 ## Phase 11: Foundational Hole Repairs
 
 - [x] **11.1 Formalize "tracking paradigm"** - State representation, update rules, correctness criteria (DONE 2026-01-29)
-- [ ] **11.2 Add dependency bounds discussion** - When ⊕ breaks under correlation, interval alternatives
+- [x] **11.2 Add dependency bounds discussion** - When ⊕ breaks under correlation, interval alternatives (DONE 2026-01-29)
 - [ ] **11.3 Document explanation extraction** - How CLAIR traces become human-auditable
 
 ---

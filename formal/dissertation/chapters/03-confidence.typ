@@ -572,6 +572,166 @@ When independence is violated, CLAIR provides alternatives:
   specifying correlation or preventing double-counting through the type system.
 ]
 
+#heading(level: 3)[Interval-Based Confidence: Dependency Bounds]
+
+When dependence between evidence sources is unknown or partially known, CLAIR
+supports #emph[interval-based confidence] as a robust alternative to point-value
+aggregation. Instead of committing to a single confidence value, we track
+upper and lower bounds that reflect uncertainty about dependence.
+
+#definition[
+  #strong[Confidence Interval.]
+
+  A #strong[confidence interval] is a pair #emph[[c_low, c_high]] with #emph[0 <= c_low <= c_high <= 1].
+  The interpretation: the true confidence lies in this interval, with the width
+  #emph[c_high - c_low] reflecting uncertainty about evidence dependence.
+]
+
+#heading(level: 4)[Interval Aggregation Bounds]
+
+For evidence with confidence values #emph[a] and #emph[b], the independence
+assumption determines the correct aggregation:
+
++ #strong[Independent]: #emph[a oplus b = a + b - a times b] (probabilistic sum)
++ #strong[Maximally dependent]: #emph[max(a, b)] (no double-counting)
++ #strong[Anti-correlated]: Could theoretically reach #emph[min(a + b, 1)]
+
+#theorem[
+  #strong[Interval Aggregation Bound.]
+
+  For confidence values #emph[a, b in C], define:
+  #emph[oplus_indep(a, b) = a oplus b = a + b - a times b]
+  #emph[oplus_dep(a, b) = max(a, b)]
+
+  Then for any unknown correlation structure:
+  #emph[oplus_dep(a, b) <= true_aggregation <= oplus_indep(a, b)]
+
+  #proof[
+    The lower bound #emph[max(a, b)] occurs when evidence is fully dependent
+    (one source's evidence is a subset of the other's). The upper bound #emph[a oplus b]
+    occurs when evidence is independent. Any positive correlation reduces the
+    effective aggregation below #emph[a oplus b], while negative correlation is
+    impossible for evidential support (evidence cannot be negatively correlated
+    with the truth of what it supports).
+  ]
+]
+
+#definition[
+  #strong[Interval Aggregation.]
+
+  For confidence intervals #emph[[a_low, a_high]] and #emph[[b_low, b_high]]:
+  #emph[[a_low, a_high] oplus_interval [b_low, b_high] = [max(a_low, b_low), a_high oplus b_high]]
+
+  The lower bound uses #emph[max] (maximal dependence) and the upper bound uses
+  #emph[oplus] (independence).
+]
+
+#example[
+  #strong[Interval-Based Aggregation for Unknown Dependence.]
+
+  Two news sources report the same fact. Each has confidence #emph[0.7], but we
+  suspect possible shared provenance (they may have derived from the same press
+  release).
+
+  Point-value approach with #emph[oplus]: #emph[0.7 oplus 0.7 = 0.91]
+  This assumes independence and may be overconfident.
+
+  Interval-based approach: #emph[[0.7, 0.7] oplus_interval [0.7, 0.7] = [max(0.7, 0.7), 0.7 oplus 0.7] = [0.7, 0.91]]
+
+  The interval #emph[[0.7, 0.91]] captures our uncertainty: the true confidence
+  could be as low as #emph[0.7] (if the sources are fully dependent) or as high as
+  #emph[0.91] (if independent). The width #emph[0.21] quantifies our dependence
+  uncertainty.
+]
+
+#heading(level: 4)[Interval Propagation]
+
+Intervals propagate through CLAIR's operations:
+
++ #strong[Multiplication]: #emph[[a_low, a_high] times [b_low, b_high] = [a_low times b_low, a_high times b_high]]
++ #strong[Undercut]: #emph[undercut([a_low, a_high], d) = [a_low times (1-d), a_high times (1-d)]]
++ #strong[Rebut]: More complex; requires propagating both bounds through the ratio
+
+#theorem[
+  #strong[Interval Bound Preservation.]
+
+  If #emph[[a_low, a_high]] and #emph[[b_low, b_high]] are valid intervals
+  (#emph[0 <= a_low <= a_high <= 1]), then all CLAIR operations produce valid
+  intervals.
+
+  #proof[
+    Each operation preserves bounds: #emph[oplus] preserves #[0,1] (Theorem 3.3),
+    multiplication preserves #[0,1] (Theorem 3.10), and undercut preserves #[0,1]
+    (Theorem 3.16). Interval extensions apply the same bounds to endpoints.
+  ]
+]
+
+#heading(level: 4)[Dependency Bounds from Provenance Tracking]
+
+CLAIR's linear type system (Chapter 10) enables #emph[provenance tracking], which
+provides tighter dependency bounds than worst-case intervals.
+
+#definition[
+  #strong[Provenance-Aware Dependency Bound.]
+
+  Let #emph[S(e)] be the set of primitive sources (axioms, sensor inputs, LLM outputs)
+  used to derive evidence #emph[e]. For two evidences #emph[e_1, e_2]:
+
+  + If #emph[S(e_1) and S(e_2)] are disjoint (disjoint provenance): independence is #emph[plausible], use #emph[oplus]
+  + If #emph[S(e_1)] is a subset of #emph[S(e_2)] or vice versa (subset provenance): maximal dependence, use #emph[max]
+  + If there is partial overlap in provenance: use #emph[oplus_delta] with dependency estimated as the fraction of shared sources
+]
+
+This provides a #emph[heuristic but principled] way to estimate correlation from
+provenance structure. The intuition: shared evidence sources correlate the
+derivations that depend on them.
+
+#example[
+  #strong[Provenance-Aware Aggregation.]
+
+  Three sources support a conclusion:
+  + #emph[e_1] depends on sensors #emph[s_1, s_2]
+  + #emph[e_2] depends on sensors #emph[s_2, s_3]
+  + #emph[e_3] depends on sensor #emph[s_4]
+
+  Aggregating #emph[e_1] and #emph[e_2]: They share sensor #emph[s_2], so #emph[delta approx 1/2].
+  Aggregating with #emph[e_3]: Disjoint from #emph[e_1, e_2], so independence is plausible.
+
+  This is more precise than worst-case intervals and more honest than assuming
+  full independence.
+]
+
+#heading(level: 4)[When to Use Intervals vs Point Values]
+
+#strong[Use point values when:]
++ Provenance tracking confirms disjoint sources
++ Domain knowledge guarantees independence
++ Computational efficiency is critical
+
+#strong[Use intervals when:]
++ Provenance is incomplete or unknown
++ Sources may share hidden dependencies
++ Conservative decision-making is required (e.g., safety-critical systems)
++ Auditing requires explicit uncertainty quantification
+
+#block[
+  #emph[Relationship to Imprecise Probability.]
+
+  Interval-based confidence in CLAIR is related to Walley's imprecise probability
+  and Dempster-Shafer theory, but with key differences:
+
+  + #strong[Not a probability interval]: Our intervals bound #emph[calibrated reliability],
+    not frequency in a reference class.
+  + #strong[Not belief/plausibility]: We don't track separate belief and plausibility
+    masses as in Dempster-Shafer.
+  + #strong[Operational]: Intervals quantify uncertainty about #emph[evidence dependence],
+    not about the proposition itself.
+]
+
+This interval-based approach directly addresses Hole A from the review: when
+independence assumptions are violated, CLAIR provides principled alternatives
+that avoid overcounting while preserving auditability.
+
 #heading(level: 2)[Conclusion]
 
 This chapter established the algebraic and semantic foundation of CLAIR:
