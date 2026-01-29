@@ -455,13 +455,72 @@ assumption that must be stated explicitly:
   do not systematically overlap.
 ]
 
-When independence fails, #emph[oplus] overcounts evidence. CLAIR provides two mechanisms:
+#heading(level: 3)[When Oplus is Valid]
 
-1. #strong[Correlation-aware aggregation]: Chapter 4 introduces #emph[oplus_delta] for
-   correlated evidence, where #emph[delta in [0,1]] measures dependency.
+The #emph[oplus] operation is #strong[semantically justified] when:
 
-2. #strong[Affine type system]: Evidence usage is tracked at type level, preventing
-   the same source from being counted twice in a derivation.
++ #strong[Independent sources]: Evidence derives from causally independent mechanisms
+  (e.g., different sensors, different witnesses, different reasoning paths).
+
++ #strong[No shared provenance]: The sources do not derive from common antecedents
+  that would cause their errors to correlate.
+
++ #strong[Reference class disjointness]: The calibration reference classes for
+  #emph[e_1] and #emph[e_2] do not systematically overlap.
+
+#example[
+  #strong[Valid Independent Aggregation.]
+
+  Three different image classifiers (trained on different datasets, with different
+  architectures) each assign confidence 0.7 to #quote[This image contains a cat].
+  The combined confidence #emph[0.7 oplus 0.7 oplus 0.7 approx 0.973] is justified
+  because the classifiers make statistically independent errors.
+]
+
+#heading(level: 3)[When Oplus Breaks]
+
+The #emph[oplus] operation #strong[overcounts] and produces misleading confidence when:
+
++ #strong[Shared provenance]: Two sources derive from the same evidence. For example,
+  two newspapers reporting the same press release should not be aggregated via #emph[oplus].
+
++ #strong[Common systematic bias]: Sources that share the same misconception or
+  training data flaw will make correlated errors. Aggregating them amplifies bias.
+
++ #strong[Circular dependence]: When #emph[e_2] cites #emph[e_1] as a source, their
+  evidence is not independent.
+
+#example[
+  #strong[Invalid Aggregation Due to Shared Provenance.]
+
+  A fact-checking website cites #emph[Source A]. A blog post then cites the
+  fact-checking website. Treating these as independent evidence would incorrectly
+  inflate confidence via #emph[oplus].
+]
+
+#heading(level: 3)[Correlation-Aware Alternatives]
+
+When independence is violated, CLAIR provides alternatives:
+
++ #strong[Correlation-aware aggregation]: Chapter 4 introduces #emph[oplus_delta] for
+  correlated evidence, where #emph[delta in [0,1]] measures dependency:
+  #emph[a oplus_delta(b) = a + b - a times b - delta]
+
++ #strong[Min-based aggregation]: When sources may be completely dependent,
+  use #emph[max(a, b)] instead of #emph[oplus] to avoid overcounting.
+
++ #strong[Affine type system]: Evidence usage is tracked at type level, preventing
+  the same source from being counted twice in a derivation. This is enforced
+  by CLAIR's linear type system (Chapter 10).
+
+#block[
+  #emph[Independence Detection.]
+
+  In practice, determining whether evidence sources are independent requires
+  domain knowledge and provenance tracking. CLAIR does #strong[not] automatically
+  detect dependence---it provides the algebraic machinery for #emph[manually]
+  specifying correlation or preventing double-counting through the type system.
+]
 
 #heading(level: 2)[Conclusion]
 
