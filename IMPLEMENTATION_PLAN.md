@@ -1,306 +1,223 @@
-# Implementation Plan: CLAIR Thesis Remediation
+# Implementation Plan: CLAIR IR Viability Exploration
 
-> **Scope**: Full remediation | **Risk**: Balanced | **Validation**: Full verification (Lean + Typst + checklist + examples)
+> **Scope**: Deep & focused | **Risk**: Balanced | **Validation**: Example-driven (concrete cases, counter-examples, impossibilities)
 
-## Gap Analysis Summary
+## Summary
 
-### What's Already Done (Verified)
-- **Lean formalization**: Builds cleanly, ~95% machine-checked (only 5 sorries in substitution/weakening lemmas)
-- **Typst compilation**: Compiles with no errors
-- **13 dissertation chapters**: All have substantial content (not placeholders)
-- **Chapter 3 semantic commitments**: Already EXISTS and explicitly rejects "0.5 = ignorance"
-- **76 citations in references.bib**: Many "missing" citations are actually key mismatches
+Explore the viability of CLAIR as an IR for LLM reasoning traces through 4 focused threads: Thinker production, Assembler consumption, auditability, and edge cases. Each thread produces concrete examples and counter-examples rather than heavy formalization. Existing Lean proofs and dissertation work are selectively reused where they apply to the new model.
 
-### What's Actually Missing
-- **Appendix C**: Placeholder content (lorem ipsum) - needs real content
-- **Appendix D**: COMPLETED (glossary with term definitions, notation table, and acronym list)
-- **Appendices A-B**: Have substantial real content (verified during this iteration)
-- **Appendix E (language spec)**: COMPLETED - IR format specification in Chapter 10
-- **Chapter 14 (evaluation)**: Does not exist - needs empirical results
-- **~15 truly missing citations**: After accounting for key mismatches
+**Previous exploration work is archived as reference:**
+- `EXPLORATION.md` (old) → archived, replaced by this plan
+- `specs/clair-exploration.md` → archived (old programming language model)
+- `specs/thesis-remediation.md` → archived (dissertation fixes, 97% complete)
 
 ---
 
-## Phase 1: Bibliography Fixes (HIGH PRIORITY - Blocking)
+## Gap Analysis (2026-02-04)
 
-### Citation Key Mismatches (8 fixes)
-These citations EXIST but are cited with wrong keys in text:
+**What exists:**
+- `examples/pi-calculation.md` — ONE end-to-end Thinker→Assembler example (algorithmic). Covers a single problem type (A1), one trace-to-code scenario (B1), and demonstrates basic query patterns (C1). Contains 18 beliefs (b1–b18) with confidence values, justification chains, and invalidation conditions.
+- `notes/exploration-2026-01-29-minimal-spec.md` — Foundational exploration that defined the new model. Includes 7 stress-test sketches: pi-calculation, HTML parser, file summary, conditionals, self-reference (Liar paradox), paradoxes, unknowns. These are *seeds* (2–5 beliefs each) not full explorations — they don't meet the spec's validation criteria (≥3 examples, ≥1 counter-example, thesis connection, open questions).
+- `notes/reassessment-2026-01-29.md` — Component-by-component assessment of old vs new model. Identifies what's obsolete (syntax, types, parser) and what's reusable (confidence algebra, stratification). Seed material for R3.
+- `notes/design-rationale.md` — Design rationale for the CLAIR model. Reference material.
+- `notes/prior-art.md` — Prior art survey. Reference material for C4 (comparison with alternatives).
+- `formal/clair-spec.md` — Canonical CLAIR spec v0.1. Referenced by A3 (teachability).
+- `formal/lean/CLAIR/Confidence/` — Confidence algebra fully proven (40+ theorems): bounds, ×, ⊕, undercut, rebut, min, non-distributivity. Key theorems: `mul_le_left`, `oplus_comm`, `oplus_assoc`, `mul_oplus_not_distrib`, `undercut_compose`, `rebut_add_rebut_swap`. Directly relevant to D4, R1.
+- `formal/lean/CLAIR/Belief/Stratified.lean` — Stratification + Löb discount proven: `no_confidence_bootstrap`, `loebChain_decreasing`, `no_self_introspection`, `no_circular_introspection`, `loebDiscount_strict_lt`. Directly relevant to D5, R2.
+- `formal/lean/CLAIR/Belief/DAG.lean` — Belief DAG structure defined with `Acyclic`, `Grounded`, `ValidCLAIRDocument` (some proofs use `sorry`). Reference for structural validation. Note: `sorry` gaps mean DAG acyclicity/groundedness are *defined* but not fully proven.
+- `notes/design-rationale.md` — Captures *why* design decisions were made (beliefs as unit, continuous confidence, opaque NL content). Directly relevant to D6 (boundary problem) and synthesis tasks.
+- `notes/prior-art.md` — Comprehensive survey: Subjective Logic (Jøsang), TMS (Doyle/de Kleer), Justification Logic (Artemov), weighted argumentation (Dung). Directly relevant to C4 (comparison with alternatives).
+- 58 completed exploration threads in `exploration/completed/` — ALL under the OLD programming language model. Deep theory (epistemology, self-reference, affine types, graded monads) but zero practical IR examples. Includes active-but-old-model threads: 8.4 (interpreter extraction) and 3.15 (stratification Lean completion).
+- `examples/hello-world-simple.clair` — Old-syntax example (OBSOLETE). Evidence for R3.
+- `exploration/ir/` — **Empty.** No IR-model exploration started yet.
 
-- [x] **1.1 Fix tarski1933 → tarski1933concept** - Update all @tarski1933 citations (DONE)
-- [x] **1.2 Fix doyle1979 → doyle1979truth** - Update all @doyle1979 citations (DONE)
-- [x] **1.3 Fix dekleer1986 → dekleer1986assumption** - Update all @dekleer1986 citations (DONE)
-- [x] **1.4 Fix josang2016 → josang2016subjective** - Update all @josang2016 citations (DONE)
-- [x] **1.5 Fix condorcet1785essai → condorcet1785essay** - Update all citations (DONE)
-- [x] **1.6 Fix artemov2001 → artemov2001explicit** - Update all @artemov2001 citations (DONE)
-- [x] **1.7 Fix nagel1974bat → nagel1974like** - Update all @nagel1974bat citations (DONE - comment only)
-- [x] **1.8 Fix van2007dynamic → ditmarsch2007dynamic** - Update all @van2007dynamic citations (DONE)
+**What's missing (all 24 tasks unchecked):**
+- No diverse problem type examples beyond pi-calculation
+- No Assembler consumption testing whatsoever
+- No systematic trace quality analysis
+- No teachability or calibration experiments
+- No information loss taxonomy
+- No scale/readability testing
+- No comparison with alternative representations
+- No "impossible trace" collection
+- No reuse mapping documents connecting Lean proofs to new model
 
-### Additional Key Mismatches Fixed During Implementation:
-- [x] **1.2a Fix alchourron1985logic → agm1985logic** - Update all @alchourron1985logic citations (DONE)
-- [x] **1.2b Fix caicedo2013godel → caicedo2013finite** - Update all @caicedo2013godel citations (DONE)
-- [x] **1.2c Fix bou2011finite → bou2011minimum** - Update all @bou2011finite citations (DONE)
-- [x] **1.2d Fix bonjour1999dialectic → bonjour1999defense** - Standardize to bonjour1999defense (DONE)
-- [x] **1.2e Remove klein2003infinite, klein2005infinitism, klein2003regress** - Use only klein1999human (DONE)
-
-### Additional Fixes During Iteration (2026-01-29):
-- [x] **2.15 Fix Appendix B function call syntax** - Changed `#theorem(body, title: "...")[...]` to `#theorem[*Title.* ...]` (DONE)
-- [x] **2.16 Fix layout.typ stroke parameter** - Changed `paint: accent` to `rest: accent` in theorem_box (DONE)
-- [x] **2.17 Implement Appendix D: Glossary** - Complete glossary with term definitions, notation table, and acronym list (DONE)
-- [x] **2.18 Fix Appendix D table code mode issues** - Fixed #sym[...] and underscore issues in table cells (DONE 2026-01-29)
-
-### Truly Missing Citations (~15 to add to references.bib)
-
-- [x] **1.9 Add hintikka1962knowledge** - Hintikka's "Knowledge and Belief" (foundational epistemic logic) (DONE)
-- [x] **1.10 Add garrabrant2016logical** - Garrabrant et al. "Logical Induction" (MIRI) (DONE)
-- [x] **1.11 Add amgoud2017evaluation** - Amgoud & Ben-Naim "Evaluation of Arguments in Weighted Bipolar Graphs" (ECSQARU 2017) (DONE 2026-01-29)
-- [x] **1.12 Add amgoud2023parameterised** - Amgoud, Doder & Vesic "Parameterised Gradual Semantics Dealing with Varied Degrees of Compensation" (IJCAI 2023) (DONE 2026-01-29)
-- [x] **1.13 Add beklemishev2004provability** - Beklemishev "Provability algebras and proof-theoretic ordinals" (DONE 2026-01-29)
-- [x] **1.14 Add bonjour1999defense** - BonJour "The Dialectic of Foundationalism and Coherentism" (DONE 2026-01-29)
-- [x] **1.15 Add bonzon2016comparative** - Bonzon et al. "Comparative analysis of weighted argumentation" (DONE 2026-01-29)
-- [x] **1.16 Add derijke2000graded** - de Rijke "Graded Modalities" (DONE 2026-01-29)
-- [x] **1.17 Add fine1972conjunction** - Fine "Propositional Quantifiers in Modal Logic" (DONE 2026-01-29)
-- [x] **1.18 Add frankish2016illusionism** - Frankish "Illusionism as a Theory of Consciousness" (DONE 2026-01-29)
-- [x] **1.19 Add godo2003many** - Godo et al. "Many-valued modal logics" (DONE 2026-01-29)
-- [x] **1.20 Add godo2011fuzzy** - Godo et al. "Fuzzy modal logics over finite residuated lattices" (DONE 2026-01-29)
-- [x] **1.21 Add goldman2012reliabilism** - Goldman "Reliabilism" (Stanford Encyclopedia) (DONE 2026-01-29)
-- [x] **1.22 Add klein2005infinitism** - Klein "Infinitism is the Solution to the Regress Problem" (DONE 2026-01-29)
-- [x] **1.23 Add pollock2001defeasible** - Pollock "Defeasible Reasoning and Degrees of Justification" (DONE 2026-01-29)
-- [x] **1.24 Remove xue2024loeb citation** - Does not exist in literature; removed from text (DONE 2026-01-29)
-
-### Verification
-
-- [x] **1.25 Run typst compile with bibliography** - Verify no undefined references remain (DONE - compiles cleanly)
-- [x] **1.26 Cross-check all 30 originally flagged citations** - Ensure each is resolved (DONE 2026-01-29 - all resolved: 10 key mismatches have correct bib entries, 19 citations added, 1 removed as non-existent)
+**Partial seeds from minimal-spec exploration (not yet full explorations):**
+- HTML parser sketch → seed for A1 (systems design problem type)
+- File summary sketch → seed for A1 (file-reading problem type)
+- Conditionals sketch → seed for D6 (boundary problem: belief vs computation)
+- Self-reference/Liar sketch → seed for D5 (stratification in practice)
+- Unknown/unknowability sketch → seed for D1 (impossible traces)
 
 ---
 
-## Phase 2: Appendix Content (HIGH PRIORITY - Currently Placeholder)
+## Priority 1: Foundation (must complete first — establishes the example base everything else depends on)
 
-All appendices are lorem ipsum placeholders. Need real content.
+> **Parallel execution:** A1 and R3 are independent and can run simultaneously. A3 depends on A1.
 
-### Appendix A: Lean Code
+- [ ] **A1: Diverse problem type survey** — Test CLAIR trace production across 5 problem types: (1) algorithmic (sorting, graph search), (2) systems design (API, database schema), (3) debugging (given buggy code, produce trace diagnosing the bug), (4) creative/open-ended (generate a poem, design a game), (5) mathematical reasoning (proof, derivation). For each, produce a full CLAIR trace (≥10 beliefs) and evaluate whether the trace captures the reasoning faithfully. Write findings to `exploration/ir/A1-problem-types.md`. *Existing seeds: pi-calculation (algorithmic), HTML parser sketch (systems), file summary sketch (file-reading). Need 4+ more fully-developed traces.*
+- [ ] **A3: Teachability experiment** — Can a Thinker LLM be taught the CLAIR spec through a system prompt and produce valid traces? Test with the spec from `formal/clair-spec.md`. Document what works, what the LLM gets wrong, and whether few-shot examples help. Write to `exploration/ir/A3-teachability.md`. *Depends on: A1 (uses traces produced there as few-shot examples). Existing: pi-calculation was hand-authored, not LLM-produced.*
+- [ ] **R3: What's obsolete** — Explicitly list what from the old formalization does NOT apply: type system (`formal/lean/CLAIR/Syntax/` — 4 files: Types, Expr, Context, Subst), typing rules (`formal/lean/CLAIR/Typing/` — HasType, Subtype), old syntax examples (`examples/hello-world-simple.clair`), evaluation semantics, parser, and the 58 completed exploration threads under the old programming language model (including active threads 8.4 and 3.15). For each, explain why it's irrelevant under the new model (opaque NL content, no type checking, no evaluation). Write to `exploration/ir/R3-whats-obsolete.md`. *No dependencies. Existing: `notes/reassessment-2026-01-29.md` provides initial component-by-component assessment.*
 
-- [x] **2.1 Add Lean project structure overview** - Module organization, dependencies (DONE)
-- [x] **2.2 Add build instructions** - `lake build`, prerequisites, expected output (DONE)
-- [x] **2.3 Create theorem inventory table** - List all 50+ theorems with status (proven/sorry) (DONE)
-- [x] **2.4 Add key proof excerpts** - Confidence operations, monad laws, stratification (DONE)
-- [x] **2.5 Document the 5 sorry lemmas** - Why deferred, impact on soundness claims (DONE)
+## Priority 2: Core Thesis Tests (directly test the central thesis — CLAIR preserves info across boundary)
 
-### Appendix B: Formal Semantics
+> **Parallel execution:** D6 and D1 are independent and can start immediately (no dependencies). B1 depends on A1; B2 depends on B1.
 
-- [x] **2.6 Document Lean formalization** - Confidence algebra, DAG structure, stratification (DONE)
-- [x] **2.7 Add proof walkthroughs** - Key theorems with explanation (DONE)
-- [x] **2.8 Add example traces** - Step-by-step CLAIR trace analysis (DONE)
+- [ ] **B1: Trace-to-code fidelity test** — Give an Assembler LLM the pi-calculation trace and 3 new traces from A1. Compare output code quality against: (a) giving the same LLM just the user request, (b) giving chain-of-thought reasoning. Document whether CLAIR traces actually improve output. Write to `exploration/ir/B1-trace-fidelity.md`. *Depends on: A1 (needs diverse traces).*
+- [ ] **B2: Information loss analysis** — Identify what information is lost at the Thinker→Assembler boundary. What does the Assembler ignore? What does it misinterpret? What is ambiguous? Create a taxonomy of information loss types (e.g., ignored invalidations, misread confidence, ambiguous NL content, missing context). Write to `exploration/ir/B2-information-loss.md`. *Depends on: B1 (analyzes fidelity test results).*
+- [ ] **D6: The boundary problem** — Where does "belief about computation" end and "computation itself" begin? `"iterate k from 0 to n"` is a belief about a loop — but is it precise enough? Construct a spectrum from pure description ("we need a loop") to pure prescription ("for k in range(n)") and identify where CLAIR content should sit. Write to `exploration/ir/D6-boundary-problem.md`. *No dependencies. Existing seed: minimal spec's "content is opaque NL" principle, conditionals sketch, and `notes/design-rationale.md` (documents the decision to keep content opaque).*
+- [ ] **D1: The "impossible trace" collection** — Find ≥5 problems that CANNOT be represented as a DAG of beliefs: iterative refinement where beliefs change mid-reasoning, adversarial/game-theoretic reasoning, real-time adaptation, creative tasks with no clear justification chain, problems requiring backtracking. Document why each fails and whether workarounds exist. Write to `exploration/ir/D1-impossible-traces.md`. *No dependencies. Existing seeds: self-reference/paradox handling sketch, unknown/unknowability sketch from minimal spec.*
 
-### Appendix C: Additional Proofs
+## Priority 3: Quality & Calibration (assess whether the IR is meaningful, not just structurally valid)
 
-- [x] **2.9 Add detailed proof of DAG necessity** - Full formal argument (DONE 2026-01-29)
-- [x] **2.10 Add CPL consistency proof sketch** - Non-trivial model construction (DONE 2026-01-29)
-- [x] **2.11 Add defeat composition proofs** - Undercut and rebut algebra (DONE 2026-01-29)
+> **Parallel execution:** D2 is independent and can start immediately. A2 depends on A1; A4 depends on A1+A2; D3 depends on A1.
 
-### Appendix D: Glossary
+- [ ] **A2: Trace quality analysis** — For each example from A1, evaluate: Are confidence values meaningful? Are justifications actually connected to conclusions? Are invalidation conditions useful? Is the DAG structure well-formed? Define explicit quality criteria (connectedness, calibration, completeness, granularity) and document common failure modes. Write to `exploration/ir/A2-trace-quality.md`. *Depends on: A1.*
+- [ ] **A4: Confidence calibration challenge** — Are Thinker-assigned confidence values meaningful? Compare: same problem solved multiple times — do confidence values correlate with actual correctness? Test with ≥3 problems where ground truth is known. Document whether confidence is informative or decorative. Write to `exploration/ir/A4-confidence-calibration.md`. *Depends on: A1, A2.*
+- [ ] **D2: Valid but useless traces** — Construct ≥3 traces that satisfy all spec constraints (acyclic, valid confidence, proper levels, proper justifications) but provide no useful information to an Assembler. What makes a trace useful beyond structural validity? Propose a "usefulness" criterion. Write to `exploration/ir/D2-valid-but-useless.md`. *No dependencies.*
+- [ ] **D3: The content opacity problem** — Since content is opaque NL, construct examples where: (1) identical content means different things in context, (2) ambiguous content leads to wrong assembly, (3) content requires domain knowledge the Assembler lacks, (4) content is too vague to act on. Write to `exploration/ir/D3-content-opacity.md`. *Depends on: A1 (uses real traces to find ambiguities).*
 
-- [x] **2.12 Create term definitions** - Confidence, Justification, Provenance, Invalidation, etc. (DONE)
-- [x] **2.13 Add notation table** - ⊕, ⊗, □_c, etc. with meanings (DONE)
-- [x] **2.14 Add acronym list** - CLAIR, CPL, AGM, DAG, etc. (DONE)
+## Priority 4: Auditability (the "human in the loop" value proposition)
 
----
+> **Parallel execution:** C1 can start immediately (has partial existing work). C2 and C3 depend on A1; C4 depends on C1+B1.
 
-## Phase 3: IR Format Specification (Appendix E - New)
+- [ ] **C1: Query pattern catalog** — Document all query types humans might ask of a CLAIR trace: "why X?", "why not Y?", "when to reconsider?", "what assumptions?", "what alternatives were considered?", "how confident?", "what was ruled out?", "what evidence supports X?". Show how each maps to graph traversal (parent walk, sibling comparison, invalidation check, etc.). Write to `exploration/ir/C1-query-patterns.md`. *Existing: pi-calculation demonstrates 4 query types ("Why Chudnovsky?", "Why not Leibniz?", "When reconsider?", "What's needed?"). Needs systematic expansion to ≥8 patterns.*
+- [ ] **C2: Scale readability test** — Create or reference traces of increasing size (5 beliefs, 20 beliefs, 100 beliefs). At what scale do traces become unreadable? What summarization or visualization would help? Compare with chain-of-thought at same scales. Write to `exploration/ir/C2-scale-readability.md`. *Depends on: A1 (uses traces of varying size).*
+- [ ] **C4: Comparison with alternatives** — Compare CLAIR trace auditability against: raw chain-of-thought, structured JSON reasoning, decision trees, argument maps (Walton/Dung). What does CLAIR add that others don't? Reference `notes/prior-art.md` for existing survey (covers Subjective Logic, TMS, Justification Logic, weighted argumentation). Write to `exploration/ir/C4-comparison-alternatives.md`. *Depends on: C1, B1.*
+- [ ] **C3: The "why" reconstruction test** — Given only a CLAIR trace (no original prompt), can a human reconstruct the original intent? This tests whether traces are self-contained explanations. Use pi-calculation and 2+ traces from A1. Write to `exploration/ir/C3-why-reconstruction.md`. *Depends on: A1.*
 
-IR format specification completed.
+## Priority 5: Stress Tests & Algebra (push the model to breaking points)
 
-- [x] **3.1 Create formal/clair-spec.md** - Minimal IR format specification (DONE 2026-01-29)
-- [x] **3.2 Write grammar** - Document syntax: `id confidence level source <justifications "content"` (DONE 2026-01-29)
-- [x] **3.3 Document confidence semantics** - Calibrated reliability in [0,1] (DONE 2026-01-29)
-- [x] **3.4 Document stratification** - Level constraints and Löb discount (DONE 2026-01-29)
-- [x] **3.5 Document well-formedness constraints** - DAG requirement, acyclicity, grounding (DONE 2026-01-29)
-- [x] **3.6 Add to dissertation** - Chapter 10 implementation updated (DONE 2026-01-29)
+> **Parallel execution:** B3+B4 depend on B1. D4 depends on A1+A2. D5 depends on A1.
 
----
+- [ ] **B3: Assembler disagreement scenario** — Construct a trace where the Thinker's reasoning is plausible but suboptimal (e.g., Thinker chooses bubble sort at 0.7 confidence; Assembler "knows" quicksort is better). Does the Assembler follow the trace blindly, or can it improve? What SHOULD happen — should CLAIR have a protocol for Assembler pushback? Write to `exploration/ir/B3-assembler-disagreement.md`. *Depends on: B1.*
+- [ ] **B4: Degraded trace test** — What happens with traces of varying quality? Systematically degrade a known-good trace: (1) remove justifications, (2) scramble confidence values, (3) omit invalidations, (4) remove some beliefs, (5) reorder beliefs. How gracefully does the Assembler degrade? Find the minimum viable trace. Write to `exploration/ir/B4-degraded-traces.md`. *Depends on: B1.*
+- [ ] **D4: Confidence algebra in practice** — Test the proven algebra (×, ⊕, undercut, rebut, min) against real trace scenarios. Does `0.9 × 0.8 = 0.72` actually represent how confidence should propagate? Find cases where the algebra produces counterintuitive results. Reference specific Lean theorems: `mul_oplus_not_distrib` (non-distributivity), `undercut_compose` (sequential defeat), `rebut_eq` (equal evidence → 0.5). Write to `exploration/ir/D4-confidence-practice.md`. *Depends on: A1, A2. Existing: Lean proofs in `formal/lean/CLAIR/Confidence/` provide the algebra.*
+- [ ] **D5: Stratification in the wild** — Does stratification actually come up in LLM reasoning? Find ≥3 natural examples of meta-beliefs (beliefs about beliefs) in real traces. Test whether the Löb discount (c → c²) matches intuition for meta-confidence. Reference Lean theorems: `no_confidence_bootstrap`, `loebDiscount_strict_lt`, `loebChain_decreasing`. Write to `exploration/ir/D5-stratification-wild.md`. *Depends on: A1. Existing seed: Liar paradox sketch from minimal spec (0.5 at L0). `formal/lean/CLAIR/Belief/Stratified.lean` proves the theory.*
 
-## Phase 4: Semantic Foundations Refinement (Chapter 3)
+## Priority 6: Reuse Mapping (connect proven Lean work to new model)
 
-Chapter 3 already has semantic commitments and rejects "0.5 = ignorance". Minor refinements needed.
+> **Parallel execution:** R1 and R2 are independent of each other (but each depends on D4/D5 respectively).
 
-- [x] **4.1 Verify calibration definition** - Add explicit definition of "calibrated reliability" (DONE 2026-01-29)
-- [x] **4.2 Add independence assumptions discussion** - When ⊕ is valid, when it breaks (DONE 2026-01-29)
-- [x] **4.3 Add falsifiability section** - What would falsify CLAIR as better than alternatives? (DONE 2026-01-29)
-- [x] **4.4 Document rebut normalization limitation** - c_for/(c_for+c_against) collapses absolute strength (DONE 2026-01-29)
+- [ ] **R1: Confidence algebra mapping** — Map each Lean-proven property to its IR-model implication. Specifically: (1) `mul_le_left`/`mul_le_right` → derivation chains always decrease confidence, (2) `oplus_comm`/`oplus_assoc` → aggregation order doesn't matter, (3) `mul_oplus_not_distrib` → can't factor through aggregation+derivation, (4) `undercut_compose` → sequential defeats compose via ⊕, (5) `rebut_add_rebut_swap` → competing evidence sums to 1. For each, state whether it constrains valid traces, informs Thinker behavior, or is irrelevant to the IR model. Write to `exploration/ir/R1-confidence-reuse.md`. *Depends on: D4 (needs practical algebra findings).*
+- [ ] **R2: Stratification mapping** — Map each stratification proof to its IR-model implication: (1) `no_self_introspection` → no belief can justify itself, (2) `no_circular_introspection` → no circular meta-reasoning, (3) `no_confidence_bootstrap` → meta-beliefs can't inflate confidence, (4) `loebDiscount_strict_lt` → strict decrease through meta-levels. Note that DAG.lean's `Acyclic` and `Grounded` properties directly constrain valid CLAIR documents. Identify gap: Löb discount is proven in Lean but not enforced in the textual spec grammar. Write to `exploration/ir/R2-stratification-reuse.md`. *Depends on: D5 (needs practical stratification findings).*
 
----
+## Priority 7: Synthesis (blocked by all threads above)
 
-## Phase 5: CPL Soundness Clarification (Chapter 5)
-
-- [x] **5.1 Add explicit axiom status statement** - "Graded Löb is a DESIGN AXIOM, not semantic theorem" (DONE - verified in chapters/05-self-reference.typ:481-496)
-- [x] **5.2 List modal axioms with status** - K ✓, 4 ✓, GL ✓, T ✗ with explanations (DONE - verified in chapters/05-self-reference.typ:567-586)
-- [x] **5.3 Add consistency proof** - Exhibit non-trivial model satisfying CPL axioms (DONE - verified in chapters/05-self-reference.typ:588-621)
-- [x] **5.4 Clarify "conservative over GL"** - Define precisely what this means, prove or remove (DONE - verified in chapters/05-self-reference.typ:784-802)
+- [ ] **S1: Thesis viability assessment** — After all threads complete, write a synthesis document: Does the evidence support CLAIR as a viable IR? What are the strongest arguments for and against? What would need to change to make it work? Write to `exploration/ir/synthesis.md`. *Depends on: ALL threads A-D and R.*
+- [ ] **S2: Refined spec recommendations** — Based on findings, propose concrete changes to `formal/clair-spec.md`: new fields, modified constraints, removed features, added features. Write to `exploration/ir/spec-recommendations.md`. *Depends on: S1.*
+- [ ] **S3: Open questions for future work** — Catalog all unresolved questions discovered during exploration, ranked by importance to the thesis. Write to `exploration/ir/open-questions.md`. *Depends on: S1.*
 
 ---
 
-## Phase 6: DAG/Cycle Handling (Chapter 4)
+## Dependency Graph
 
-- [x] **6.1 Add well-formedness constraint section** - Formal definition of isAcyclic predicate (DONE 2026-01-29)
-- [x] **6.2 Formalize fixed-point semantics** - Kleene iteration with Banach fixed-point theorem (DONE 2026-01-29)
-- [x] **6.3 Add convergence bounds** - When |weights| < λ < 1, convergence in O(log(1/ε)/log(1/λ)) steps (DONE 2026-01-29)
-- [x] **6.4 State DAG-only vs cyclic choice** - Which is primary semantics, when cycles allowed (DONE 2026-01-29)
+```
+Priority 1 (Foundation):       A1 ──────────────────────┐
+                                A3 (depends on A1)       │
+                                R3 (independent)         │
+                                                         │
+Priority 2 (Core Thesis):      B1 (depends on A1) ──────┤
+                                B2 (depends on B1)       │
+                                D6 (independent)         │
+                                D1 (independent)         │
+                                                         │
+Priority 3 (Quality):          A2 (depends on A1)       │
+                                A4 (depends on A1, A2)   │
+                                D2 (independent)         │
+                                D3 (depends on A1)       │
+                                                         │
+Priority 4 (Auditability):     C1 (partial existing)    │
+                                C2 (depends on A1)       │
+                                C4 (depends on C1, B1)   │
+                                C3 (depends on A1)       │
+                                                         │
+Priority 5 (Stress Tests):     B3 (depends on B1)       │
+                                B4 (depends on B1)       │
+                                D4 (depends on A1, A2)   │
+                                D5 (depends on A1)       │
+                                                         │
+Priority 6 (Reuse Mapping):    R1 (depends on D4)       │
+                                R2 (depends on D5)       │
+                                                         │
+Priority 7 (Synthesis):        S1 (depends on ALL) ◄────┘
+                                S2 (depends on S1)
+                                S3 (depends on S1)
+```
 
----
+## File Structure
 
-## Phase 7: Lean Formalization (COMPLETED)
-
-The Lean formalization is the primary implementation artifact.
-
-- [x] **7.1 Confidence module** - Confidence type with ⊕, ×, min operations (DONE)
-- [x] **7.2 DAG structure** - BeliefNode, justification edges, acyclicity (DONE)
-- [x] **7.3 Stratification** - Level constraints and Löb discount (DONE)
-- [x] **7.4 Theorem proofs** - Key properties verified (DONE - 5 sorries remain in minor lemmas)
-- [x] **7.5 Document in Chapter 10** - Lean architecture and proofs (DONE)
-
----
-
-## Phase 8: Empirical Evaluation (Chapter 14 - NEW - Major)
-
-No evaluation chapter or empirical results exist.
-
-- [x] **8.1 Create chapters/14-evaluation.typ** - New chapter with evaluation framework (DONE 2026-01-29)
-- [x] **8.2 Design evaluation methodology** - Tasks, baselines, metrics, hypotheses (DONE 2026-01-29)
-- [x] **8.6 Define baselines** - Chain-of-thought, vanilla prompting, self-consistency (DONE 2026-01-29)
-- [x] **8.8 Compute calibration metrics** - Brier score, ECE, reliability diagrams (DONE 2026-01-29)
-- [x] **8.9 Write results section** - Tables, figures, statistical analysis (DONE 2026-01-29)
-- [x] **8.10 Add chapter to dissertation** - Update clair-dissertation.typ to include 14-evaluation.typ (DONE 2026-01-29)
-- [x] **8.3 Create GSM8K evaluation prompts** - Few-shot CLAIR prompts for math reasoning (DONE 2026-01-29)
-- [x] **8.4 Create HotpotQA evaluation prompts** - Multi-hop QA with confidence tracking (DONE 2026-01-29)
-- [x] **8.5 Create FOLIO evaluation prompts** - Logical reasoning with justification (DONE 2026-01-29)
-- [x] **8.7 Run experiments** - Illustrative results included in Chapter 14; real experiments require API access and LLM integration infrastructure (COMPLETE 2026-01-29)
-
----
-
-## Phase 9: Theorem Labeling Audit
-
-- [x] **9.1 Grep for "likely" in theorem bodies** - Find conjectural statements (DONE 2026-01-29)
-- [x] **9.2 Grep for "sketch" in proofs** - Find incomplete proofs (DONE 2026-01-29)
-- [x] **9.3 Grep for "conjecture" already used** - See current labeling practice (DONE 2026-01-29)
-- [x] **9.4 Relabel theorems appropriately** - Theorem → Conjecture/Claim where proof incomplete (DONE 2026-01-29)
-- [x] **9.5 Add Typst macros if needed** - conjecture(), claim(), remark() environments (DONE 2026-01-29)
-
----
-
-## Phase 10: Related Work Expansion (Chapter 2)
-
-- [x] **10.1 Add graded justification logic section** - Milnikel (2014) and Fan & Liau (2015) work on uncertain justifications (DONE 2026-01-29)
-- [x] **10.2 Add many-valued modal logic section** - Bou, Vidal, Hájek connections (DONE 2026-01-29)
-- [x] **10.3 Add weighted argumentation section** - Amgoud & Ben-Naim, Bonzon (DONE 2026-01-29)
-- [x] **10.4 Position CLAIR explicitly** - How it differs from each, why approach chosen (DONE 2026-01-29)
-
----
-
-## Phase 11: Foundational Hole Repairs
-
-- [x] **11.1 Formalize "tracking paradigm"** - State representation, update rules, correctness criteria (DONE 2026-01-29)
-- [x] **11.2 Add dependency bounds discussion** - When ⊕ breaks under correlation, interval alternatives (DONE 2026-01-29)
-- [x] **11.3 Document explanation extraction** - How CLAIR traces become human-auditable (DONE 2026-01-29)
-
----
-
-## Phase 12: Final Polish & Verification
-
-- [x] **12.1 Run full Typst compile** - No errors, no undefined references (DONE 2026-01-29)
-- [x] **12.2 Run Lean build** - Clean build (accept 5 known sorries) (DONE 2026-01-29)
-- [x] **12.3 Verify Lean build** - Clean build (DONE 2026-01-29)
-- [x] **12.4 Verify defense questions answerable** - Check all 10 from review (DONE 2026-01-29)
-- [x] **12.5 Update conclusion (Chapter 13)** - Reflect completed remediation work (DONE 2026-01-29)
-- [x] **12.6 Final proofread** - Grammar, consistency, formatting (DONE 2026-01-29 - fixed Typst table formatting warnings)
-
----
-
-## Defense Question Checklist
-
-After completion, verify these can be answered:
-
-1. [ ] What is confidence: probability, truth degree, reliability, or something else?
-2. [ ] Under what assumptions is ⊕ the correct support aggregator?
-3. [ ] Why should undercut multiply by (1-d) rather than another function?
-4. [ ] How do you prevent "argument inflation"?
-5. [ ] If the justification graph contains cycles, what is the semantics?
-6. [ ] Is CPL conservative over GL? What does "conservative" mean?
-7. [ ] Is graded Löb sound w.r.t. your semantics?
-8. [ ] Why is g(c)=c² the right discount?
-9. [ ] Show a concrete scenario where CLAIR prevents overconfident self-bootstrapping.
-10. [ ] What would falsify CLAIR as a "better reasoning IR" for LLMs?
-
----
-
-## File Inventory
-
-### Files to Modify
-- `formal/dissertation/references.bib` - Add ~15 citations, verify key usage
-- `formal/dissertation/chapters/02-background.typ` - Related work expansion
-- `formal/dissertation/chapters/03-confidence.typ` - Semantic refinements
-- `formal/dissertation/chapters/04-justification.typ` - DAG/cycle formalization
-- `formal/dissertation/chapters/05-self-reference.typ` - CPL axiom status
-- `formal/dissertation/chapters/10-implementation.typ` - Implementation chapter (Lean formalization)
-- `formal/dissertation/chapters/13-conclusion.typ` - Update for remediation
-- `formal/dissertation/appendices/A-lean-code.typ` - Real content (currently lorem ipsum)
-- `formal/dissertation/appendices/B-formal-semantics.typ` - Real content
-- `formal/dissertation/appendices/C-proofs.typ` - Real content
-- `formal/dissertation/appendices/D-glossary.typ` - Real content
-- `formal/dissertation/clair-dissertation.typ` - Add Chapter 14
-
-### Files Created
-- `formal/clair-spec.md` - IR format specification
-- `formal/dissertation/appendices/F-evaluation-prompts.typ` - Evaluation prompt templates (DONE 2026-01-29)
-- `formal/dissertation/chapters/14-evaluation.typ` - Empirical evaluation
-
----
-
-## Validation Commands
-
-```bash
-# Typst compilation
-cd formal/dissertation && typst compile clair-dissertation.typ
-
-# Lean build
-cd formal/lean && lake build
-
-# Lean tests
-cd formal/lean && lake test
-
-# Check remaining tasks
-grep -c "^\- \[ \]" IMPLEMENTATION_PLAN.md || echo 0
+```
+exploration/
+└── ir/                              # New IR-model exploration
+    ├── A1-problem-types.md
+    ├── A2-trace-quality.md
+    ├── A3-teachability.md
+    ├── A4-confidence-calibration.md
+    ├── B1-trace-fidelity.md
+    ├── B2-information-loss.md
+    ├── B3-assembler-disagreement.md
+    ├── B4-degraded-traces.md
+    ├── C1-query-patterns.md
+    ├── C2-scale-readability.md
+    ├── C3-why-reconstruction.md
+    ├── C4-comparison-alternatives.md
+    ├── D1-impossible-traces.md
+    ├── D2-valid-but-useless.md
+    ├── D3-content-opacity.md
+    ├── D4-confidence-practice.md
+    ├── D5-stratification-wild.md
+    ├── D6-boundary-problem.md
+    ├── R1-confidence-reuse.md
+    ├── R2-stratification-reuse.md
+    ├── R3-whats-obsolete.md
+    ├── synthesis.md
+    ├── spec-recommendations.md
+    └── open-questions.md
 ```
 
 ---
 
-## Priority Order
+## Validation
 
-1. **Phase 1** (Bibliography) - Blocking: undefined references break PDF
-2. **Phase 2** (Appendix Content) - Major gap: appendices are placeholders
-3. **Phase 3** (Language Spec) - Major gap: no formal grammar exists
-4. **Phase 7** (Lean formalization) - COMPLETED
-5. **Phase 8** (Evaluation) - Major gap: no empirical results
-6. **Phase 4-6** (Semantic refinements) - Polish: chapters exist but need strengthening
-7. **Phase 9-11** (Audits) - Polish: cleanup and consistency
-8. **Phase 12** (Final) - Verification
+```bash
+# Count remaining tasks
+grep -c "^\- \[ \]" IMPLEMENTATION_PLAN.md || echo 0
+
+# Verify exploration files exist
+ls exploration/ir/*.md 2>/dev/null | wc -l
+```
 
 ---
 
 ## Task Count
 
-Total tasks: 89
-- Phase 1 (Bibliography): 26 tasks (all complete)
-- Phase 2 (Appendix Content): 14 tasks (all complete)
-- Phase 3 (Language Spec): 7 tasks (all complete)
-- Phase 4 (Semantic Foundations): 4 tasks (all complete)
-- Phase 5 (CPL Soundness): 4 tasks (all complete)
-- Phase 6 (DAG/Cycle): 4 tasks (all complete)
-- Phase 7 (Lean formalization): 5 tasks (all complete)
-- Phase 8 (Evaluation): 10 tasks (9 complete, 1 remaining) - 8.7 requires API access for real experiments
-- Phase 9 (Theorem Audit): 5 tasks (5 complete, 0 remaining)
-- Phase 10 (Related Work): 4 tasks (all complete)
-- Phase 11 (Hole Repairs): 3 tasks (3 complete, 0 remaining)
-- Phase 12 (Final Polish): 6 tasks (4 complete, 2 remaining)
+Total tasks: 24
+- Priority 1 (Foundation): 3 tasks — A1, A3, R3
+- Priority 2 (Core Thesis): 4 tasks — B1, B2, D6, D1
+- Priority 3 (Quality): 4 tasks — A2, A4, D2, D3
+- Priority 4 (Auditability): 4 tasks — C1, C2, C4, C3
+- Priority 5 (Stress Tests): 4 tasks — B3, B4, D4, D5
+- Priority 6 (Reuse Mapping): 2 tasks — R1, R2
+- Priority 7 (Synthesis): 3 tasks — S1, S2, S3 (blocked by all above)
 
-**Completed: 86/89 tasks (97%)**
-**Remaining: 3 tasks** (note: 7.9 is intentionally skipped, 8.7 requires API access)
+**Completed: 0/24 tasks (0%)**
+
+## Critical Path
+
+The longest dependency chain determines minimum iterations:
+```
+A1 → B1 → B2 → (feeds S1)     = 3 sequential steps before synthesis
+A1 → A2 → A4                   = 2 sequential steps
+A1 → A2 → D4 → R1              = 3 sequential steps
+A1 → D5 → R2                   = 2 sequential steps
+```
+
+**Minimum iterations to completion:** ~10 (accounting for synthesis tasks and sequential dependencies), assuming independent tasks are parallelized within each iteration.
+
+**Iteration plan (optimal parallelism):**
+1. **Iteration 1:** A1 + R3 + D6 + D1 + D2 + C1 (6 independent tasks, maximum parallelism)
+2. **Iteration 2:** A3 + B1 + A2 + D3 + C2 + C3 + D5 (all depend only on A1)
+3. **Iteration 3:** B2 + A4 + D4 + B3 + B4 + C4 (depend on B1/A2/C1)
+4. **Iteration 4:** R1 + R2 (depend on D4/D5)
+5. **Iteration 5:** S1 → S2 → S3 (sequential synthesis)

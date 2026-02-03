@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# CLAIR Thesis Remediation Loop
+# CLAIR IR Exploration Loop
 # Usage:
-#   ./loop.sh           # Auto mode: plan first, then build
+#   ./loop.sh           # Auto mode: plan first, then build (default)
 #   ./loop.sh plan      # Planning mode only
 #   ./loop.sh build     # Build mode only
-#   ./loop.sh 10        # Auto mode, max 10 iterations
+#   ./loop.sh 10        # Auto mode, max 10 build iterations
 #   ./loop.sh build 5   # Build mode, max 5 iterations
 
 set -e
 
 MODE="plan"
 AUTO_MODE=true
-PLAN_MAX_ITERATIONS=3
+PLAN_MAX_ITERATIONS=5
 MAX_ITERATIONS=0
 ITERATION=0
 CONSECUTIVE_FAILURES=0
@@ -40,6 +40,7 @@ PROMPT_FILE="PROMPT_${MODE}.md"
 
 if [[ ! -f "$PROMPT_FILE" ]]; then
   echo -e "${RED}Error: $PROMPT_FILE not found${NC}"
+  echo "Run the ralph skill first to generate the required files."
   exit 1
 fi
 
@@ -93,6 +94,7 @@ is_usage_limit_error() {
   local output="$1"
   local exit_code="$2"
 
+  # Only check for usage limits if there was an error
   [[ "$exit_code" -eq 0 ]] && return 1
 
   # Check the result JSON for error subtypes first (most reliable)
@@ -100,7 +102,7 @@ is_usage_limit_error() {
     return 0
   fi
 
-  # Fallback to text patterns in stderr/error messages
+  # Fallback to text patterns in stderr/error messages (not in assistant text)
   local error_text
   error_text=$(echo "$output" | grep -v '^{' || true)
   error_text+=$(echo "$output" | grep '^{' | jq -r 'select(.type == "result" and .is_error == true) | .result // empty' 2>/dev/null || true)
@@ -193,13 +195,13 @@ handle_usage_limit() {
 }
 
 echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     CLAIR Thesis Remediation Loop      ║${NC}"
-echo -e "${GREEN}║     Addressing PhD Review Concerns     ║${NC}"
+echo -e "${GREEN}║   CLAIR IR Viability Exploration Loop  ║${NC}"
+echo -e "${GREEN}║   Proving the Thesis Through Examples  ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
 echo ""
 
 if [[ "$AUTO_MODE" == true ]]; then
-  echo -e "Mode: ${CYAN}AUTO${NC} (plan ×${PLAN_MAX_ITERATIONS} → build)"
+  echo -e "Mode: ${CYAN}AUTO${NC} (plan x${PLAN_MAX_ITERATIONS} -> build)"
   [[ $MAX_ITERATIONS -gt 0 ]] && echo "Max build iterations: $MAX_ITERATIONS"
 else
   echo -e "Mode: ${CYAN}$(echo "$MODE" | tr '[:lower:]' '[:upper:]')${NC}"
@@ -215,7 +217,7 @@ while true; do
   if [[ "$MODE" == "plan" ]]; then
     echo -e "${GREEN}=== PLANNING Iteration $ITERATION ===${NC}"
   else
-    echo -e "${GREEN}=== BUILD Iteration $ITERATION ===${NC}"
+    echo -e "${GREEN}=== EXPLORE Iteration $ITERATION ===${NC}"
   fi
   echo ""
 
@@ -230,12 +232,16 @@ while true; do
       def tool_info:
         if .name == "Edit" or .name == "Write" or .name == "Read" then
           (.input.file_path // .input.path | split("/") | last | .[0:60])
+        elif .name == "TodoWrite" then
+          ((.input.todos // []) | map(.content) | join(", ") | if contains("\n") then .[0:60] else . end)
         elif .name == "Bash" then
           (.input.command // .input.cmd | if contains("\n") then split("\n") | first | .[0:50] else .[0:80] end)
         elif .name == "Grep" then
           (.input.pattern | .[0:40])
         elif .name == "Glob" then
           (.input.pattern // .input.filePattern | .[0:40])
+        elif .name == "WebFetch" then
+          (.input.url | .[0:60])
         elif .name == "Task" then
           (.input.description // .input.prompt | if contains("\n") then .[0:40] else .[0:80] end)
         else null end;
@@ -267,11 +273,14 @@ while true; do
     CONSECUTIVE_FAILURES=$((CONSECUTIVE_FAILURES + 1))
     echo ""
     echo -e "${RED}=== Error (exit code: $EXIT_CODE) ===${NC}"
+    echo -e "${RED}Output:${NC}"
+    echo "$OUTPUT" | tail -20
+    echo ""
 
     BACKOFF=$((30 * (2 ** (CONSECUTIVE_FAILURES - 1))))
     [[ $BACKOFF -gt 300 ]] && BACKOFF=300
 
-    echo -e "${YELLOW}Retrying in ${BACKOFF}s... (failures: $CONSECUTIVE_FAILURES)${NC}"
+    echo -e "${YELLOW}Retrying in ${BACKOFF}s... (consecutive failures: $CONSECUTIVE_FAILURES)${NC}"
     countdown $BACKOFF "Waiting..."
     ITERATION=$((ITERATION - 1))
     continue
@@ -288,8 +297,8 @@ while true; do
   if [[ "$RESULT_MSG" =~ RALPH_COMPLETE ]]; then
     echo ""
     echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║     REMEDIATION COMPLETE               ║${NC}"
-    echo -e "${GREEN}║     All tasks finished                 ║${NC}"
+    echo -e "${GREEN}║      EXPLORATION COMPLETE              ║${NC}"
+    echo -e "${GREEN}║      All threads explored              ║${NC}"
     echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
     break
   fi
@@ -304,9 +313,9 @@ while true; do
 done
 
 echo ""
-echo -e "${GREEN}Remediation session complete. Iterations: $ITERATION${NC}"
+echo -e "${GREEN}Exploration session complete. Iterations: $ITERATION${NC}"
 echo ""
-echo "Validation:"
-echo "  cd formal/dissertation && typst compile clair-dissertation.typ"
-echo "  cd formal/lean && lake build"
+echo "Check progress:"
+echo "  grep -c '^\- \[ \]' IMPLEMENTATION_PLAN.md || echo 0"
+echo "  ls exploration/ir/*.md 2>/dev/null | wc -l"
 echo ""
