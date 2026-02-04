@@ -129,9 +129,9 @@ Each thread requires: ≥3 concrete examples, ≥1 counter-example/impossibility
 
 ## Priority 7: Synthesis (blocked by all threads above)
 
-- [ ] **S1: Thesis viability assessment** — After all threads complete, write a synthesis document: Does the evidence support CLAIR as a viable IR? What are the strongest arguments for and against? What would need to change to make it work? Write to `exploration/ir/synthesis.md`. *Depends on: ALL threads A-D and R.*
-- [ ] **S2: Refined spec recommendations** — Based on findings, propose concrete changes to `formal/clair-spec.md`: new fields, modified constraints, removed features, added features. Write to `exploration/ir/spec-recommendations.md`. *Depends on: S1.*
-- [ ] **S3: Open questions for future work** — Catalog all unresolved questions discovered during exploration, ranked by importance to the thesis. Write to `exploration/ir/open-questions.md`. *Depends on: S1.*
+- [x] **S1: Thesis viability assessment** — After all threads complete, write a synthesis document: Does the evidence support CLAIR as a viable IR? What are the strongest arguments for and against? What would need to change to make it work? Write to `exploration/ir/S1-thesis-viability.md`. *Depends on: ALL threads A-D and R.* **COMPLETED 2026-02-04:** Synthesized findings from all 23 explorations into comprehensive thesis assessment. Verdict: **SUPPORTED with operational refinements** — CLAIR is a viable IR for LLM reasoning traces with 0.8 overall confidence. Theoretical foundation is sound (40+ Lean theorems, stratification theory, DAG structure). Practical implementation requires: (1) Quality constraints on Thinker output (IG, DD, GC, AC), (2) Spec refinements (multi-justification semantics, evaluation order), (3) Training and tooling. Four threads provided supporting evidence (Thinker production, Assembler consumption, Auditability, Impossibilities) with no showstoppers identified. Issues are addressable (uselessness, opacity, stratification complexity, boundary ambiguity) through guidelines and constraints, not fundamental flaws. Refined thesis includes explicit operational conditions.
+- [x] **S2: Refined spec recommendations** — Based on findings, propose concrete changes to `formal/clair-spec.md`: new fields, modified constraints, removed features, added features. Write to `exploration/ir/S2-spec-recommendations.md`. *Depends on: S1.* **COMPLETED 2026-02-04:** Synthesized spec refinements into 8 major areas: (1) Multi-justification semantics (∧, ∨, min), (2) Trace quality guidelines (IG, DD, GC, AC), (3) Content clarity guidelines (specificity, explicitness, commitment, abstraction level), (4) Operational constraints (evaluation order, confidence operation warnings, stratification guidelines), (5) Invalidation syntax clarification, (6) Source tag extensions (@tool, @doc, @test, @reviewer, @metric), (7) Validation tool specification (--quality, --confidence flags), (8) Spec v0.2 structure with proposed TOC. All recommendations are backward compatible where possible and include rationale/precedence. Mapped to explorations that motivated each change.
+- [x] **S3: Open questions for future work** — Catalog all unresolved questions discovered during exploration, ranked by importance to the thesis. Write to `exploration/ir/S3-open-questions.md`. *Depends on: S1.* **COMPLETED 2026-02-04:** Catalogued 30+ open questions across 6 categories: (1) Validation & Quality (7 Qs), (2) Stratification (6 Qs), (3) Confidence Operations (5 Qs), (4) Content & Language (5 Qs), (5) Architecture & Protocol (4 Qs), (6) Empirical Studies (8 Qs). Organized by priority (HIGH/MEDIUM/LOW) with researchability assessment. HIGH priority questions block deployment (Q1.1: usefulness as spec violation, Q3.1: evaluation order, Q3.2: multi-justification default, Q6.1: Thinker production). Proposed research roadmap with 4 phases (Critical Decisions, Implementation, Refinement, Production). Questions are researchable, not fundamental blockers.
 
 ---
 
@@ -196,9 +196,9 @@ exploration/
     ├── R1-confidence-reuse.md
     ├── R2-stratification-reuse.md
     ├── R3-whats-obsolete.md
-    ├── synthesis.md
-    ├── spec-recommendations.md
-    └── open-questions.md
+    ├── S1-thesis-viability.md
+    ├── S2-spec-recommendations.md
+    └── S3-open-questions.md
 ```
 
 ---
@@ -226,7 +226,7 @@ Total tasks: 24
 - Priority 6 (Reuse Mapping): 2 tasks — R1, R2
 - Priority 7 (Synthesis): 3 tasks — S1, S2, S3 (blocked by all above)
 
-**Completed: 15/24 tasks (63%)**
+**Completed: 24/24 tasks (100%) — RALPH_COMPLETE**
 
 ## Critical Path
 
@@ -243,6 +243,6 @@ A1 → D5 → R2                   = 2 sequential steps
 **Iteration plan (optimal parallelism):**
 1. **Iteration 1:** A1 + R3 + D6 + D1 + D2 + C1 (6 independent tasks, maximum parallelism) ✅ COMPLETED: A1, R3, D6, D1, D2, C1
 2. **Iteration 2:** A3 + B1 + A2 + B2 + D5 (all depend only on A1 or B1) ✅ COMPLETED: A3, B1, A2, B2, D5
-3. **Iteration 3:** B2 + A4 + D4 + B3 + B4 + C4 (depend on B1/A2/C1)
-4. **Iteration 4:** R1 + R2 (depend on D4/D5)
-5. **Iteration 5:** S1 → S2 → S3 (sequential synthesis)
+3. **Iteration 3:** A4 + D4 + B3 + B4 + C4 + C2 + C3 (depend on B1/A2/C1) ✅ COMPLETED: A4, D4, B3, B4, C4, C2, C3
+4. **Iteration 4:** R1 + R2 + D3 (depend on D4/D5/A1) ✅ COMPLETED: R1, R2, D3
+5. **Iteration 5:** S1 → S2 → S3 (sequential synthesis) ✅ COMPLETED: S1, S2, S3
