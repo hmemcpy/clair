@@ -118,7 +118,7 @@ Each thread requires: ≥3 concrete examples, ≥1 counter-example/impossibility
 - [ ] **B3: Assembler disagreement scenario** — Construct a trace where the Thinker's reasoning is plausible but suboptimal (e.g., Thinker chooses bubble sort at 0.7 confidence; Assembler "knows" quicksort is better). Does the Assembler follow the trace blindly, or can it improve? What SHOULD happen — should CLAIR have a protocol for Assembler pushback? Write to `exploration/ir/B3-assembler-disagreement.md`. *Depends on: B1.*
 - [ ] **B4: Degraded trace test** — What happens with traces of varying quality? Systematically degrade a known-good trace: (1) remove justifications, (2) scramble confidence values, (3) omit invalidations, (4) remove some beliefs, (5) reorder beliefs. How gracefully does the Assembler degrade? Find the minimum viable trace. Write to `exploration/ir/B4-degraded-traces.md`. *Depends on: B1.*
 - [ ] **D4: Confidence algebra in practice** — Test the proven algebra (×, ⊕, undercut, rebut, min) against real trace scenarios. Does `0.9 × 0.8 = 0.72` actually represent how confidence should propagate? Find cases where the algebra produces counterintuitive results. Reference specific Lean theorems: `mul_oplus_not_distrib` (non-distributivity), `undercut_compose` (sequential defeat), `rebut_eq` (equal evidence → 0.5). Write to `exploration/ir/D4-confidence-practice.md`. *Depends on: A1, A2. Existing: Lean proofs in `formal/lean/CLAIR/Confidence/` provide the algebra.*
-- [ ] **D5: Stratification in the wild** — Does stratification actually come up in LLM reasoning? Find ≥3 natural examples of meta-beliefs (beliefs about beliefs) in real traces. Test whether the Löb discount (c → c²) matches intuition for meta-confidence. Reference Lean theorems: `no_confidence_bootstrap`, `loebDiscount_strict_lt`, `loebChain_decreasing`. Write to `exploration/ir/D5-stratification-wild.md`. *Depends on: A1. Existing seed: Liar paradox sketch from minimal spec (0.5 at L0). `formal/lean/CLAIR/Belief/Stratified.lean` proves the theory.*
+- [x] **D5: Stratification in the wild** — Does stratification actually come up in LLM reasoning? Find ≥3 natural examples of meta-beliefs (beliefs about beliefs) in real traces. Test whether the Löb discount (c → c²) matches intuition for meta-confidence. Reference Lean theorems: `no_confidence_bootstrap`, `loebDiscount_strict_lt`, `loebChain_decreasing`. Write to `exploration/ir/D5-stratification-wild.md`. *Depends on: A1. Existing seed: Liar paradox sketch from minimal spec (0.5 at L0). `formal/lean/CLAIR/Belief/Stratified.lean` proves the theory.* **COMPLETED 2026-02-04:** Found that meta-beliefs DO occur naturally in 4 patterns: revision ("I was wrong"), comparison ("X vs Y"), qualification ("X is limited by Y"), and grounding ("X depends on Y"). However, analysis of 20+ existing traces revealed **ZERO** beliefs at L1 or higher — LLMs don't naturally capture meta-reasoning at higher levels. Identified counter-examples: Löb discount is too aggressive for comparative/qualitative meta-beliefs (c → c² assumes endorsement, but "X > Y" can have higher confidence than X or Y individually). Stratification creates perverse incentive to stay at L0 (confidence penalty). Teachability experiments show LLMs systematically misuse levels (under-use: everything at L0; over-use: random L1/L2 for non-meta beliefs). Verdict: **REFINES thesis** — stratification is theoretically sound but operationally problematic. Meta-beliefs are useful for auditing ("why did you change your mind?") but most traces don't need levels. Recommended spec v0.2 changes: make meta-beliefs optional, relax Löb discount for comparative meta-beliefs, add level inference rules.
 
 ## Priority 6: Reuse Mapping (connect proven Lean work to new model)
 
@@ -226,7 +226,7 @@ Total tasks: 24
 - Priority 6 (Reuse Mapping): 2 tasks — R1, R2
 - Priority 7 (Synthesis): 3 tasks — S1, S2, S3 (blocked by all above)
 
-**Completed: 5/24 tasks (21%)**
+**Completed: 11/24 tasks (46%)**
 
 ## Critical Path
 
@@ -241,8 +241,8 @@ A1 → D5 → R2                   = 2 sequential steps
 **Minimum iterations to completion:** ~10 (accounting for synthesis tasks and sequential dependencies), assuming independent tasks are parallelized within each iteration.
 
 **Iteration plan (optimal parallelism):**
-1. **Iteration 1:** A1 + R3 + D6 + D1 + D2 + C1 (6 independent tasks, maximum parallelism) ✅ COMPLETED: A1, R3, D6, D1, D2
-2. **Iteration 2:** A3 + B1 + A2 + D3 + C2 + C3 + D5 (all depend only on A1)
+1. **Iteration 1:** A1 + R3 + D6 + D1 + D2 + C1 (6 independent tasks, maximum parallelism) ✅ COMPLETED: A1, R3, D6, D1, D2, C1
+2. **Iteration 2:** A3 + B1 + A2 + B2 + D5 (all depend only on A1 or B1) ✅ COMPLETED: A3, B1, A2, B2, D5
 3. **Iteration 3:** B2 + A4 + D4 + B3 + B4 + C4 (depend on B1/A2/C1)
 4. **Iteration 4:** R1 + R2 (depend on D4/D5)
 5. **Iteration 5:** S1 → S2 → S3 (sequential synthesis)
