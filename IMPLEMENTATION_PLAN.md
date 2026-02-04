@@ -43,6 +43,7 @@ Each thread requires: ≥3 concrete examples, ≥1 counter-example/impossibility
 - `exploration/ir/D6-boundary-problem.md` — Boundary problem exploration. Found boundary is a zone (not hard line) with optimal sweet spot at strategy+algorithm level. 3-part test: actionability, universality, belief-level. Counter-examples: bit manipulation, async patterns, SQL.
 - `exploration/ir/D1-impossible-traces.md` — "Impossible trace" collection with 6 trace types: iterative refinement, real-time adaptation, game-theoretic reasoning, non-monotonic reasoning, probabilistic sequential reasoning, cyclic dependencies. Key finding: no fundamental impossibilities—all have workarounds (temporal metadata, invalidation conditions, equilibrium modeling, two-trace protocol).
 - `exploration/ir/R3-whats-obsolete.md` — Comprehensive catalog of obsolete components from old formalization. ~70% obsolete: type system, expression language, evaluation semantics, parser, old examples, 58 exploration threads, formal/syntax.md. ~30% reusable: confidence algebra (fully proven), stratification (needs Löb discount), DAG structure (needs completion), foundations/limits, prior art.
+- `exploration/ir/D2-valid-but-useless.md` — Valid but useless traces exploration. Constructed 5 structurally valid but useless traces (tautological, confidence-splat, disconnected DAG, wrong-level, descriptive loop). Identified 4 uselessness patterns (tautology, splat, disconnection, wrong granularity). Proposed usefulness criterion (IG, DD, GC, AC). Thesis: **REFINES** — structural validity ≠ usefulness; CLAIR viable but Thinkers need quality guidelines.
 - `examples/pi-calculation.md` — ONE end-to-end Thinker→Assembler example (algorithmic). Covers a single problem type (A1), one trace-to-code scenario (B1), and demonstrates basic query patterns (C1). Contains 18 beliefs (b1–b18) with confidence values, justification chains, and invalidation conditions.
 - `notes/exploration-2026-01-29-minimal-spec.md` — Foundational exploration that defined the new model. Includes 7 stress-test sketches: pi-calculation, HTML parser, file summary, conditionals, self-reference (Liar paradox), paradoxes, unknowns. These are *seeds* (2–5 beliefs each) not full explorations — they don't meet the spec's validation criteria (≥3 examples, ≥1 counter-example, thesis connection, open questions).
 - `notes/reassessment-2026-01-29.md` — Component-by-component assessment of old vs new model. Identifies what's obsolete (syntax, types, parser) and what's reusable (confidence algebra, stratification). Seed material for R3.
@@ -57,7 +58,7 @@ Each thread requires: ≥3 concrete examples, ≥1 counter-example/impossibility
 - 58 completed exploration threads in `exploration/completed/` — ALL under the OLD programming language model. Deep theory (epistemology, self-reference, affine types, graded monads) but zero practical IR examples. Includes active-but-old-model threads: 8.4 (interpreter extraction) and 3.15 (stratification Lean completion).
 - `examples/hello-world-simple.clair` — Old-syntax example (OBSOLETE). Evidence for R3.
 
-**What's missing (21/24 tasks unchecked):**
+**What's missing (20/24 tasks unchecked):**
 - No Assembler consumption testing whatsoever (B1, B2, B3, B4)
 - No systematic trace quality analysis (A2)
 - No teachability or calibration experiments (A3, A4)
@@ -98,7 +99,7 @@ Each thread requires: ≥3 concrete examples, ≥1 counter-example/impossibility
 
 - [ ] **A2: Trace quality analysis** — For each example from A1, evaluate: Are confidence values meaningful? Are justifications actually connected to conclusions? Are invalidation conditions useful? Is the DAG structure well-formed? Define explicit quality criteria (connectedness, calibration, completeness, granularity) and document common failure modes. Write to `exploration/ir/A2-trace-quality.md`. *Depends on: A1.*
 - [ ] **A4: Confidence calibration challenge** — Are Thinker-assigned confidence values meaningful? Compare: same problem solved multiple times — do confidence values correlate with actual correctness? Test with ≥3 problems where ground truth is known. Document whether confidence is informative or decorative. Write to `exploration/ir/A4-confidence-calibration.md`. *Depends on: A1, A2.*
-- [ ] **D2: Valid but useless traces** — Construct ≥3 traces that satisfy all spec constraints (acyclic, valid confidence, proper levels, proper justifications) but provide no useful information to an Assembler. What makes a trace useful beyond structural validity? Propose a "usefulness" criterion. Write to `exploration/ir/D2-valid-but-useless.md`. *No dependencies.*
+- [x] **D2: Valid but useless traces** — Construct ≥3 traces that satisfy all spec constraints (acyclic, valid confidence, proper levels, proper justifications) but provide no useful information to an Assembler. What makes a trace useful beyond structural validity? Propose a "usefulness" criterion. Write to `exploration/ir/D2-valid-but-useless.md`. *No dependencies.* **COMPLETED 2026-02-04:** Constructed 5 structurally valid but useless traces: (1) Tautological trace (10 beliefs, zero information gain), (2) Confidence-splat trace (5 alternatives, all .5, no decision signal), (3) Disconnected DAG trace (3 islands with no bridges), (4) Wrong-level trace (hardware details for software Assembler), (5) Descriptive loop trace (circular restatements). Identified 4 uselessness patterns: tautology (low IG), confidence splat (low DD), disconnected DAG (broken GC), wrong granularity (low AC). Proposed usefulness criterion with 4 metrics: Information Gain (IG), Decision Discriminance (DD), Grounding Connectivity (GC), Actionability (AC). Thesis: **REFINES the thesis** — structural validity ≠ usefulness. CLAIR is viable as an IR, but Thinkers need guidelines (or spec constraints) to produce high-quality traces. Recommended adding "Trace Quality Guidelines" section to spec.
 - [ ] **D3: The content opacity problem** — Since content is opaque NL, construct examples where: (1) identical content means different things in context, (2) ambiguous content leads to wrong assembly, (3) content requires domain knowledge the Assembler lacks, (4) content is too vague to act on. Write to `exploration/ir/D3-content-opacity.md`. *Depends on: A1 (uses real traces to find ambiguities).*
 
 ## Priority 4: Auditability (the "human in the loop" value proposition)
@@ -225,7 +226,7 @@ Total tasks: 24
 - Priority 6 (Reuse Mapping): 2 tasks — R1, R2
 - Priority 7 (Synthesis): 3 tasks — S1, S2, S3 (blocked by all above)
 
-**Completed: 3/24 tasks (13%)**
+**Completed: 4/24 tasks (17%)**
 
 ## Critical Path
 
@@ -240,7 +241,7 @@ A1 → D5 → R2                   = 2 sequential steps
 **Minimum iterations to completion:** ~10 (accounting for synthesis tasks and sequential dependencies), assuming independent tasks are parallelized within each iteration.
 
 **Iteration plan (optimal parallelism):**
-1. **Iteration 1:** A1 + R3 + D6 + D1 + D2 + C1 (6 independent tasks, maximum parallelism)
+1. **Iteration 1:** A1 + R3 + D6 + D1 + D2 + C1 (6 independent tasks, maximum parallelism) ✅ COMPLETED: A1, R3, D6, D1, D2
 2. **Iteration 2:** A3 + B1 + A2 + D3 + C2 + C3 + D5 (all depend only on A1)
 3. **Iteration 3:** B2 + A4 + D4 + B3 + B4 + C4 (depend on B1/A2/C1)
 4. **Iteration 4:** R1 + R2 (depend on D4/D5)
