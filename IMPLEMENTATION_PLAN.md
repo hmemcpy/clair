@@ -39,6 +39,8 @@ Explore the viability of CLAIR as an IR for LLM reasoning traces through 4 focus
 Each thread requires: ≥3 concrete examples, ≥1 counter-example/impossibility, thesis connection, open questions stated.
 
 **What exists:**
+- `exploration/ir/A1-problem-types.md` — Diverse problem type survey with 6 full CLAIR traces (sorting, REST API, debugging, poem, mathematical proof, multi-file refactoring). Each trace ≥15 beliefs with evaluation. Includes cross-analysis, counter-examples (mind-change, adversarial, external feedback), and thesis impact assessment.
+- `exploration/ir/D6-boundary-problem.md` — Boundary problem exploration. Found boundary is a zone (not hard line) with optimal sweet spot at strategy+algorithm level. 3-part test: actionability, universality, belief-level. Counter-examples: bit manipulation, async patterns, SQL.
 - `examples/pi-calculation.md` — ONE end-to-end Thinker→Assembler example (algorithmic). Covers a single problem type (A1), one trace-to-code scenario (B1), and demonstrates basic query patterns (C1). Contains 18 beliefs (b1–b18) with confidence values, justification chains, and invalidation conditions.
 - `notes/exploration-2026-01-29-minimal-spec.md` — Foundational exploration that defined the new model. Includes 7 stress-test sketches: pi-calculation, HTML parser, file summary, conditionals, self-reference (Liar paradox), paradoxes, unknowns. These are *seeds* (2–5 beliefs each) not full explorations — they don't meet the spec's validation criteria (≥3 examples, ≥1 counter-example, thesis connection, open questions).
 - `notes/reassessment-2026-01-29.md` — Component-by-component assessment of old vs new model. Identifies what's obsolete (syntax, types, parser) and what's reusable (confidence algebra, stratification). Seed material for R3.
@@ -52,9 +54,8 @@ Each thread requires: ≥3 concrete examples, ≥1 counter-example/impossibility
 - `notes/prior-art.md` — Comprehensive survey: Subjective Logic (Jøsang), TMS (Doyle/de Kleer), Justification Logic (Artemov), weighted argumentation (Dung). Directly relevant to C4 (comparison with alternatives).
 - 58 completed exploration threads in `exploration/completed/` — ALL under the OLD programming language model. Deep theory (epistemology, self-reference, affine types, graded monads) but zero practical IR examples. Includes active-but-old-model threads: 8.4 (interpreter extraction) and 3.15 (stratification Lean completion).
 - `examples/hello-world-simple.clair` — Old-syntax example (OBSOLETE). Evidence for R3.
-- `exploration/ir/` — **Empty.** No IR-model exploration started yet.
 
-**What's missing (all 24 tasks unchecked):**
+**What's missing (22/24 tasks unchecked):**
 - No diverse problem type examples beyond pi-calculation
 - No Assembler consumption testing whatsoever
 - No systematic trace quality analysis
@@ -78,7 +79,7 @@ Each thread requires: ≥3 concrete examples, ≥1 counter-example/impossibility
 
 > **Parallel execution:** A1 and R3 are independent and can run simultaneously. A3 depends on A1.
 
-- [ ] **A1: Diverse problem type survey** — Test CLAIR trace production across 6 problem types: (1) algorithmic (sorting, graph search), (2) systems design (API, database schema), (3) debugging (given buggy code, produce trace diagnosing the bug), (4) creative/open-ended (generate a poem, design a game), (5) mathematical reasoning (proof, derivation), (6) multi-file/multi-concern (refactoring across modules, feature spanning frontend+backend). For each, produce a full CLAIR trace (≥10 beliefs) and evaluate whether the trace captures the reasoning faithfully. Write findings to `exploration/ir/A1-problem-types.md`. *Existing seeds: pi-calculation (algorithmic), HTML parser sketch (systems), file summary sketch (file-reading). Need 5+ more fully-developed traces. Note: multi-file type is explicitly required by spec R2.*
+- [x] **A1: Diverse problem type survey** — Test CLAIR trace production across 6 problem types: (1) algorithmic (sorting, graph search), (2) systems design (API, database schema), (3) debugging (given buggy code, produce trace diagnosing the bug), (4) creative/open-ended (generate a poem, design a game), (5) mathematical reasoning (proof, derivation), (6) multi-file/multi-concern (refactoring across modules, feature spanning frontend+backend). For each, produce a full CLAIR trace (≥10 beliefs) and evaluate whether the trace captures the reasoning faithfully. Write findings to `exploration/ir/A1-problem-types.md`. *Existing seeds: pi-calculation (algorithmic), HTML parser sketch (systems), file summary sketch (file-reading). Need 5+ more fully-developed traces. Note: multi-file type is explicitly required by spec R2.* **COMPLETED 2026-02-04:** Explored 6 problem types with full CLAIR traces: (1) Algorithmic sorting (18 beliefs), (2) REST API design (32 beliefs), (3) Debugging missing return (15 beliefs), (4) Creative poem generation (24 beliefs), (5) Mathematical proof (√2 irrational, 24 beliefs), (6) Multi-file refactoring (28 beliefs). Each trace evaluated for faithful reasoning capture. Cross-analysis identified common patterns and counter-examples. Thesis: **supports with operational constraints** — CLAIR works well for most reasoning types but struggles with temporal reasoning (mind-change), creative content vs intent boundary, and tasks requiring external feedback.
 - [ ] **A3: Teachability experiment** — Can a Thinker LLM be taught the CLAIR spec through a system prompt and produce valid traces? Test with the spec from `formal/clair-spec.md`. Document what works, what the LLM gets wrong, and whether few-shot examples help. Write to `exploration/ir/A3-teachability.md`. *Depends on: A1 (uses traces produced there as few-shot examples). Existing: pi-calculation was hand-authored, not LLM-produced.*
 - [ ] **R3: What's obsolete** — Explicitly list what from the old formalization does NOT apply: type system (`formal/lean/CLAIR/Syntax/` — 4 files: Types, Expr, Context, Subst), typing rules (`formal/lean/CLAIR/Typing/` — HasType, Subtype), old syntax examples (`examples/hello-world-simple.clair`), evaluation semantics, parser, and the 58 completed exploration threads under the old programming language model (including active threads 8.4 and 3.15). For each, explain why it's irrelevant under the new model (opaque NL content, no type checking, no evaluation). Write to `exploration/ir/R3-whats-obsolete.md`. *No dependencies. Existing: `notes/reassessment-2026-01-29.md` provides initial component-by-component assessment.*
 
@@ -224,7 +225,7 @@ Total tasks: 24
 - Priority 6 (Reuse Mapping): 2 tasks — R1, R2
 - Priority 7 (Synthesis): 3 tasks — S1, S2, S3 (blocked by all above)
 
-**Completed: 1/24 tasks (4%)**
+**Completed: 2/24 tasks (8%)**
 
 ## Critical Path
 
